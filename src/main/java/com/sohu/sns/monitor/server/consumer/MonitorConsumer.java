@@ -52,7 +52,7 @@ public class MonitorConsumer implements Function<byte[], Boolean> {
 
             List<MethodTraceLog> methodTraceLogList = urlTraceLog.getMethodTraceLogList();
             if (methodTraceLogList != null) {
-                List<MethodLog> methodLogs = new ArrayList<MethodLog>(methodTraceLogList.size());
+                /*List<MethodLog> methodLogs = new ArrayList<MethodLog>(methodTraceLogList.size());
                 for (MethodTraceLog methodTraceLog : methodTraceLogList) {
                     MethodLog methodLog = new MethodLog();
                     methodLog.setUrlTraceId(methodTraceLog.getUrlTraceLogId());
@@ -65,13 +65,13 @@ public class MonitorConsumer implements Function<byte[], Boolean> {
                     methodLog.setParam(methodTraceLog.getInParam());
                     methodLog.setResult(methodTraceLog.getOutParam());
                     methodLogs.add(methodLog);
-                }
+                }*/
                 monitorUrl.setMethodCount(methodTraceLogList.size());
-                try {
+                /*try {
                     monitorUrlDAO.saveMethodLog(methodLogs);
                 } catch (MysqlClusterException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
             try {
                 monitorUrlDAO.saveMonitorUrl(monitorUrl);

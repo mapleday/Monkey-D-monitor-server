@@ -9,8 +9,11 @@ import com.sohu.sns.monitor.model.MethodLog;
 import com.sohu.sns.monitor.model.MonitorUrl;
 import com.sohu.sns.monitor.server.MessageProcessor;
 import com.sohu.sns.monitor.server.dao.MonitorUrlDAO;
+import com.sohu.sns.monitor.server.dao.MonitorUrlHBaseDAO;
 import com.sohu.sns.monitor.util.ProtobufUtil;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +22,11 @@ import java.util.List;
  * Created by morgan on 15/9/22.
  */
 public class MonitorConsumer implements Function<byte[], Boolean> {
-    private MonitorUrlDAO monitorUrlDAO;
+    private MonitorUrlHBaseDAO monitorUrlHBaseDAO;
 
-    public MonitorConsumer(MonitorUrlDAO monitorUrlDAO) {
-        this.monitorUrlDAO = monitorUrlDAO;
+
+    public MonitorConsumer(MonitorUrlHBaseDAO monitorUrlHBaseDAO) {
+        this.monitorUrlHBaseDAO = monitorUrlHBaseDAO;
     }
     @Override
     public Boolean apply(byte[] input) {
@@ -52,7 +56,7 @@ public class MonitorConsumer implements Function<byte[], Boolean> {
 
             List<MethodTraceLog> methodTraceLogList = urlTraceLog.getMethodTraceLogList();
             if (methodTraceLogList != null) {
-                /*List<MethodLog> methodLogs = new ArrayList<MethodLog>(methodTraceLogList.size());
+                List<MethodLog> methodLogs = new ArrayList<MethodLog>(methodTraceLogList.size());
                 for (MethodTraceLog methodTraceLog : methodTraceLogList) {
                     MethodLog methodLog = new MethodLog();
                     methodLog.setUrlTraceId(methodTraceLog.getUrlTraceLogId());
@@ -65,22 +69,23 @@ public class MonitorConsumer implements Function<byte[], Boolean> {
                     methodLog.setParam(methodTraceLog.getInParam());
                     methodLog.setResult(methodTraceLog.getOutParam());
                     methodLogs.add(methodLog);
-                }*/
+                }
                 monitorUrl.setMethodCount(methodTraceLogList.size());
-                /*try {
-                    monitorUrlDAO.saveMethodLog(methodLogs);
-                } catch (MysqlClusterException e) {
-                    e.printStackTrace();
-                }*/
+                try {
+                    monitorUrlHBaseDAO.saveMethodUrlLog(methodLogs, monitorUrl.getBeginTime());
+                } catch (Exception e) {
+                    LOGGER.errorLog(ModuleEnum.METRIC, "MonitorConsumer.saveMethodUrlLog", null, null, e);
+                    System.exit(1);
+                }
             }
             try {
-                monitorUrlDAO.saveMonitorUrl(monitorUrl);
-            } catch (MysqlClusterException e) {
-                e.printStackTrace();
+                monitorUrlHBaseDAO.saveMonitorUrlLog(monitorUrl);
+            } catch (Exception e) {
+                LOGGER.errorLog(ModuleEnum.METRIC, "MonitorConsumer.saveMonitorUrlLog", null, null, e);
+                System.exit(1);
             }
         }
         System.out.println("trace log size == >"+traceLog.getUrlTraceLogs().size());
-        //
 
         return true;
     }

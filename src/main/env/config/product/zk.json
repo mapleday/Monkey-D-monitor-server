@@ -1,0 +1,6 @@
+{
+  "sce.zk.root" : "/sns",
+  "sce.zk.url" : ["10.16.5.144:2181","10.16.5.153:2181","10.16.5.163:2181"],
+  "sce.zk.timeout" : 50000,
+  "sce.zk.auth" : [{"user":"sns", "password":"f8304d7fa320a864cbe193f335e8fd44"}]
+}

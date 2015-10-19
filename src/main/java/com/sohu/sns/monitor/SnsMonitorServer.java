@@ -19,9 +19,6 @@ public class SnsMonitorServer {
 
             new ClassPathXmlApplicationContext("classpath:monitor/monitor-spring.xml");
 
-            MysqlClusterService bean = SpringContextUtil.getBean(MysqlClusterService.class);
-            bean.init(new MonitorDBConfig());
-
             new MessageProcessor().start();
 
         } catch (Exception e) {

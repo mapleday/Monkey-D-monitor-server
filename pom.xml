@@ -19,11 +19,39 @@
             <groupId>com.sohu.snscommon</groupId>
             <artifactId>db-cluster-common</artifactId>
             <version>${sns-common.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.sohu</groupId>
+                    <artifactId>azure</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.belerweb</groupId>
+                    <artifactId>pinyin4j</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.sohu.snscommon</groupId>
             <artifactId>kafka-common</artifactId>
             <version>${sns-common.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>log4j-over-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.dyuproject.protostuff</groupId>
@@ -47,10 +75,96 @@
             <artifactId>protostuff-runtime-registry</artifactId>
             <version>${protostuff.version}</version>
         </dependency>
+        <!-- hbase begin -->
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>0.98.13-hadoop2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-rest</artifactId>
+            <version>0.98.13-hadoop2</version>
+        </dependency>
+        <!-- hbase end-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>test</id>
+            <properties>
+                <env>test</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>develop</id>
+            <properties>
+                <env>develop</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>product</id>
+            <properties>
+                <env>product</env>
+            </properties>
+        </profile>
+    </profiles>
     <build>
         <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>true</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/env/package/${env}_package.xml</descriptor>
+                    </descriptors>
+                    <encoding>UTF-8</encoding>
+                    <finalName>sns-monitor</finalName>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.sohu.sns.monitor.SnsMonitorServer</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -68,6 +182,31 @@
             <id>sns-local</id>
             <name>Nexus Public Repository</name>
             <url>http://sns.mtpc.sohu.com/nexus/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>nexus</id>
+            <name>local private nexus</name>
+            <url>http://mtpc.sohu.com/maven/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>pv_repo</id>
+            <name>pv repo</name>
+            <url>http://mtpc.sohu.com/maven/content/repositories/pvinsight</url>
+        </repository>
+        <repository>
+            <id>sce</id>
+            <name>sce</name>
+            <url>http://mtpc.sohu.com/maven/content/repositories/sce</url>
+        </repository>
+        <repository>
+            <id>nexus snapshots</id>
+            <name>mtpc snapshots</name>
+            <url>http://mtpc.sohu.com/maven/content/repositories/passport_snapshots/</url>
+        </repository>
+        <repository>
+            <id>nexus_snapshots</id>
+            <name>mtpc_snapshots</name>
+            <url>http://mtpc.sohu.com/maven/content/repositories/passport</url>
         </repository>
     </repositories>
 </project>

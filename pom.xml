@@ -96,6 +96,18 @@
 
     <profiles>
         <profile>
+            <id>test_log</id>
+            <properties>
+                <env>test_log</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>product_log</id>
+            <properties>
+                <env>product_log</env>
+            </properties>
+        </profile>
+        <profile>
             <id>test</id>
             <properties>
                 <env>test</env>

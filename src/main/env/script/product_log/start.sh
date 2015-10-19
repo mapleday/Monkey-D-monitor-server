@@ -9,7 +9,7 @@ for i in /opt/src/lib/*.jar; do
    CLASSPATH="$CLASSPATH":"$i"
 done
   
-JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
+JAVA_OPTS=" -server -Xms2048m -Xmx2048m -Xss256k
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:HeapDumpPath=/opt/logs/
 -Djava.awt.headless=true

@@ -9,7 +9,6 @@ import com.sohu.sns.monitor.agent.store.model.url.MethodTraceLog;
 import com.sohu.sns.monitor.agent.store.model.url.TraceLog;
 import com.sohu.sns.monitor.agent.store.model.url.UrlTraceLog;
 import com.sohu.sns.monitor.server.consumer.MonitorConsumer;
-import com.sohu.sns.monitor.server.dao.MonitorUrlDAO;
 import com.sohu.sns.monitor.server.dao.MonitorUrlHBaseDAO;
 import com.sohu.snscommon.kafka.Kafka;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;

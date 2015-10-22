@@ -1,7 +1,10 @@
 package com.sohu.sns.monitor;
 
+import com.sohu.sns.monitor.config.MySqlDBConfig;
 import com.sohu.sns.monitor.server.LogMessageProcessor;
-import com.sohu.sns.monitor.server.MessageProcessor;
+import com.sohu.sns.monitor.thread.ErrorLogProcessor;
+import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
+import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -17,11 +20,13 @@ public class SnsMonitorLogServer {
 
             new ClassPathXmlApplicationContext("classpath:monitor/monitor-spring.xml");
 
-            new LogMessageProcessor().start();
+            MysqlClusterServiceImpl bean = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
+            bean.init(new MySqlDBConfig());
 
+            new LogMessageProcessor().start();
+            new Thread(new ErrorLogProcessor()).start();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }

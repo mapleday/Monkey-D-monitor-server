@@ -2,7 +2,7 @@
 
 ZK_CONF=/opt/src/config/zk.json
 
-APP_MAINCLASS=
+APP_MAINCLASS=com.sohu.sns.monitor.SnsMonitorLogServer
 
 CLASSPATH='.'
 for i in /opt/src/lib/*.jar; do

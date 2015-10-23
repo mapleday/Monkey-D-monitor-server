@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ErrorLog数据的处理器
- * Created by morgan on 2015年07月14日
+ * Created by Gary on 2015年10月20日
  */
 public class ErrorLogProcessor implements Runnable{
 
@@ -19,7 +19,7 @@ public class ErrorLogProcessor implements Runnable{
     private static final String INSTANCE_COUNT = "instanceCount";
     private static final String ERROR_COUNT = "errorCount";
     private static final String ERROR_DETAIL = "errorDetail";
-    private static final String BASE_URL = "10.10.46.44";
+    private static final String BASE_URL = "http://10.10.46.44";
 
     private boolean inProcess =  false;
 
@@ -60,8 +60,8 @@ public class ErrorLogProcessor implements Runnable{
 
                         Set<Map.Entry<String, Integer>> set = map.entrySet();
                         for(Map.Entry<String, Integer> entry : set) {
-                            emailSb.append("\n\t\t >>>> 错误信息 : " + entry.getKey() +
-                                    "\n\t\t      出现次数：" + entry.getValue());
+                            emailSb.append("\n\n\t\t >>>> 错误信息 : " + entry.getKey() +
+                                    "\n\t\t           出现次数：" + entry.getValue());
                             total += entry.getValue();
                         }
                     }
@@ -72,14 +72,14 @@ public class ErrorLogProcessor implements Runnable{
                     String smsResult = null, emailResult = null;
                     HttpClientUtil httpClientUtil = new HttpClientUtil();
                     try {
-                        smsResult = httpClientUtil.getByUtf(BASE_URL + "/send", smsMap);
+                        smsResult = httpClientUtil.getByUtf(BASE_URL + "/sendErrorLogSms", smsMap);
                     } catch (Exception e) {
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendErrorLogsSms", smsMap.size()+"", smsResult, e);
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendErrorLogSms", smsMap.size()+"", smsResult, e);
                     }
                     try {
-                        emailResult = httpClientUtil.postByUtf(BASE_URL+"send", emailMap, null);
+                        emailResult = httpClientUtil.postByUtf(BASE_URL+"/sendErrorLogEmail", emailMap, null);
                     } catch (Exception e) {
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendErrorLogsEmail", emailMap.size() + "", emailResult, e);
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendErrorLogEmail", emailMap.size() + "", emailResult, e);
                     }
 
                 }

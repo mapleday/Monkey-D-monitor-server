@@ -2,8 +2,10 @@ package com.sohu.sns.monitor.server;
 
 import com.codahale.metrics.MetricRegistry;
 import com.sohu.sns.monitor.server.consumer.MonitorErrorLogConsumer;
+import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
 import com.sohu.snscommon.kafka.Kafka;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
+import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.apache.zookeeper.KeeperException;
 
@@ -24,7 +26,7 @@ public class LogMessageProcessor {
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
         String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka"));
         Kafka kafka = new Kafka(kafkaConfig, new MetricRegistry());
-        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer());
+        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer(SpringContextUtil.getBean(MysqlClusterServiceImpl.class)));
     }
 
     public void start() {

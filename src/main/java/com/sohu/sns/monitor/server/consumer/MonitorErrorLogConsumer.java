@@ -8,7 +8,6 @@ import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.annotation.Nullable;
@@ -21,12 +20,15 @@ import java.util.Map;
 public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private static final String INSERT_DATA = "replace into error_logs set appId = ?, instanceId = ?, " +
-            "module = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, updateTime = now()";
+            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, updateTime = now()";
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
-    @Autowired
-    MysqlClusterService mysqlClusterService;
+    private MysqlClusterService mysqlClusterService;
+
+    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService) {
+        this.mysqlClusterService = mysqlClusterService;
+    }
 
     @Nullable
     @Override
@@ -36,6 +38,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "applyErrorLog", msg, null);
             handle(msg);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return true;
     }

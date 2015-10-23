@@ -19,7 +19,7 @@ import java.util.List;
  * Created by morgan on 15/10/14.
  */
 @Repository("monitorUrlHBaseDAO")
-public class MonitorUrlHBaseDAO {
+public class MonitorUrlHbaseDAO {
 
     public void saveMonitorUrlLog(MonitorUrl monitorUrl) throws IOException {
 

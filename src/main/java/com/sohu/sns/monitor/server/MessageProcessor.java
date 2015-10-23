@@ -9,7 +9,7 @@ import com.sohu.sns.monitor.agent.store.model.url.MethodTraceLog;
 import com.sohu.sns.monitor.agent.store.model.url.TraceLog;
 import com.sohu.sns.monitor.agent.store.model.url.UrlTraceLog;
 import com.sohu.sns.monitor.server.consumer.MonitorConsumer;
-import com.sohu.sns.monitor.server.dao.MonitorUrlHbaseDAO;
+import com.sohu.sns.monitor.server.dao.MonitorUrlHBaseDAO;
 import com.sohu.snscommon.kafka.Kafka;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.spring.SpringContextUtil;
@@ -48,7 +48,7 @@ public class MessageProcessor {
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
         String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka"));
         Kafka kafka = new Kafka(kafkaConfig, new MetricRegistry());
-        kafka.consumeForever(topicName, groupName, 1, new MonitorConsumer(SpringContextUtil.getBean(MonitorUrlHbaseDAO.class)));
+        kafka.consumeForever(topicName, groupName, 1, new MonitorConsumer(SpringContextUtil.getBean(MonitorUrlHBaseDAO.class)));
     }
 
     public void start() {

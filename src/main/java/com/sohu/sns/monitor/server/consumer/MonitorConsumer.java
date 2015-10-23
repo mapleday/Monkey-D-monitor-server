@@ -8,7 +8,7 @@ import com.sohu.sns.monitor.agent.store.model.url.UrlTraceLog;
 import com.sohu.sns.monitor.model.MethodLog;
 import com.sohu.sns.monitor.model.MonitorUrl;
 import com.sohu.sns.monitor.server.MessageProcessor;
-import com.sohu.sns.monitor.server.dao.MonitorUrlHbaseDAO;
+import com.sohu.sns.monitor.server.dao.MonitorUrlHBaseDAO;
 import com.sohu.sns.monitor.util.ProtobufUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -20,10 +20,10 @@ import java.util.List;
  * Created by morgan on 15/9/22.
  */
 public class MonitorConsumer implements Function<byte[], Boolean> {
-    private MonitorUrlHbaseDAO monitorUrlHBaseDAO;
+    private MonitorUrlHBaseDAO monitorUrlHBaseDAO;
 
 
-    public MonitorConsumer(MonitorUrlHbaseDAO monitorUrlHBaseDAO) {
+    public MonitorConsumer(MonitorUrlHBaseDAO monitorUrlHBaseDAO) {
         this.monitorUrlHBaseDAO = monitorUrlHBaseDAO;
     }
     @Override

@@ -1,11 +1,11 @@
 #!/bin/sh
 
-ZK_CONF=/home/media-sns/monitor/config/zk.json
+ZK_CONF=/opt/src/config/zk.json
 
-APP_MAINCLASS=com.sohu.sns.monitor.SnsMonitorServer
+APP_MAINCLASS=
 
 CLASSPATH='.'
-for i in /home/media-sns/monitor/lib/*.jar; do
+for i in /opt/src/lib/*.jar; do
    CLASSPATH="$CLASSPATH":"$i"
 done
   
@@ -21,6 +21,6 @@ JAVA_OPTS=" -server -Xms2048m -Xmx2048m -Xss256k
 -Dfile.encoding=UTF-8"
 
 
-JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=/home/media-sns/monitor/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF"
+JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=/opt/src/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF"
 echo $JAVA_CMD
 $JAVA_CMD

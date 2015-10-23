@@ -46,7 +46,8 @@ public class ErrorLogProcessor implements Runnable{
                     int total = 0;
                     for(String instance : keySet) {
                         List<ErrorLog> errorLogs = bucket.get(instance);
-                        emailSb.append("\n\n\t>> <b><font color='red'>" + instance +"</font></b> : ");
+                        emailSb.append("\n\n\t>> <b><font color='red'>" + instance +"</font></b> : \n" +
+                                "\t\t\t<table border=\"1\" cellspacing=\"0\">");
                         Map<String, Integer> map = new HashMap<String, Integer>();
 
                         for(ErrorLog errorLog : errorLogs) {
@@ -60,9 +61,9 @@ public class ErrorLogProcessor implements Runnable{
 
                         Set<Map.Entry<String, Integer>> set = map.entrySet();
                         for(Map.Entry<String, Integer> entry : set) {
-                            emailSb.append("\n\t\t\t " + entry.getKey() +
+                            emailSb.append(entry.getKey() +
                                     "<tr><td><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue()+"</td></tr>" +
-                                    "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>");
+                                    "<tr><td colspan=\"2\">&nbsp;</td></tr>");
                             total += entry.getValue();
                         }
                         emailSb.append("</table>");

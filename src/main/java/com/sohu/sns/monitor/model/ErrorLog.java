@@ -84,7 +84,7 @@ public class ErrorLog implements Serializable {
         /*return "【Module】 : "+ this.getModule() + ", 【Method】 : " + this.getMethod() + ", 【Param】 : " +
                 this.getParam() + ", 【returnValue】 : " + this.getReturnValue() + ", 【ExceptionName】 : " +
                 this.getExceptionName() + ", 【ExceptionDesc】 : " + this.getExceptionDesc();*/
-        return "<table border=\"1\" cellspacing=\"0\"><tr><th><b><font color='red'>Module</font></b></th><th>"+this.getModule()+"</th></tr>" +
+        return "<tr><th><b><font color='red'>Module</font></b></th><th>"+this.getModule()+"</th></tr>" +
                 "<tr><td><b><font color='red'>Method</font></b></td><td>"+this.getMethod()+"</td></tr>" +
                 "<tr><td><b><font color='red'>Param</font></b></td><td>"+this.getParam()+"</td></tr>" +
                 "<tr><td><b><font color='red'>returnValue</font></b></td><td>"+this.getReturnValue()+"</td></tr>" +

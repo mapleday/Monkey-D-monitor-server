@@ -46,7 +46,7 @@ public class ErrorLogProcessor implements Runnable{
                     int total = 0;
                     for(String instance : keySet) {
                         List<ErrorLog> errorLogs = bucket.get(instance);
-                        emailSb.append("\n\t>> " + instance +" : ");
+                        emailSb.append("\n\n\t>> <b><font color='red'>" + instance +"</font></b> : ");
                         Map<String, Integer> map = new HashMap<String, Integer>();
 
                         for(ErrorLog errorLog : errorLogs) {
@@ -60,10 +60,12 @@ public class ErrorLogProcessor implements Runnable{
 
                         Set<Map.Entry<String, Integer>> set = map.entrySet();
                         for(Map.Entry<String, Integer> entry : set) {
-                            emailSb.append("\n\n\t\t >>>> 错误信息 : " + entry.getKey() +
-                                    "\n\t\t           出现次数：" + entry.getValue());
+                            emailSb.append("\n\t\t\t " + entry.getKey() +
+                                    "<tr><td><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue()+"</td></tr>" +
+                                    "<tr><td>&nbsp;</td><td>&nbsp;</td></tr>");
                             total += entry.getValue();
                         }
+                        emailSb.append("</table>");
                     }
                     //清理切换到的桶
                     bucket.clear();

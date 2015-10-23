@@ -46,8 +46,8 @@ public class ErrorLogProcessor implements Runnable{
                     int total = 0;
                     for(String instance : keySet) {
                         List<ErrorLog> errorLogs = bucket.get(instance);
-                        emailSb.append("\n\n\t>> <b><font color='red'>" + instance +"</font></b> : \n" +
-                                "\t\t\t<table border=\"1\" cellspacing=\"0\">");
+                        emailSb.append("<META http-equiv=Content-Type content='text/html; charset=GBK'><br><br>&nbsp;&nbsp;<b>" + instance +"</b> : <br>" +
+                                "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<table border=\"1\" cellspacing=\"0\">");
                         Map<String, Integer> map = new HashMap<String, Integer>();
 
                         for(ErrorLog errorLog : errorLogs) {

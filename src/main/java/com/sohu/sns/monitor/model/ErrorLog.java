@@ -1,6 +1,8 @@
 package com.sohu.sns.monitor.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Gary on 2015/10/19.
@@ -14,6 +16,7 @@ public class ErrorLog implements Serializable {
     private String returnValue;
     private String exceptionName;
     private String exceptionDesc;
+    private Date time;
 
     public String getAppId() {
         return appId;
@@ -79,6 +82,14 @@ public class ErrorLog implements Serializable {
         this.exceptionDesc = exceptionDesc;
     }
 
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+    }
+
     @Override
     public String toString() {
         /*return "【Module】 : "+ this.getModule() + ", 【Method】 : " + this.getMethod() + ", 【Param】 : " +
@@ -89,6 +100,7 @@ public class ErrorLog implements Serializable {
                 "<tr><td><b><font color='red'>Param</font></b></td><td>"+this.getParam()+"</td></tr>" +
                 "<tr><td><b><font color='red'>returnValue</font></b></td><td>"+this.getReturnValue()+"</td></tr>" +
                 "<tr><td><b><font color='red'>exceptionName</font></b></td><td>"+this.getExceptionName()+"</td></tr>" +
-                "<tr><td><b><font color='red'>exceptionDesc</font></b></td><td>"+this.getExceptionDesc()+"</td></tr>";
+                "<tr><td><b><font color='red'>exceptionDesc</font></b></td><td>"+this.getExceptionDesc()+"</td></tr>" +
+                "<tr><td><b><font color='red'>Occur_Time</font></b></td><td>"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.getTime())+"</td></tr>";
     }
 }

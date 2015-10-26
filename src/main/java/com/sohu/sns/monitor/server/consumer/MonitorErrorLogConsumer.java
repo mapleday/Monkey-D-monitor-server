@@ -11,6 +11,7 @@ import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.annotation.Nullable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,6 +67,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         errorLog.setReturnValue((String) msgMap.get("returnValue"));
         errorLog.setExceptionName((String) msgMap.get("exceptionName"));
         errorLog.setExceptionDesc((String) msgMap.get("exceptionDesc"));
+        errorLog.setTime(new Date());
 
         ErrorLogBucket.insertData(errorLog);
         saveToDB(errorLog);

@@ -90,11 +90,11 @@ public class ErrorLog implements Serializable {
         this.time = time;
     }
 
-    @Override
-    public String toString() {
-        /*return "【Module】 : "+ this.getModule() + ", 【Method】 : " + this.getMethod() + ", 【Param】 : " +
-                this.getParam() + ", 【returnValue】 : " + this.getReturnValue() + ", 【ExceptionName】 : " +
-                this.getExceptionName() + ", 【ExceptionDesc】 : " + this.getExceptionDesc();*/
+    public String getKey() {
+        return getMethod() + getMethod() + getExceptionName();
+    }
+
+    public String warpHtml() {
         return "<tr><th><b><font color='red'>Module</font></b></th><th>"+this.getModule()+"</th></tr>" +
                 "<tr><td><b><font color='red'>Method</font></b></td><td>"+this.getMethod()+"</td></tr>" +
                 "<tr><td><b><font color='red'>Param</font></b></td><td>"+this.getParam()+"</td></tr>" +
@@ -103,4 +103,5 @@ public class ErrorLog implements Serializable {
                 "<tr><td><b><font color='red'>exceptionDesc</font></b></td><td>"+this.getExceptionDesc()+"</td></tr>" +
                 "<tr><td><b><font color='red'>Occur_Time</font></b></td><td>"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.getTime())+"</td></tr>";
     }
+
 }

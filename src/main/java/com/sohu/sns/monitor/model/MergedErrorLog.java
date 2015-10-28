@@ -21,7 +21,7 @@ public class MergedErrorLog {
     }
 
     public void addParams(String param) {
-        this.params.append(" || "+param);
+        this.params.append(param+"<br>");
     }
 
     public int getTimes() {

@@ -68,8 +68,8 @@ public class ErrorLogProcessor implements Runnable{
                         Set<Map.Entry<String, MergedErrorLog>> set = map.entrySet();
                         for(Map.Entry<String, MergedErrorLog> entry : set) {
                             emailSb.append(entry.getValue().getErrorLog().warpHtml() +
-                                    "<tr><td><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue().getTimes()+"</td></tr>" +
                                     "<tr><td><b><font color='red'>Params</font></b></td><td>"+entry.getValue().getParams().toString()+"</td></tr>" +
+                                    "<tr><td><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue().getTimes()+"</td></tr>" +
                                     "<tr><td colspan=\"2\">&nbsp;</td></tr>");
                             total += entry.getValue().getTimes();
                         }

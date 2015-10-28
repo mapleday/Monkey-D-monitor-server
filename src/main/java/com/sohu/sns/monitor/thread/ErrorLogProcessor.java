@@ -2,6 +2,7 @@ package com.sohu.sns.monitor.thread;
 
 import com.sohu.sns.monitor.bucket.ErrorLogBucket;
 import com.sohu.sns.monitor.model.ErrorLog;
+import com.sohu.sns.monitor.model.MergedErrorLog;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
@@ -48,23 +49,29 @@ public class ErrorLogProcessor implements Runnable{
                         List<ErrorLog> errorLogs = bucket.get(instance);
                         emailSb.append("<META http-equiv=Content-Type content='text/html; charset=GBK'><br><br>&nbsp;&nbsp;<b>" + instance +"</b> : <br>" +
                                 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<table border=\"1\" cellspacing=\"0\">");
-                        Map<String, Integer> map = new HashMap<String, Integer>();
+                        Map<String, MergedErrorLog> map = new HashMap<String, MergedErrorLog>();
 
                         for(ErrorLog errorLog : errorLogs) {
-                            String key = errorLog.toString();
+                            String key = errorLog.getKey();
                             if(map.containsKey(key)) {
-                                map.put(key, map.get(errorLog.toString()) + 1);
+                                map.get(key).addParams(errorLog.getParam());
+                                map.get(key).addTimes(1);
                             } else {
-                                map.put(key, 1);
+                                MergedErrorLog mergedErrorLog = new MergedErrorLog();
+                                mergedErrorLog.setErrorLog(errorLog);
+                                mergedErrorLog.addParams(errorLog.getParam());
+                                mergedErrorLog.addTimes(1);
+                                map.put(key, mergedErrorLog);
                             }
                         }
 
-                        Set<Map.Entry<String, Integer>> set = map.entrySet();
-                        for(Map.Entry<String, Integer> entry : set) {
-                            emailSb.append(entry.getKey() +
-                                    "<tr><td><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue()+"</td></tr>" +
+                        Set<Map.Entry<String, MergedErrorLog>> set = map.entrySet();
+                        for(Map.Entry<String, MergedErrorLog> entry : set) {
+                            emailSb.append(entry.getValue().getErrorLog().warpHtml() +
+                                    "<tr><td><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue().getTimes()+"</td></tr>" +
+                                    "<tr><td><b><font color='red'>Params</font></b></td><td>"+entry.getValue().getParams().toString()+"</td></tr>" +
                                     "<tr><td colspan=\"2\">&nbsp;</td></tr>");
-                            total += entry.getValue();
+                            total += entry.getValue().getTimes();
                         }
                         emailSb.append("</table>");
                     }

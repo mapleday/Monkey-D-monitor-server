@@ -95,12 +95,12 @@ public class ErrorLog implements Serializable {
     }
 
     public String warpHtml() {
-        return "<tr><th><b><font color='red'>Module</font></b></th><th>"+this.getModule()+"</th></tr>" +
-                "<tr><td><b><font color='red'>Method</font></b></td><td>"+this.getMethod()+"</td></tr>" +
-                "<tr><td><b><font color='red'>returnValue</font></b></td><td>"+this.getReturnValue()+"</td></tr>" +
-                "<tr><td><b><font color='red'>exceptionName</font></b></td><td>"+this.getExceptionName()+"</td></tr>" +
-                "<tr><td><b><font color='red'>exceptionDesc</font></b></td><td>"+this.getExceptionDesc()+"</td></tr>" +
-                "<tr><td><b><font color='red'>Occur_Time</font></b></td><td>"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.getTime())+"</td></tr>";
+        return "<tr><td width='100'><b><font color='red'>Module</font></b></td><td><b>"+this.getModule()+"</b></td></tr>" +
+                "<tr><td width='100'><b><font color='red'>Method</font></b></td><td>"+this.getMethod()+"</td></tr>" +
+                "<tr><td width='100'><b><font color='red'>returnValue</font></b></td><td>"+this.getReturnValue()+"</td></tr>" +
+                "<tr><td width='100'><b><font color='red'>exceptionName</font></b></td><td>"+this.getExceptionName()+"</td></tr>" +
+                "<tr><td width='100'><b><font color='red'>exceptionDesc</font></b></td><td>"+this.getExceptionDesc()+"</td></tr>" +
+                "<tr><td width='100'><b><font color='red'>Occur_Time</font></b></td><td>"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.getTime())+"</td></tr>";
     }
 
 }

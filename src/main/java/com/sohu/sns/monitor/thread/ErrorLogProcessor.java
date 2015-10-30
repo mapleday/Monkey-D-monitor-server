@@ -47,8 +47,8 @@ public class ErrorLogProcessor implements Runnable{
                     int total = 0;
                     for(String instance : keySet) {
                         List<ErrorLog> errorLogs = bucket.get(instance);
-                        emailSb.append("<META http-equiv=Content-Type content='text/html; charset=GBK'><br><br>&nbsp;&nbsp;<b>" + instance +"</b> : <br>" +
-                                "<table border=\"1\" cellspacing=\"0\" width=\"800\">");
+                        emailSb.append("<br><div align=\"center\"><b><font color=\"red\">"+ instance +" : </font></b></div><br>" +
+                                "<table align=\"center\" border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"800\" style=\"border-collapse: collapse;\">");
                         Map<String, MergedErrorLog> map = new HashMap<String, MergedErrorLog>();
 
                         for(ErrorLog errorLog : errorLogs) {
@@ -68,8 +68,8 @@ public class ErrorLogProcessor implements Runnable{
                         Set<Map.Entry<String, MergedErrorLog>> set = map.entrySet();
                         for(Map.Entry<String, MergedErrorLog> entry : set) {
                             emailSb.append(entry.getValue().getErrorLog().warpHtml() +
-                                    "<tr><td width='100'><b><font color='red'>Params</font></b></td><td>"+entry.getValue().getParams().toString()+"</td></tr>" +
-                                    "<tr><td width='100'><b><font color='red'>出现次数</font></b></td><td>"+entry.getValue().getTimes()+"</td></tr>" +
+                                    "<tr><td align=\"center\"><b>Params</b></td><td>"+entry.getValue().getParams().toString()+"</td></tr>" +
+                                    "<tr><td align=\"center\"><b>出现次数</b></td><td>"+entry.getValue().getTimes()+"</td></tr>" +
                                     "<tr><td colspan=\"2\">&nbsp;</td></tr>");
                             total += entry.getValue().getTimes();
                         }

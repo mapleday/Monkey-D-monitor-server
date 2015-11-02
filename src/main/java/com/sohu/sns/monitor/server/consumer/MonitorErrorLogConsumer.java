@@ -67,7 +67,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         errorLog.setReturnValue((String) msgMap.get("returnValue"));
         errorLog.setExceptionName((String) msgMap.get("exceptionName"));
         errorLog.setExceptionDesc((String) msgMap.get("exceptionDesc"));
-        errorLog.setExceptionDesc((String) msgMap.get("stackTrace"));
+        errorLog.setStackTrace((String) msgMap.get("stackTrace"));
         errorLog.setTime(new Date());
 
         ErrorLogBucket.insertData(errorLog);

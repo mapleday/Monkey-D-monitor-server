@@ -21,6 +21,7 @@ public class ErrorLogProcessor implements Runnable{
     private static final String ERROR_COUNT = "errorCount";
     private static final String ERROR_DETAIL = "errorDetail";
     private static final String BASE_URL = "http://10.10.46.44";
+    private static final String QUERY_STACKTRACE_URL = "http://10.10.125.172:3000/queryStackTrace";
 
     private boolean inProcess =  false;
 
@@ -69,6 +70,7 @@ public class ErrorLogProcessor implements Runnable{
                         for(Map.Entry<String, MergedErrorLog> entry : set) {
                             emailSb.append(entry.getValue().getErrorLog().warpHtml() +
                                     "<tr><td align=\"center\" ><b>Params</b></td><td style=\"word-wrap:break-word;\">"+entry.getValue().getParams().toString()+"</td></tr>" +
+                                    "<tr><td align=\"center\" ><b>StackTrace</b></td><td style=\"word-wrap:break-word;\"><a href=\""+QUERY_STACKTRACE_URL+entry.getValue().getErrorLog().genParams()+"\">点击查看</a></td></tr>" +
                                     "<tr><td align=\"center\"><b>出现次数</b></td><td style=\"word-wrap:break-word;\">"+entry.getValue().getTimes()+"</td></tr>" +
                                     "<tr><td colspan=\"2\">&nbsp;</td></tr>");
                             total += entry.getValue().getTimes();

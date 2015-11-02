@@ -16,6 +16,7 @@ public class ErrorLog implements Serializable {
     private String returnValue;
     private String exceptionName;
     private String exceptionDesc;
+    private String stackTrace;
     private Date time;
 
     public String getAppId() {
@@ -82,6 +83,14 @@ public class ErrorLog implements Serializable {
         this.exceptionDesc = exceptionDesc;
     }
 
+    public String getStackTrace() {
+        return stackTrace;
+    }
+
+    public void setStackTrace(String stackTrace) {
+        this.stackTrace = stackTrace;
+    }
+
     public Date getTime() {
         return time;
     }
@@ -91,7 +100,11 @@ public class ErrorLog implements Serializable {
     }
 
     public String getKey() {
-        return getMethod() + getMethod() + getExceptionName();
+        return getModule() + getMethod() + getExceptionName();
+    }
+
+    public String genParams() {
+        return "?module="+getModule()+"&method="+getMethod()+"&exceptionName="+getExceptionName();
     }
 
     public String warpHtml() {

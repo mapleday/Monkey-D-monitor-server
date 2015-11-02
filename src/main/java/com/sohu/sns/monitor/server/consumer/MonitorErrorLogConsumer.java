@@ -21,7 +21,7 @@ import java.util.Map;
 public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private static final String INSERT_DATA = "replace into error_logs set appId = ?, instanceId = ?, " +
-            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, updateTime = now()";
+            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, statckTrace = ?, updateTime = now()";
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
@@ -67,6 +67,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         errorLog.setReturnValue((String) msgMap.get("returnValue"));
         errorLog.setExceptionName((String) msgMap.get("exceptionName"));
         errorLog.setExceptionDesc((String) msgMap.get("exceptionDesc"));
+        errorLog.setExceptionDesc((String) msgMap.get("stackTrace"));
         errorLog.setTime(new Date());
 
         ErrorLogBucket.insertData(errorLog);
@@ -82,6 +83,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
         writeJdbcTemplate.update(INSERT_DATA, errorLog.getAppId(), errorLog.getInstanceId(),
                 errorLog.getModule(), errorLog.getMethod(), errorLog.getParam(),
-                errorLog.getReturnValue(), errorLog.getExceptionName(), errorLog.getExceptionDesc());
+                errorLog.getReturnValue(), errorLog.getExceptionName(), errorLog.getExceptionDesc(),
+                errorLog.getStackTrace());
     }
 }

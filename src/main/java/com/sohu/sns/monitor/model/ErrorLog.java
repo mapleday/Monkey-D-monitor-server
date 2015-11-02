@@ -95,12 +95,12 @@ public class ErrorLog implements Serializable {
     }
 
     public String warpHtml() {
-        return "<tr><td align=\"center\"><b>Module</b></td><td><b>"+this.getModule()+"</b></td></tr>" +
-                "<tr><td align=\"center\"><b>Method</b></td><td>"+this.getMethod()+"</td></tr>" +
-                "<tr><td align=\"center\"><b>returnValue</b></td><td>"+this.getReturnValue()+"</td></tr>" +
-                "<tr><td align=\"center\"><b>exceptionName</b></td><td>"+this.getExceptionName()+"</td></tr>" +
-                "<tr><td align=\"center\" style=\"word-wrap:break-word;\"><b>exceptionDesc</b></td><td>"+this.getExceptionDesc()+"</td></tr>" +
-                "<tr><td align=\"center\"><b>Occur_Time</font></b></td><td>"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.getTime())+"</td></tr>";
+        return "<tr><td align=\"center\" width=\"120\"><b>Module</b></td><td style=\"word-wrap:break-word;\"><b>"+this.getModule()+"</b></td></tr>" +
+                "<tr><td align=\"center\"><b>Method</b></td><td style=\"word-wrap:break-word;\">"+this.getMethod()+"</td></tr>" +
+                "<tr><td align=\"center\"><b>returnValue</b></td><td style=\"word-wrap:break-word;\">"+this.getReturnValue()+"</td></tr>" +
+                "<tr><td align=\"center\"><b>exceptionName</b></td><td style=\"word-wrap:break-word;\">"+this.getExceptionName()+"</td></tr>" +
+                "<tr><td align=\"center\" ><b>exceptionDesc</b></td><td style=\"word-wrap:break-word;\">"+this.getExceptionDesc()+"</td></tr>" +
+                "<tr><td align=\"center\"><b>Occur_Time</font></b></td><td style=\"word-wrap:break-word;\">"+new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(this.getTime())+"</td></tr>";
     }
 
 }

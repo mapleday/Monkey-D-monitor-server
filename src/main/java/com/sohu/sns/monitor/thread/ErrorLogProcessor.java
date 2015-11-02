@@ -48,7 +48,7 @@ public class ErrorLogProcessor implements Runnable{
                     for(String instance : keySet) {
                         List<ErrorLog> errorLogs = bucket.get(instance);
                         emailSb.append("<br><div align=\"center\"><b><font color=\"red\">"+ instance +" : </font></b></div><br>" +
-                                "<table align=\"center\" border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"800\" style=\"border-collapse: collapse;\">");
+                                "<table align=\"center\" border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"800\" style=\"border-collapse: collapse; table-layout:fixed;\">");
                         Map<String, MergedErrorLog> map = new HashMap<String, MergedErrorLog>();
 
                         for(ErrorLog errorLog : errorLogs) {

@@ -8,7 +8,7 @@ import java.util.Date;
  * Created by Gary on 2015/10/19.
  */
 public class ErrorLog implements Serializable {
-    private String appId;
+    private String appId ;
     private String instanceId;
     private String module;
     private String method;
@@ -24,7 +24,11 @@ public class ErrorLog implements Serializable {
     }
 
     public void setAppId(String appId) {
-        this.appId = appId;
+        if(null == appId) {
+            this.appId = "null";
+        } else {
+            this.appId = appId;
+        }
     }
 
     public String getInstanceId() {
@@ -32,7 +36,11 @@ public class ErrorLog implements Serializable {
     }
 
     public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
+        if(null == instanceId) {
+            this.instanceId = "null";
+        } else {
+            this.instanceId = instanceId;
+        }
     }
 
     public String getModule() {
@@ -40,7 +48,11 @@ public class ErrorLog implements Serializable {
     }
 
     public void setModule(String module) {
-        this.module = module;
+        if(null == module) {
+            this.module = "null";
+        } else {
+            this.module = module;
+        }
     }
 
     public String getMethod() {
@@ -48,6 +60,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setMethod(String method) {
+        if(null == method) {
+            this.method = "null";
+            return;
+        }
         this.method = method;
     }
 
@@ -56,6 +72,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setParam(String param) {
+        if(null == param) {
+            this.param = "null";
+            return;
+        }
         this.param = param;
     }
 
@@ -64,6 +84,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setReturnValue(String returnValue) {
+        if(null == returnValue) {
+            this.returnValue = "null";
+            return;
+        }
         this.returnValue = returnValue;
     }
 
@@ -72,6 +96,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setExceptionName(String exceptionName) {
+        if(null == exceptionName) {
+            this.exceptionName = "null";
+            return;
+        }
         this.exceptionName = exceptionName;
     }
 
@@ -80,6 +108,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setExceptionDesc(String exceptionDesc) {
+        if(null == exceptionDesc) {
+            this.exceptionDesc = "null";
+            return;
+        }
         this.exceptionDesc = exceptionDesc;
     }
 
@@ -88,6 +120,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setStackTrace(String stackTrace) {
+        if(null == stackTrace) {
+            this.stackTrace = "null";
+            return;
+        }
         this.stackTrace = stackTrace;
     }
 
@@ -96,6 +132,10 @@ public class ErrorLog implements Serializable {
     }
 
     public void setTime(Date time) {
+        if(null == time) {
+            this.time = new Date();
+            return;
+        }
         this.time = time;
     }
 

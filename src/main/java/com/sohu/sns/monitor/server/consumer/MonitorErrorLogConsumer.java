@@ -34,12 +34,13 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
     @Nullable
     @Override
     public Boolean apply(byte[] bytes) {
+        String msg = null;
         try {
-            String msg = new String(bytes, "UTF-8");
+            msg = new String(bytes, "UTF-8");
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "applyErrorLog", msg, null);
             handle(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "apply.msg.handleMsg", msg, null, e);
         }
         return true;
     }

@@ -21,7 +21,7 @@ import java.util.Map;
 public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private static final String INSERT_DATA = "replace into error_logs set appId = ?, instanceId = ?, " +
-            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, statckTrace = ?, updateTime = now()";
+            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, stackTrace = ?, updateTime = now()";
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 

@@ -34,8 +34,8 @@ public class AppErrorCountProcessor{
     private static final String QUERY_STATUS = "select status from count_status where id = 1";
     private static final String SET_STATUS = "update count_status set status = ? where id = 1";
 
-    //@Scheduled(cron = "0 0/60 * * * ? ")
-   @Scheduled(cron = "0/30 * * * * ? ")
+    @Scheduled(cron = "0 0/60 * * * ? ")
+//   @Scheduled(cron = "0/30 * * * * ? ")
     public void countAppErrors() {
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);

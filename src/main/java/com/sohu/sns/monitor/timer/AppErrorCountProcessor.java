@@ -36,7 +36,7 @@ public class AppErrorCountProcessor{
 
     @Scheduled(cron = "0 0/60 * * * ? ")
 //   @Scheduled(cron = "0/30 * * * * ? ")
-    public void countAppErrors() {
+    public void process() {
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
         int random = new Random().nextInt(10000);

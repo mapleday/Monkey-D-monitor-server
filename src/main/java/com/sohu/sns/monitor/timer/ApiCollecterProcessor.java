@@ -1,6 +1,5 @@
 package com.sohu.sns.monitor.timer;
 
-import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ApiStatusBucket;
 import com.sohu.sns.monitor.model.ApiStatusCount;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
@@ -16,7 +15,10 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by Gary on 2015/11/6.
@@ -24,25 +26,23 @@ import java.util.*;
 @Component
 public class ApiCollecterProcessor {
 
-    private static final String QUERY_PATH = "select pathName from api_method_to_path where methodName = ?";
+    private static final String QUERY_PATH = "select count(1) from api_method_to_path where methodName = ?";
     private static final String IS_EXIST_METHOD = "select count(1) from api_use_count where methodName = ? and date_str = ?";
     private static final String INSERT_METHOD = "replace into api_method_to_path set methodName = ?, pathName = ? ";
-    private static final String INSERT_API_USE_RECORD = "replace into api_use_count set methodName = ?, pathName = ?, " +
+    private static final String INSERT_API_USE_RECORD = "replace into api_use_count set methodName = ?, " +
             "allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_API_USE_RECORD = "update api_use_count set allCount = ifnull(allCount, 0) + ?, %s = ? where methodName = ? and " +
             "date_str = ?";
     private static final String IS_EXIST_TIMEOUT = "select count(1) from api_timeout_count where methodName = ? and date_str = ?";
-    private static final String INSERT_TIMEOUT_RECORD = "replace into api_timeout_count set methodName = ?, pathName = ?, " +
+    private static final String INSERT_TIMEOUT_RECORD = "replace into api_timeout_count set methodName = ?, " +
             "allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_TIMEOUT_RECORD = "update api_timeout_count set allCount = ifnull(allCount, 0) + ?, %s = ? where methodName = ? and " +
             "date_str = ?";
-    private static final String BASE_URL = "http://10.10.46.44";
-    private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
     @Autowired
     private MysqlClusterService mysqlClusterService;
 
-    @Scheduled(cron = "0 0/60 * * * ? ")
-//    @Scheduled(cron = "0/30 * * * * ? ")
+//    @Scheduled(cron = "0 0/60 * * * ? ")
+    @Scheduled(cron = "0/30 * * * * ? ")
     public void process() {
         try {
             System.out.println("process api_status begin, time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -54,20 +54,15 @@ public class ApiCollecterProcessor {
             Iterator<Map.Entry<String, ApiStatusCount>> iter = lastBucket.entrySet().iterator();
             while(iter.hasNext()) {
                 Map.Entry<String, ApiStatusCount> entry = iter.next();
-                List list = readJdbcTemplate.query(QUERY_PATH, new PathNameMapper(), entry.getKey());
-                String pathName;
-                if(null == list || 0 == list.size()) {
+                if(0 == readJdbcTemplate.queryForObject(QUERY_PATH, Long.class, entry.getKey())) {
                     writeJdbcTemplate.update(INSERT_METHOD, entry.getKey(), "unknown");
-                    pathName = "";
-                } else {
-                    pathName = (String)list.get(0);
                 }
 
                 /*更新访问数量*/
                 long useCount = readJdbcTemplate.queryForObject(IS_EXIST_METHOD, Long.class, entry.getKey(), date_str);
                 if(0 == useCount) {
                     String insertSql = String.format(INSERT_API_USE_RECORD, hour);
-                    writeJdbcTemplate.update(insertSql, entry.getKey(), pathName, entry.getValue().getUseCount(),
+                    writeJdbcTemplate.update(insertSql, entry.getKey(), entry.getValue().getUseCount(),
                             entry.getValue().getUseCount(), date_str);
                 } else {
                     String updateSql = String.format(UPDATE_API_USE_RECORD, hour);
@@ -79,7 +74,7 @@ public class ApiCollecterProcessor {
                 long timeoutCount = readJdbcTemplate.queryForObject(IS_EXIST_TIMEOUT, Long.class, entry.getKey(), date_str);
                 if(0 == timeoutCount) {
                     String insertSql = String.format(INSERT_TIMEOUT_RECORD, hour);
-                    writeJdbcTemplate.update(insertSql, entry.getKey(), pathName, entry.getValue().getTimeOutCount(),
+                    writeJdbcTemplate.update(insertSql, entry.getKey(), entry.getValue().getTimeOutCount(),
                             entry.getValue().getTimeOutCount(), date_str);
                 } else {
                     String updateSql = String.format(UPDATE_TIMEOUT_RECORD, hour);

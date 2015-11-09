@@ -57,7 +57,7 @@ public class ApiStatusBucket {
         ConcurrentHashMap<String, ApiStatusCount> b = getBucket();
         ApiStatusCount apiStatusCount = b.get(key);
         if (null != apiStatusCount) {
-            apiStatusCount.addTimeOutCount(1);
+            apiStatusCount.addUseCount(1);
             if(apiStatus.getCompMill() >= 1000) {
                 apiStatusCount.addTimeOutCount(1);
             }

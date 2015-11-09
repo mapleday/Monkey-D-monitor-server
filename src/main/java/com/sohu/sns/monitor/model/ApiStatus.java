@@ -1,12 +1,11 @@
 package com.sohu.sns.monitor.model;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Gary on 2015/11/6.
  */
-public class ApiStatus implements Serializable{
+public class ApiStatus {
 
     private String moduleName;
     private String methodName;

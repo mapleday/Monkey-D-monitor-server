@@ -1,6 +1,7 @@
 package com.sohu.sns.monitor;
 
 import com.sohu.sns.monitor.config.MySqlDBConfig;
+import com.sohu.sns.monitor.server.ApiStatusProfessor;
 import com.sohu.sns.monitor.server.LogMessageProcessor;
 import com.sohu.sns.monitor.thread.ErrorLogProcessor;
 import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
@@ -23,7 +24,8 @@ public class SnsMonitorLogServer {
             MysqlClusterServiceImpl bean = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
             bean.init(new MySqlDBConfig());
 
-            new LogMessageProcessor().start();
+            new LogMessageProcessor().start();  //接收错误日志
+            new ApiStatusProfessor().start();   //接收api使用情况日志
             new Thread(new ErrorLogProcessor()).start();
         } catch (Exception e) {
             e.printStackTrace();

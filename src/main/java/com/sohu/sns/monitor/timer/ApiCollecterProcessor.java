@@ -7,7 +7,6 @@ import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
-import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -27,7 +26,7 @@ public class ApiCollecterProcessor {
 
     private static final String QUERY_PATH = "select pathName from api_method_to_path where methodName = ?";
     private static final String IS_EXIST_METHOD = "select count(1) from api_use_count where methodName = ? and date_str = ?";
-    private static final String INSERT_METHOD = "replace into api_method_to_path set methodName = ?";
+    private static final String INSERT_METHOD = "replace into api_method_to_path set methodName = ?, pathName = ? ";
     private static final String INSERT_API_USE_RECORD = "replace into api_use_count set methodName = ?, pathName = ?, " +
             "allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_API_USE_RECORD = "update api_use_count set allCount = ifnull(allCount, 0) + ?, %s = ? where methodName = ? and " +
@@ -42,27 +41,29 @@ public class ApiCollecterProcessor {
     @Autowired
     private MysqlClusterService mysqlClusterService;
 
-    @Scheduled(cron = "0 0/5 * * * ? ")
+    @Scheduled(cron = "0 0/60 * * * ? ")
+//    @Scheduled(cron = "0/30 * * * * ? ")
     public void process() {
         try {
+            System.out.println("process api_status begin, time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             String hour = getHour();
             String date_str = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
             Map<String, ApiStatusCount> lastBucket = ApiStatusBucket.exchange();
             Iterator<Map.Entry<String, ApiStatusCount>> iter = lastBucket.entrySet().iterator();
-            List<ApiStatusCount> allList = new LinkedList<ApiStatusCount>();
             while(iter.hasNext()) {
                 Map.Entry<String, ApiStatusCount> entry = iter.next();
                 List list = readJdbcTemplate.query(QUERY_PATH, new PathNameMapper(), entry.getKey());
-                String pathName = null;
+                String pathName;
                 if(null == list || 0 == list.size()) {
-                    writeJdbcTemplate.update(INSERT_METHOD, entry.getKey());
+                    writeJdbcTemplate.update(INSERT_METHOD, entry.getKey(), "unknown");
                     pathName = "";
                 } else {
                     pathName = (String)list.get(0);
                 }
 
+                /*更新访问数量*/
                 long useCount = readJdbcTemplate.queryForObject(IS_EXIST_METHOD, Long.class, entry.getKey(), date_str);
                 if(0 == useCount) {
                     String insertSql = String.format(INSERT_API_USE_RECORD, hour);
@@ -74,29 +75,17 @@ public class ApiCollecterProcessor {
                             entry.getKey(), date_str);
                 }
 
-                if(entry.getValue().getTimeOutCount() > 0) {
-                    long timeoutCount = readJdbcTemplate.queryForObject(IS_EXIST_TIMEOUT, Long.class, entry.getKey(), date_str);
-                    if(0 == timeoutCount) {
-                        String insertSql = String.format(INSERT_TIMEOUT_RECORD, hour);
-                        writeJdbcTemplate.update(insertSql, entry.getKey(), pathName, entry.getValue().getTimeOutCount(),
-                                entry.getValue().getTimeOutCount(), date_str);
-                    } else {
-                        String updateSql = String.format(UPDATE_TIMEOUT_RECORD, hour);
-                        writeJdbcTemplate.update(updateSql, entry.getValue().getTimeOutCount(), entry.getValue().getTimeOutCount(),
-                                entry.getKey(), date_str);
-                    }
+                /*更新超过1秒的访问数量*/
+                long timeoutCount = readJdbcTemplate.queryForObject(IS_EXIST_TIMEOUT, Long.class, entry.getKey(), date_str);
+                if(0 == timeoutCount) {
+                    String insertSql = String.format(INSERT_TIMEOUT_RECORD, hour);
+                    writeJdbcTemplate.update(insertSql, entry.getKey(), pathName, entry.getValue().getTimeOutCount(),
+                            entry.getValue().getTimeOutCount(), date_str);
+                } else {
+                    String updateSql = String.format(UPDATE_TIMEOUT_RECORD, hour);
+                    writeJdbcTemplate.update(updateSql, entry.getValue().getTimeOutCount(), entry.getValue().getTimeOutCount(),
+                            entry.getKey(), date_str);
                 }
-                allList.add(entry.getValue().setPathName(pathName));
-            }
-            Map<String, Object> resultMap = new HashMap<String, Object>();
-            resultMap.put("apiStatus", allList);
-            String sendContent = jsonMapper.toJson(resultMap);
-            Map<String, String> emailMap = new HashMap<String, String>();
-            emailMap.put("apiStatus", sendContent);
-            try {
-                new HttpClientUtil().postByUtf(BASE_URL + "/sendApiStatusEmail", emailMap, null);
-            } catch (Exception e) {
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendApiStatusEmail", sendContent, null, e);
             }
         } catch (MysqlClusterException e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendApiStatusEmail", null, null, e);
@@ -109,7 +98,7 @@ public class ApiCollecterProcessor {
      */
     private String getHour() {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, -1);
+        now.add(Calendar.MINUTE, -5);
         int hour = now.get(Calendar.HOUR_OF_DAY);
         return getCurrentHourStr(hour);
     }

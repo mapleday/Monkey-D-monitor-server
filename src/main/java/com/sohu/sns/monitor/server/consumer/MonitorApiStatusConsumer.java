@@ -28,7 +28,7 @@ public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "applyApiStatus", msg, null);
             handle(msg);
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "apply.msg.handleMsg", msg, null, e);
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "apply.msg.handleApiStatusMsg", msg, null, e);
         }
         return true;
     }
@@ -42,14 +42,17 @@ public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
         if(null == msgMap || 0 == msgMap.size()) {
             return;
         }
+        if(!((String)msgMap.get("module")).equals("sns_api")) {
+            return;
+        }
         ApiStatus apiStatus = new ApiStatus();
-        apiStatus.setModuleName((String)msgMap.get("module"));
+        apiStatus.setModuleName((String) msgMap.get("module"));
         apiStatus.setMethodName((String) msgMap.get("method"));
         apiStatus.setParam((String) msgMap.get("param"));
         apiStatus.setReturnValue((String) msgMap.get("returnValue"));
-        apiStatus.setCompMill((Long) msgMap.get("compMill"));
-        apiStatus.setCacheMill((Long) msgMap.get("cacheMill"));
-        apiStatus.setThirdIterMill((Long) msgMap.get("thirdIterMill"));
+        apiStatus.setCompMill((Long.valueOf(msgMap.get("compMill").toString())));
+        apiStatus.setCacheMill(Long.valueOf(msgMap.get("cacheMill").toString()));
+        apiStatus.setThirdIterMill(Long.valueOf(msgMap.get("thirdIterMill").toString()));
         apiStatus.setDate(new Date());
 
         ApiStatusBucket.insertData(apiStatus);

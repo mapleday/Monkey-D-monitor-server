@@ -45,12 +45,15 @@ public class ApiCollecterProcessor {
     //@Scheduled(cron = "0/60 * * * * ? ")
     public void process() {
         try {
+            Map<String, ApiStatusCount> lastBucket = ApiStatusBucket.exchange();
+            if(lastBucket.isEmpty()) {
+                return;
+            }
             System.out.println("process api_status begin, time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
             String hour = getHour();
             String date_str = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-            Map<String, ApiStatusCount> lastBucket = ApiStatusBucket.exchange();
             Iterator<Map.Entry<String, ApiStatusCount>> iter = lastBucket.entrySet().iterator();
             while(iter.hasNext()) {
                 Map.Entry<String, ApiStatusCount> entry = iter.next();

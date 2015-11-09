@@ -41,8 +41,8 @@ public class ApiCollecterProcessor {
     @Autowired
     private MysqlClusterService mysqlClusterService;
 
-//    @Scheduled(cron = "0 0/60 * * * ? ")
-    @Scheduled(cron = "0/60 * * * * ? ")
+    @Scheduled(cron = "0 0/60 * * * ? ")
+    //@Scheduled(cron = "0/60 * * * * ? ")
     public void process() {
         try {
             System.out.println("process api_status begin, time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));

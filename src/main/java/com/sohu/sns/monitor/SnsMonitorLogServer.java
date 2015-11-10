@@ -34,7 +34,7 @@ public class SnsMonitorLogServer {
             JdbcTemplate readJdbcTemplate = bean.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = bean.getWriteJdbcTemplate(null);
             writeJdbcTemplate.update("update api_status set status = ? where id = 1", flag);
-            Thread.currentThread().sleep(3000);
+            Thread.currentThread().sleep(180000);
             if(flag == readJdbcTemplate.queryForObject("select status from api_status where id = 1", Integer.class)) {
                 new ApiStatusProfessor().start();   //接收api使用情况日志
             }

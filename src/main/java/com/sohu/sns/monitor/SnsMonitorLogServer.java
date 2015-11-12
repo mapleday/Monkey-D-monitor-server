@@ -39,7 +39,6 @@ public class SnsMonitorLogServer {
                 new ApiStatusProfessor().start();   //接收api使用情况日志
             }
 
-
             new Thread(new ErrorLogProcessor()).start();
         } catch (Exception e) {
             e.printStackTrace();

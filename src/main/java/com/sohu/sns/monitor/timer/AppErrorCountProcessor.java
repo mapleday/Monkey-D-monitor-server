@@ -40,7 +40,6 @@ public class AppErrorCountProcessor{
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
         int random = new Random().nextInt(10000);
-
         writeJdbcTemplate.update(SET_STATUS, random);
         try {
             Thread.currentThread().sleep(3000);

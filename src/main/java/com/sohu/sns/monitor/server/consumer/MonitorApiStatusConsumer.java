@@ -3,12 +3,10 @@ package com.sohu.sns.monitor.server.consumer;
 import com.google.common.base.Function;
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ApiStatusBucket;
-import com.sohu.sns.monitor.model.ApiStatus;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 
 import javax.annotation.Nullable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +16,7 @@ import java.util.Map;
 public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
+    private static final Long MAX_COMPILPERIOD = 1000L;
 
     @Nullable
     @Override
@@ -37,24 +36,14 @@ public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
      * 将api使用情况存入缓冲桶中
      * @param msg
      */
-    private void handle(String msg){
+    private void handle(String msg) throws Exception {
         Map<String, Object> msgMap = jsonMapper.fromJson(msg, HashMap.class);
         if(null == msgMap || 0 == msgMap.size()) {
             return;
         }
-        if(!((String)msgMap.get("module")).equals("sns_api")) {
-            return;
-        }
-        ApiStatus apiStatus = new ApiStatus();
-        apiStatus.setModuleName((String) msgMap.get("module"));
-        apiStatus.setMethodName((String) msgMap.get("method"));
-        apiStatus.setParam((String) msgMap.get("param"));
-        apiStatus.setReturnValue((String) msgMap.get("returnValue"));
-        apiStatus.setCompMill((Long.valueOf(msgMap.get("compMill").toString())));
-        apiStatus.setCacheMill(Long.valueOf(msgMap.get("cacheMill").toString()));
-        apiStatus.setThirdIterMill(Long.valueOf(msgMap.get("thirdIterMill").toString()));
-        apiStatus.setDate(new Date());
-
-        ApiStatusBucket.insertData(apiStatus);
+        String moduleName = (String)msgMap.get("module");
+        String method = (String) msgMap.get("method");
+        boolean timeOut = Long.valueOf(msgMap.get("compMill").toString()) >= MAX_COMPILPERIOD ? true : false;
+        ApiStatusBucket.insertData(moduleName, method, timeOut);
     }
 }

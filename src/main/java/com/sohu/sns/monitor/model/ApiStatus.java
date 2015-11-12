@@ -1,6 +1,6 @@
 package com.sohu.sns.monitor.model;
 
-import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by Gary on 2015/11/6.
@@ -9,12 +9,16 @@ public class ApiStatus {
 
     private String moduleName;
     private String methodName;
-    private String param;
-    private String returnValue;
-    private Long compMill;
-    private Long cacheMill;
-    private Long thirdIterMill;
-    private Date date;
+    private AtomicLong useCount;
+    private AtomicLong timeOutCount;
+
+    public ApiStatus(){}
+    public ApiStatus(String moduleName, String methodName, long useCount, long timeOutCount) {
+        this.moduleName = moduleName;
+        this.methodName = methodName;
+        this.useCount = new AtomicLong(useCount);
+        this.timeOutCount = new AtomicLong(timeOutCount);
+    }
 
     public String getModuleName() {
         return moduleName;
@@ -32,51 +36,19 @@ public class ApiStatus {
         this.methodName = methodName;
     }
 
-    public String getParam() {
-        return param;
+    public Long getUseCount() {
+        return this.useCount.get();
     }
 
-    public void setParam(String param) {
-        this.param = param;
+    public Long getTimeOutCount() {
+        return this.timeOutCount.get();
     }
 
-    public String getReturnValue() {
-        return returnValue;
+    public void addUseCount(long time) {
+        this.useCount.addAndGet(time);
     }
 
-    public void setReturnValue(String returnValue) {
-        this.returnValue = returnValue;
-    }
-
-    public Long getCompMill() {
-        return compMill;
-    }
-
-    public void setCompMill(Long compMill) {
-        this.compMill = compMill;
-    }
-
-    public Long getCacheMill() {
-        return cacheMill;
-    }
-
-    public void setCacheMill(Long cacheMill) {
-        this.cacheMill = cacheMill;
-    }
-
-    public Long getThirdIterMill() {
-        return thirdIterMill;
-    }
-
-    public void setThirdIterMill(Long thirdIterMill) {
-        this.thirdIterMill = thirdIterMill;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+    public void addTimeOutCount(long time) {
+        this.timeOutCount.addAndGet(time);
     }
 }

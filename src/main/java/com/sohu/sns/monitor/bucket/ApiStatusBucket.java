@@ -2,7 +2,9 @@ package com.sohu.sns.monitor.bucket;
 
 import com.google.common.base.Strings;
 import com.sohu.sns.monitor.model.ApiStatus;
-import com.sohu.sns.monitor.model.ApiStatusCount;
+import com.sohu.sns.monitor.util.DateUtil;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,23 +15,23 @@ public class ApiStatusBucket {
     /**
      * 存放数据的alpha桶
      */
-    private static final ConcurrentHashMap<String, ApiStatusCount> bucketAlpha = new ConcurrentHashMap<String, ApiStatusCount>();
+    private static final ConcurrentHashMap<String, ApiStatus> bucketAlpha = new ConcurrentHashMap<String, ApiStatus>();
     /**
      * 存放数据的beta桶
      */
-    private static final ConcurrentHashMap<String,ApiStatusCount> bucketBeta = new ConcurrentHashMap<String, ApiStatusCount>();
+    private static final ConcurrentHashMap<String,ApiStatus> bucketBeta = new ConcurrentHashMap<String, ApiStatus>();
 
     /**
      * 正在工作中的桶
      */
-    private static ConcurrentHashMap<String,ApiStatusCount> bucket = bucketAlpha;
+    private static ConcurrentHashMap<String,ApiStatus> bucket = bucketAlpha;
 
     /**
      * 切换桶
      * @return
      */
-    public static ConcurrentHashMap<String,ApiStatusCount> exchange() {
-        ConcurrentHashMap<String, ApiStatusCount> lastBucket = bucket;
+    public static ConcurrentHashMap<String,ApiStatus> exchange() {
+        ConcurrentHashMap<String, ApiStatus> lastBucket = bucket;
         if(bucket == bucketAlpha){
             bucket = bucketBeta;
         } else {
@@ -38,41 +40,39 @@ public class ApiStatusBucket {
         return lastBucket;
     }
 
-    private static ConcurrentHashMap<String,ApiStatusCount> getBucket() {
+    private static ConcurrentHashMap<String,ApiStatus> getBucket() {
         return bucket;
     }
 
     /**
      * 向桶中插入数据
-     * @param apiStatus
+     * @param
      */
-    public static void insertData(ApiStatus apiStatus) {
-        if(null == apiStatus) {
+    public static void insertData(String moduleName, String method, boolean timeOut) {
+        if (Strings.isNullOrEmpty(method) || Strings.isNullOrEmpty(moduleName)) {
             return;
         }
-        String key = apiStatus.getMethodName();
-        if (Strings.isNullOrEmpty(key)) {
-            return;
-        }
-        ConcurrentHashMap<String, ApiStatusCount> b = getBucket();
-        ApiStatusCount apiStatusCount = b.get(key);
-        if (null != apiStatusCount) {
-            apiStatusCount.addUseCount(1);
-            if(apiStatus.getCompMill() >= 1000) {
-                apiStatusCount.addTimeOutCount(1);
+        ConcurrentHashMap<String, ApiStatus> b = getBucket();
+        String key = moduleName + "_" + method;
+        ApiStatus apiStatus = b.get(key);
+        if (null != apiStatus) {
+            apiStatus.addUseCount(1);
+            if(timeOut) {
+                apiStatus.addTimeOutCount(1);
             }
         } else {
             synchronized (ApiStatusBucket.class) {
                 if(null != b.get(key)) {
-                    insertData(apiStatus);
+                    insertData(moduleName, method, timeOut);
                 } else {
-                    ApiStatusCount apiStatusCountTemp = new ApiStatusCount(key, 1, 0);
-                    if(apiStatus.getCompMill() >= 1000) {
-                        apiStatusCountTemp.addTimeOutCount(1);
+                    ApiStatus apiStatusTemp = new ApiStatus(moduleName, method, 1, 0);
+                    if(timeOut) {
+                        apiStatusTemp.addTimeOutCount(1);
                     }
-                    b.put(key, apiStatusCountTemp);
+                    b.put(method, apiStatusTemp);
                 }
             }
         }
+        LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "bucket.insertData."+moduleName, method+"_"+timeOut, "bucketSize:"+b.size()+","+ DateUtil.getCurrentDate());
     }
 }

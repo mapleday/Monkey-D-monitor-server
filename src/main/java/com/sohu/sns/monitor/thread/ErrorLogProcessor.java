@@ -1,6 +1,8 @@
 package com.sohu.sns.monitor.thread;
 
+import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ErrorLogBucket;
+import com.sohu.sns.monitor.bucket.TimeoutBucket;
 import com.sohu.sns.monitor.model.ErrorLog;
 import com.sohu.sns.monitor.model.MergedErrorLog;
 import com.sohu.snscommon.utils.LOGGER;
@@ -9,6 +11,7 @@ import com.sohu.snscommon.utils.http.HttpClientUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * ErrorLog数据的处理器
@@ -22,7 +25,7 @@ public class ErrorLogProcessor implements Runnable{
     private static final String ERROR_DETAIL = "errorDetail";
     private static final String BASE_URL = "http://10.10.46.44";
     private static final String QUERY_STACKTRACE_URL = "http://10.10.125.172:3000/queryStackTrace";
-
+    private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
     private boolean inProcess =  false;
 
     public void beginProcess() {
@@ -36,9 +39,7 @@ public class ErrorLogProcessor implements Runnable{
                 ConcurrentHashMap<String, List<ErrorLog>> bucket = ErrorLogBucket.exchange();
                 System.out.println("errorLogProcessor timer ... " + bucket.size());
                 if(bucket != null && !bucket.isEmpty()){
-
                     Set<String> keySet = bucket.keySet();
-
                     Map<String, String> smsMap = new HashMap<String, String>();
                     Map<String, String> emailMap = new HashMap<String, String>();
                     StringBuilder emailSb = new StringBuilder();
@@ -96,8 +97,22 @@ public class ErrorLogProcessor implements Runnable{
 
                 }
 
+                /**发送超时统计*/
+                ConcurrentHashMap<String, AtomicLong> timeoutBucket = TimeoutBucket.exchange();
+                System.out.println("timeoutCountProcessor timer ... " + timeoutBucket.size());
+                if(timeoutBucket != null && !timeoutBucket.isEmpty()){
+                    String content = jsonMapper.toJson(timeoutBucket);
+                    Map<String, String> sendMap = new HashMap<String, String>();
+                    sendMap.put("timeoutCount", content);
+                    try {
+                        new HttpClientUtil().postByUtf(BASE_URL + "/sendTimeoutCount", sendMap, null);
+                    } catch (Exception e) {
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendTimeoutCount", sendMap.size()+"", null, e);
+                    } finally {
+                        timeoutBucket.clear();
+                    }
+                }
                 inProcess = false;
-
             }
         }, 300000, 300000);
     }

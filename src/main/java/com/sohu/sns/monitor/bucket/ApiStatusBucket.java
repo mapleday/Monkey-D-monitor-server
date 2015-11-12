@@ -69,7 +69,7 @@ public class ApiStatusBucket {
                     if(timeOut) {
                         apiStatusTemp.addTimeOutCount(1);
                     }
-                    b.put(method, apiStatusTemp);
+                    b.put(key, apiStatusTemp);
                 }
             }
         }

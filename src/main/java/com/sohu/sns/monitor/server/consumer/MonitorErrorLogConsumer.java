@@ -25,11 +25,11 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
     private MysqlClusterService mysqlClusterService;
+    private List<String> exceptionList;
 
-    List<String> exceptionList = Arrays.asList("java.net.SocketTimeoutException", "org.apache.commons.httpclient.ConnectTimeoutException");
-
-    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService) {
+    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, List<String> exceptionList) {
         this.mysqlClusterService = mysqlClusterService;
+        this.exceptionList = exceptionList;
     }
 
     @Nullable

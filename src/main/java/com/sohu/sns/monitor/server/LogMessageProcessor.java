@@ -10,6 +10,8 @@ import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.apache.zookeeper.KeeperException;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by morgan on 15/9/22.
@@ -26,7 +28,9 @@ public class LogMessageProcessor {
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
         String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka"));
         Kafka kafka = new Kafka(kafkaConfig, new MetricRegistry());
-        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer(SpringContextUtil.getBean(MysqlClusterServiceImpl.class)));
+        /**超时的异常种类*/
+        List<String> exceptionList = Arrays.asList("java.net.SocketTimeoutException", "org.apache.commons.httpclient.ConnectTimeoutException");
+        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer(SpringContextUtil.getBean(MysqlClusterServiceImpl.class), exceptionList));
     }
 
     public void start() {

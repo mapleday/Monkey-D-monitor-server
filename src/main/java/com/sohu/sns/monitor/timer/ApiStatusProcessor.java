@@ -42,7 +42,7 @@ public class ApiStatusProcessor {
             "moduleName = ? and methodName = ? and date_str = ?";
 
 
-    @Scheduled(cron = "0 0/15 * * * ? ")
+    @Scheduled(cron = "0 0/5 * * * ? ")
     //@Scheduled(cron = "0/60 * * * * ? ")
     public void process() {
         Map<String, ApiStatus> bucket = ApiStatusBucket.exchange();

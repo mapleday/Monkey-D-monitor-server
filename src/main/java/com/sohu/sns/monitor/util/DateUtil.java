@@ -14,7 +14,7 @@ public class DateUtil {
      */
     public static String getHour() {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, -5);
+        now.add(Calendar.MINUTE, -1);
         int hour = now.get(Calendar.HOUR_OF_DAY);
         return getCurrentHourStr(hour);
     }

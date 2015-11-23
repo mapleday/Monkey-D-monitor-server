@@ -5,10 +5,13 @@ import com.sohu.sns.monitor.bucket.ErrorLogBucket;
 import com.sohu.sns.monitor.bucket.TimeoutBucket;
 import com.sohu.sns.monitor.model.ErrorLog;
 import com.sohu.sns.monitor.model.MergedErrorLog;
+import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,9 +28,17 @@ public class ErrorLogProcessor implements Runnable{
     private static final String ERROR_DETAIL = "errorDetail";
     private static final String BASE_URL = "http://10.10.46.44";
     private static final String QUERY_STACKTRACE_URL = "http://10.10.125.172:3000/queryStackTrace";
+    private static final String IS_EXISTS = "select count(1) from timeout_api_collect where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
+    private static final String INSERT_DATA = "replace into timeout_api_collect set appId = ?, moduleName = ?, methodName = ?, timeoutCount = ?, date_str = ?, updateTime = now()";
+    private static final String UPDATE_DATA = "update timeout_api_collect set timeoutCount = ifnull(timeoutCount, 0)+?, updateTime = now() where appId = ?, moduleName = ?, methodName = ?, date_str = ?";
+    private int random = new Random().nextInt(200000)+100000;
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
+    private MysqlClusterService mysqlClusterService;
     private boolean inProcess =  false;
 
+    public ErrorLogProcessor(MysqlClusterService mysqlClusterService) {
+        this.mysqlClusterService = mysqlClusterService;
+    }
     public void beginProcess() {
         final Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -101,6 +112,7 @@ public class ErrorLogProcessor implements Runnable{
                 ConcurrentHashMap<String, AtomicLong> timeoutBucket = TimeoutBucket.exchange();
                 System.out.println("timeoutCountProcessor timer ... " + timeoutBucket.size());
                 if(timeoutBucket != null && !timeoutBucket.isEmpty()){
+                    saveToDB(timeoutBucket);    //保存超时次数到数据库
                     String content = jsonMapper.toJson(timeoutBucket);
                     Map<String, String> sendMap = new HashMap<String, String>();
                     sendMap.put("timeoutCount", content);
@@ -114,7 +126,36 @@ public class ErrorLogProcessor implements Runnable{
                 }
                 inProcess = false;
             }
-        }, 300000, 300000);
+        }, random, random);
+    }
+
+    /**
+     * 保存数据到数据库
+     * @param map
+     */
+    private void saveToDB(ConcurrentHashMap<String, AtomicLong> map) {
+        System.out.println("saveToDBTimeoutCount timer ...... time : " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ,bucket:" + map.size());
+        try {
+            JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
+            JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
+            String date_str = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+            Set<String> keySet = map.keySet();
+            for(String key : keySet) {
+                String[] arr = key.split("_");
+                String appId = arr[0];
+                String moduleName = arr[1];
+                String methodName = arr[2];
+                Long timeoutCount = map.get(key).get();
+                Long count = readJdbcTemplate.queryForObject(IS_EXISTS, Long.class, appId, moduleName, methodName, date_str);
+                if(0 != count) {
+                    writeJdbcTemplate.update(UPDATE_DATA, timeoutCount, appId, moduleName, methodName, date_str);
+                } else {
+                    writeJdbcTemplate.update(INSERT_DATA, appId, moduleName, methodName, timeoutCount, date_str);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.SMS_EMAIL_SERVICE, "saveToDB.timeout_collect", null, null, e);
+        }
     }
 
     @Override

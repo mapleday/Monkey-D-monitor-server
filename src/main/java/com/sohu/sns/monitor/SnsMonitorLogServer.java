@@ -39,7 +39,7 @@ public class SnsMonitorLogServer {
                 new ApiStatusProfessor().start();   //接收api使用情况日志
             }
 
-            new Thread(new ErrorLogProcessor()).start();
+            new Thread(new ErrorLogProcessor(bean)).start();
         } catch (Exception e) {
             e.printStackTrace();
         }

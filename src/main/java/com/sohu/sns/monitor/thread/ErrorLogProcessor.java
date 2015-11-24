@@ -30,7 +30,7 @@ public class ErrorLogProcessor implements Runnable{
     private static final String QUERY_STACKTRACE_URL = "http://10.10.125.172:3000/queryStackTrace";
     private static final String IS_EXISTS = "select count(1) from timeout_api_collect where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
     private static final String INSERT_DATA = "replace into timeout_api_collect set appId = ?, moduleName = ?, methodName = ?, timeoutCount = ?, date_str = ?, updateTime = now()";
-    private static final String UPDATE_DATA = "update timeout_api_collect set timeoutCount = ifnull(timeoutCount, 0)+?, updateTime = now() where appId = ?, moduleName = ?, methodName = ?, date_str = ?";
+    private static final String UPDATE_DATA = "update timeout_api_collect set timeoutCount = ifnull(timeoutCount, 0)+?, updateTime = now() where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
     private int random = new Random().nextInt(200000)+100000;
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
     private MysqlClusterService mysqlClusterService;

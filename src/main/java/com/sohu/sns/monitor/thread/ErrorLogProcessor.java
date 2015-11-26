@@ -27,7 +27,7 @@ public class ErrorLogProcessor implements Runnable{
     private static final String ERROR_COUNT = "errorCount";
     private static final String ERROR_DETAIL = "errorDetail";
     private static final String BASE_URL = "http://10.10.46.44";
-    private static final String QUERY_STACKTRACE_URL = "http://10.10.125.172:3000/queryStackTrace";
+    private static final String QUERY_STACKTRACE_URL = "http://sns-monitor-web-test.sohusce.com/queryStackTrace";
     private static final String IS_EXISTS = "select count(1) from timeout_api_collect where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
     private static final String INSERT_DATA = "replace into timeout_api_collect set appId = ?, moduleName = ?, methodName = ?, timeoutCount = ?, date_str = ?, updateTime = now()";
     private static final String UPDATE_DATA = "update timeout_api_collect set timeoutCount = ifnull(timeoutCount, 0)+?, updateTime = now() where appId = ? and moduleName = ? and methodName = ? and date_str = ?";

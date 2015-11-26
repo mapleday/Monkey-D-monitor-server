@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Gary on 2015/11/6.
@@ -42,7 +43,7 @@ public class ApiStatusProcessor {
             "moduleName = ? and methodName = ? and date_str = ?";
 
 
-    @Scheduled(cron = "0 0/5 * * * ? ")
+    @Scheduled(cron = "0 0/10 * * * ? ")
     //@Scheduled(cron = "0/60 * * * * ? ")
     public void process() {
         Map<String, ApiStatus> bucket = ApiStatusBucket.exchange();
@@ -54,6 +55,7 @@ public class ApiStatusProcessor {
             }
             String hour = DateUtil.getHour();
             String date_str = DateUtil.getCurrentDate();
+            Thread.currentThread().sleep(new Random().nextInt(60000));
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
             Iterator<Map.Entry<String, ApiStatus>> iter = bucket.entrySet().iterator();

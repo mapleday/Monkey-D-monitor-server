@@ -48,12 +48,12 @@ public class ApiStatusBucket {
      * 向桶中插入数据
      * @param
      */
-    public static void insertData(String moduleName, String method, boolean timeOut) {
-        if (Strings.isNullOrEmpty(method) || Strings.isNullOrEmpty(moduleName)) {
+    public static void insertData(String appId, String moduleName, String method, boolean timeOut) {
+        if (Strings.isNullOrEmpty(method) || Strings.isNullOrEmpty(moduleName) || Strings.isNullOrEmpty(appId)) {
             return;
         }
         ConcurrentHashMap<String, ApiStatus> b = getBucket();
-        String key = moduleName + "_" + method;
+        String key = appId + "_" + moduleName + "_" + method;
         ApiStatus apiStatus = b.get(key);
         if (null != apiStatus) {
             apiStatus.addUseCount(1);
@@ -63,9 +63,9 @@ public class ApiStatusBucket {
         } else {
             synchronized (ApiStatusBucket.class) {
                 if(null != b.get(key)) {
-                    insertData(moduleName, method, timeOut);
+                    insertData(appId, moduleName, method, timeOut);
                 } else {
-                    ApiStatus apiStatusTemp = new ApiStatus(moduleName, method, 1, 0);
+                    ApiStatus apiStatusTemp = new ApiStatus(appId, moduleName, method, 1, 0);
                     if(timeOut) {
                         apiStatusTemp.addTimeOutCount(1);
                     }

@@ -38,12 +38,13 @@ public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
      */
     private void handle(String msg) throws Exception {
         Map<String, Object> msgMap = jsonMapper.fromJson(msg, HashMap.class);
-        if(null == msgMap || 0 == msgMap.size()) {
+        if(null == msgMap || msgMap.isEmpty()) {
             return;
         }
-        String moduleName = (String)msgMap.get("module");
-        String method = (String) msgMap.get("method");
+        String appId = (null == msgMap.get("appId")?"-":(String)msgMap.get("appId"));
+        String moduleName = (null == msgMap.get("module")?"-":(String)msgMap.get("module"));
+        String method = (null == msgMap.get("method")?"-":(String)msgMap.get("method"));
         boolean timeOut = Long.valueOf(msgMap.get("compMill").toString()) >= MAX_COMPILPERIOD ? true : false;
-        ApiStatusBucket.insertData(moduleName, method, timeOut);
+        ApiStatusBucket.insertData(appId, moduleName, method, timeOut);
     }
 }

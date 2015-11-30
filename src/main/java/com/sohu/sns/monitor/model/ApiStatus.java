@@ -7,17 +7,27 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class ApiStatus {
 
+    private String appId;
     private String moduleName;
     private String methodName;
     private AtomicLong useCount;
     private AtomicLong timeOutCount;
 
     public ApiStatus(){}
-    public ApiStatus(String moduleName, String methodName, long useCount, long timeOutCount) {
+    public ApiStatus(String appId, String moduleName, String methodName, long useCount, long timeOutCount) {
+        this.appId = appId;
         this.moduleName = moduleName;
         this.methodName = methodName;
         this.useCount = new AtomicLong(useCount);
         this.timeOutCount = new AtomicLong(timeOutCount);
+    }
+
+    public String getAppId() {
+        return appId;
+    }
+
+    public void setAppId(String appId) {
+        this.appId = appId;
     }
 
     public String getModuleName() {

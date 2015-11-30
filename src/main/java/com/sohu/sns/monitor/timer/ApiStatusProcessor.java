@@ -29,18 +29,18 @@ public class ApiStatusProcessor {
     private static final String INSERT_UNIQUE_METHOD = "replace into api_method_to_path set moduleName = ?, methodName = ?, pathName = ? ";
 
     /**查询，插入，更新API的使用情况*/
-    private static final String IS_EXIST_API_STATUS = "select count(1) from api_status_count where moduleName = ? and methodName = ? and date_str = ?";
-    private static final String INSERT_API_STATUS_RECORD = "replace into api_status_count set moduleName = ?, methodName = ?, " +
+    private static final String IS_EXIST_API_STATUS = "select count(1) from api_status_count where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
+    private static final String INSERT_API_STATUS_RECORD = "replace into api_status_count set appId = ?, moduleName = ?, methodName = ?, " +
             "allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_API_STATUS_RECORD = "update api_status_count set allCount = ifnull(allCount, 0) + ?, %s = ifnull(%s, 0)+? where " +
-            "moduleName = ? and methodName = ? and date_str = ?";
+            "appId = ? and moduleName = ? and methodName = ? and date_str = ?";
 
     /**查询，插入，更新API的超时情况*/
-    private static final String IS_EXIST_TIMEOUT = "select count(1) from api_timeout_count where moduleName = ? and methodName = ? and date_str = ?";
-    private static final String INSERT_TIMEOUT_RECORD = "replace into api_timeout_count set moduleName = ?, methodName = ?, " +
+    private static final String IS_EXIST_TIMEOUT = "select count(1) from api_timeout_count where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
+    private static final String INSERT_TIMEOUT_RECORD = "replace into api_timeout_count set appId = ?, moduleName = ?, methodName = ?, " +
             "allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_TIMEOUT_RECORD = "update api_timeout_count set allCount = ifnull(allCount, 0) + ?, %s = ifnull(%s, 0)+? where " +
-            "moduleName = ? and methodName = ? and date_str = ?";
+            "appId = ? and moduleName = ? and methodName = ? and date_str = ?";
 
 
     @Scheduled(cron = "0 0/5 * * * ? ")
@@ -55,7 +55,10 @@ public class ApiStatusProcessor {
             }
             String hour = DateUtil.getHour();
             String date_str = DateUtil.getCurrentDate();
+
+            /** 为防止出现同时插入的情况，每个实例随机sleep一段时间*/
             Thread.currentThread().sleep(new Random().nextInt(60000));
+
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
             Iterator<Map.Entry<String, ApiStatus>> iter = bucket.entrySet().iterator();
@@ -69,28 +72,28 @@ public class ApiStatusProcessor {
 
                 /**更新访问数量*/
                 long useCount = readJdbcTemplate.queryForObject(IS_EXIST_API_STATUS, Long.class,
-                        entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
+                        entry.getValue().getAppId(), entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
                 if(0 == useCount) {
                     String insertSql = String.format(INSERT_API_STATUS_RECORD, hour);
-                    writeJdbcTemplate.update(insertSql, entry.getValue().getModuleName(), entry.getValue().getMethodName(),
+                    writeJdbcTemplate.update(insertSql, entry.getValue().getAppId(), entry.getValue().getModuleName(), entry.getValue().getMethodName(),
                             entry.getValue().getUseCount(), entry.getValue().getUseCount(), date_str);
                 } else {
                     String updateSql = String.format(UPDATE_API_STATUS_RECORD, hour, hour);
                     writeJdbcTemplate.update(updateSql, entry.getValue().getUseCount(), entry.getValue().getUseCount(),
-                            entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
+                            entry.getValue().getAppId(), entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
                 }
 
                 /**更新超过1秒的访问数量*/
-                long timeoutCount = readJdbcTemplate.queryForObject(IS_EXIST_TIMEOUT, Long.class, entry.getValue().getModuleName(),
-                        entry.getValue().getMethodName(), date_str);
+                long timeoutCount = readJdbcTemplate.queryForObject(IS_EXIST_TIMEOUT, Long.class, entry.getValue().getAppId(),
+                        entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
                 if(0 == timeoutCount) {
                     String insertSql = String.format(INSERT_TIMEOUT_RECORD, hour);
-                    writeJdbcTemplate.update(insertSql, entry.getValue().getModuleName(), entry.getValue().getMethodName(),
+                    writeJdbcTemplate.update(insertSql, entry.getValue().getAppId(), entry.getValue().getModuleName(), entry.getValue().getMethodName(),
                             entry.getValue().getTimeOutCount(), entry.getValue().getTimeOutCount(), date_str);
                 } else {
                     String updateSql = String.format(UPDATE_TIMEOUT_RECORD, hour, hour);
                     writeJdbcTemplate.update(updateSql, entry.getValue().getTimeOutCount(), entry.getValue().getTimeOutCount(),
-                            entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
+                            entry.getValue().getAppId(), entry.getValue().getModuleName(), entry.getValue().getMethodName(), date_str);
                 }
             }
         } catch (Exception e) {

@@ -44,7 +44,7 @@ public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
         String appId = "-";
         String appInstance = (String) msgMap.get("appId");
         if(null != appInstance) {
-            String[] arr = appInstance.split("-");
+            String[] arr = appInstance.split("_");
             if(2 == arr.length) {
                 appId = arr[0];
             }

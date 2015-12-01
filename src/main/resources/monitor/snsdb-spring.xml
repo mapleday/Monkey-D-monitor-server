@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.0.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd"
+        >
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>classpath:OnlineDB.properties</value>
+        </property>
+    </bean>
+
+    <bean id="snsReadJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="snsReadDataSource"/>
+    </bean>
+
+    <bean id="snsWriteJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="snsWriteDataSource"/>
+    </bean>
+
+    <bean id="snsReadDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="url" value="${sns.jdbc.read.url}" />
+        <property name="username" value="${sns.jdbc.read.username}" />
+        <property name="password" value="${sns.jdbc.read.password}" />
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="filters" value="${filters}" />
+
+        <property name="maxActive" value="${maxActive}" />
+        <property name="initialSize" value="${initialSize}" />
+        <property name="maxWait" value="${maxWait}" />
+        <property name="minIdle" value="${minIdle}" />
+
+        <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+        <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />
+
+        <property name="validationQuery" value="${validationQuery}" />
+        <property name="testWhileIdle" value="${testWhileIdle}" />
+        <property name="testOnBorrow" value="${testOnBorrow}" />
+        <property name="testOnReturn" value="${testOnReturn}" />
+        <property name="maxOpenPreparedStatements"  value="${maxOpenPreparedStatements}" />
+        <property name="removeAbandoned" value="${removeAbandoned}" />
+        <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}" />
+        <property name="logAbandoned" value="${logAbandoned}" />
+    </bean>
+
+    <bean id="snsWriteDataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="url" value="${sns.jdbc.write.url}" />
+        <property name="username" value="${sns.jdbc.write.username}" />
+        <property name="password" value="${sns.jdbc.write.password}" />
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="filters" value="${filters}" />
+
+        <property name="maxActive" value="${maxActive}" />
+        <property name="initialSize" value="${initialSize}" />
+        <property name="maxWait" value="${maxWait}" />
+        <property name="minIdle" value="${minIdle}" />
+
+        <property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+        <property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />
+
+        <property name="validationQuery" value="${validationQuery}" />
+        <property name="testWhileIdle" value="${testWhileIdle}" />
+        <property name="testOnBorrow" value="${testOnBorrow}" />
+        <property name="testOnReturn" value="${testOnReturn}" />
+        <property name="maxOpenPreparedStatements"  value="${maxOpenPreparedStatements}" />
+        <property name="removeAbandoned" value="${removeAbandoned}" />
+        <property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}" />
+        <property name="logAbandoned" value="${logAbandoned}" />
+    </bean>
+
+</beans>

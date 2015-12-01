@@ -13,6 +13,8 @@
     <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"></bean>
 
     <import resource="classpath*:db_cluster_spring/db-cluster-spring.xml"/>
+    <import resource="classpath*:monitor/mpdb-spring.xml"/>
+    <import resource="classpath*:monitor/snsdb-spring.xml"/>
 
     <context:component-scan base-package="com.sohu.sns.monitor"/>
     <task:annotation-driven/>
@@ -25,5 +27,9 @@
     <bean id="readDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"></bean>
 
     <bean id="writeDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"></bean>
+
+    <bean id="uNameReadDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"></bean>
+
+    <bean id="uNameWriteDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"></bean>
 
 </beans>

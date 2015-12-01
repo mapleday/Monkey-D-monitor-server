@@ -41,7 +41,14 @@ public class MonitorApiStatusConsumer implements Function<byte[], Boolean> {
         if(null == msgMap || msgMap.isEmpty()) {
             return;
         }
-        String appId = (null == msgMap.get("appId")?"-":(String)msgMap.get("appId"));
+        String appId = "-";
+        String appInstance = (String) msgMap.get("appId");
+        if(null != appInstance) {
+            String[] arr = appInstance.split("-");
+            if(2 == arr.length) {
+                appId = arr[0];
+            }
+        }
         String moduleName = (null == msgMap.get("module")?"-":(String)msgMap.get("module"));
         String method = (null == msgMap.get("method")?"-":(String)msgMap.get("method"));
         boolean timeOut = Long.valueOf(msgMap.get("compMill").toString()) >= MAX_COMPILPERIOD ? true : false;

@@ -79,9 +79,7 @@ public class DiffProcessor {
                 List uNameInfoForSnsList = uNameReadJdbcTemplate.query(queryUnameForSns, new UnameInfoMapper());
 
                 /**遍历uname与mp的不同**/
-            int flag1 = 0;
                 for(Object obj : uNameInfoForMpList) {
-            System.out.println(++flag1);
                     UnameInfo unameInfo = (UnameInfo) obj;
                     JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
                     MpUserInfo mpUserInfo = null;
@@ -91,15 +89,11 @@ public class DiffProcessor {
                         LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
                         continue;
                     }
-            System.out.println(unameInfo.getOriginalUserName()+","+mpUserInfo.getUserName());
-            System.out.println(unameInfo.getType()+","+mpUserInfo.getAccountType());
                     saveUnameMpDiffToDB(unameInfo, mpUserInfo);
                 }
 
                 /**遍历uname与sns的不同**/
-            int flag2 = 0;
                 for(Object obj : uNameInfoForSnsList) {
-            System.out.println(++flag2);
                     UnameInfo unameInfo = (UnameInfo) obj;
                     JdbcTemplate snsReadJdbcTemplate = SpringContextUtil.getBean("snsReadJdbcTemplate");
                     SnsUserInfo snsUserInfo = null;
@@ -109,8 +103,6 @@ public class DiffProcessor {
                         LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
                         continue;
                     }
-            System.out.println(unameInfo.getOriginalUserName()+","+snsUserInfo.getUserName());
-            System.out.println(unameInfo.getType()+","+snsUserInfo.getType());
                     saveUnameSnsDiffToDB(unameInfo, snsUserInfo);
                 }
             }

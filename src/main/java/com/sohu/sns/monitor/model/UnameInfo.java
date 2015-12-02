@@ -4,12 +4,12 @@ package com.sohu.sns.monitor.model;
  * Created by Gary on 2015/12/1.
  */
 public class UnameInfo {
-    private int id;
+    private Integer id;
     private String passportId;
     private String userName;
     private String originalUserName;
     private String userInfo;
-    private int status;
+    private Integer status;
     private String createPassportId;
     private Long createTime;
     private String updatePassportId;
@@ -18,11 +18,11 @@ public class UnameInfo {
     private String ex1;
     private String ex2;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -58,11 +58,11 @@ public class UnameInfo {
         this.userInfo = userInfo;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

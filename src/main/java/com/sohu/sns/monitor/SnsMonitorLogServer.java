@@ -29,7 +29,6 @@ public class SnsMonitorLogServer {
             UNameMysqlClusterService uNameBean = SpringContextUtil.getBean(UNameMysqlClusterService.class);
             uNameBean.init(null);
 
-
             new LogMessageProcessor().start();  //接收错误日志
 
             new ApiStatusProfessor().start();   //接收api使用情况日志

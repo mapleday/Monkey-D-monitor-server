@@ -4,16 +4,16 @@ package com.sohu.sns.monitor.model;
  * Created by Gary on 2015/12/1.
  */
 public class SnsUserInfo {
-    private int id;
+    private Integer id;
     private String passportId;
     private String userName;
-    private int type;
+    private Integer type;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -33,11 +33,11 @@ public class SnsUserInfo {
         this.userName = userName;
     }
 
-    public int getType() {
+    public Integer getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(Integer type) {
         this.type = type;
     }
 }

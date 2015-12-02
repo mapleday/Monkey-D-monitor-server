@@ -42,13 +42,13 @@ public class DiffProcessor {
 
     private static final String UPDATE_UNAME_MP = "update uname_mp_diff set uname_username = ?, mp_username = ?, mp_type = ?, " +
             "uname_type = ?, diff_type = ?, updateTime = now() where passportId = ? and date_str = ?";
-    private static final String UPDATE_UNAME_SNS = "update uname_sns_diff set uname_username = ?, mp_username = ?, mp_type = ?, " +
+    private static final String UPDATE_UNAME_SNS = "update uname_sns_diff set uname_username = ?, sns_username = ?, sns_type = ?, " +
             "uname_type = ?, diff_type = ?, updateTime = now() where passportId = ? and date_str = ?";
 
     private static final String INSERT_UNAME_MP = "replace into uname_mp_diff set passportId = ?, uname_username = ?, mp_username = ?, " +
             "mp_type = ?, uname_type = ?, diff_type = ?, date_str = ?, updateTime = now()";
-    private static final String INSERT_UNAME_SNS = "replace into uname_sns_diff set passportId = ?, uname_username = ?, mp_username = ?, " +
-            "mp_type = ?, uname_type = ?, diff_type = ?, date_str = ?, updateTime = now()";
+    private static final String INSERT_UNAME_SNS = "replace into uname_sns_diff set passportId = ?, uname_username = ?, sns_username = ?, " +
+            "sns_type = ?, uname_type = ?, diff_type = ?, date_str = ?, updateTime = now()";
 
     @Autowired
     private MysqlClusterService mysqlClusterService;
@@ -108,7 +108,7 @@ public class DiffProcessor {
             }
             System.out.println("diff compare timer end >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle.finish", null, null, e);
             e.printStackTrace();
         }
 
@@ -120,17 +120,33 @@ public class DiffProcessor {
      * @param snsUserInfo
      * @throws MysqlClusterException
      */
-    private void saveUnameSnsDiffToDB(UnameInfo unameInfo, SnsUserInfo snsUserInfo) throws MysqlClusterException {
+    private void saveUnameSnsDiffToDB(UnameInfo unameInfo, SnsUserInfo snsUserInfo) throws Exception {
         if(null == unameInfo || null == snsUserInfo) return;
+        Integer uNameType, snsUserType = 10000;
+        try {
+            uNameType = Integer.parseInt(unameInfo.getType());
+            if(null != snsUserInfo.getType()) {
+                snsUserType = snsUserInfo.getType();
+            }
+        } catch (NumberFormatException e) {
+            uNameType = 1000;
+        }
+        String unameUserName = "uname_unknown", snsUsername = "sns_unknown";
+        if(null != unameInfo.getOriginalUserName()) {
+            unameUserName = unameInfo.getOriginalUserName();
+        }
+        if(null != snsUserInfo.getUserName()) {
+            snsUsername = snsUserInfo.getUserName();
+        }
 
         Integer diffType = 3;
-        if( ! unameInfo.getOriginalUserName().equals(snsUserInfo.getUserName()) && Integer.parseInt(unameInfo.getType()) == snsUserInfo.getType()) {
+        if( ! unameUserName.equals(snsUsername) && uNameType == snsUserType) {
             diffType = 0;
         }
-        if(unameInfo.getOriginalUserName().equals(snsUserInfo.getUserName()) && ! (Integer.parseInt(unameInfo.getType()) == snsUserInfo.getType())) {
+        if(unameUserName.equals(snsUsername) && ! (uNameType == snsUserType)) {
             diffType = 1;
         }
-        if( ! unameInfo.getOriginalUserName().equals(snsUserInfo.getUserName()) && ! (Integer.parseInt(unameInfo.getType()) == snsUserInfo.getType())) {
+        if( ! unameUserName.equals(snsUsername) && ! (uNameType == snsUserType)) {
             diffType = 2;
         }
         if(3 == diffType) return;
@@ -140,11 +156,11 @@ public class DiffProcessor {
         String date_str = DateUtil.getCurrentDate();
         Long count = readJdbcTemplate.queryForObject(IS_EXIST_UNAME_SNS, Long.class, unameInfo.getPassportId(), date_str);
         if(0 == count) {
-            writeJdbcTemplate.update(INSERT_UNAME_SNS, unameInfo.getPassportId(), unameInfo.getOriginalUserName(),
-                    snsUserInfo.getUserName(), snsUserInfo.getType(), Integer.parseInt(unameInfo.getType()), diffType, date_str);
+            writeJdbcTemplate.update(INSERT_UNAME_SNS, unameInfo.getPassportId(), unameUserName,
+                    snsUsername, snsUserType, uNameType, diffType, date_str);
         } else {
-            writeJdbcTemplate.update(UPDATE_UNAME_SNS, unameInfo.getOriginalUserName(), snsUserInfo.getUserName(),
-                    snsUserInfo.getType(), Integer.parseInt(unameInfo.getType()), diffType, unameInfo.getPassportId(), date_str);
+            writeJdbcTemplate.update(UPDATE_UNAME_SNS, unameUserName, snsUsername,
+                    snsUserType, uNameType, diffType, unameInfo.getPassportId(), date_str);
         }
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "saveUnameSnsDiffToDB", null, null);
     }
@@ -155,15 +171,18 @@ public class DiffProcessor {
      * @param mpUserInfo
      * @throws MysqlClusterException
      */
-    private void saveUnameMpDiffToDB(UnameInfo unameInfo, MpUserInfo mpUserInfo) throws MysqlClusterException {
+    private void saveUnameMpDiffToDB(UnameInfo unameInfo, MpUserInfo mpUserInfo) throws Exception {
 
         if(null == unameInfo || null == mpUserInfo) return;
 
-        Integer uNameType;
+        Integer uNameType, mpType = 10000;
         try {
             uNameType = Integer.parseInt(unameInfo.getType());
+            if(null != mpUserInfo.getAccountType()) {
+                mpType = mpUserInfo.getAccountType();
+            }
         } catch (NumberFormatException e) {
-            return;
+            uNameType = 1000;
         }
         switch (uNameType) {
             case 1:
@@ -177,14 +196,22 @@ public class DiffProcessor {
                 break;
         }
 
+        String unameUserName = "uname_unknown", mpUsername = "sns_unknown";
+        if(null != unameInfo.getOriginalUserName()) {
+            unameUserName = unameInfo.getOriginalUserName();
+        }
+        if(null != mpUserInfo.getUserName()) {
+            mpUsername = mpUserInfo.getUserName();
+        }
+
         Integer diffType = 3;
-        if( ! unameInfo.getOriginalUserName().equals(mpUserInfo.getUserName()) && uNameType == mpUserInfo.getAccountType()) {
+        if( ! unameUserName.equals(mpUsername) && uNameType == mpType) {
             diffType = 0;
         }
-        if(unameInfo.getOriginalUserName().equals(mpUserInfo.getUserName()) && ! (uNameType == mpUserInfo.getAccountType())) {
+        if(unameUserName.equals(mpUsername) && ! (uNameType == mpType)) {
             diffType = 1;
         }
-        if( ! unameInfo.getOriginalUserName().equals(mpUserInfo.getUserName()) && ! (uNameType == mpUserInfo.getAccountType())) {
+        if( ! unameUserName.equals(mpUsername) && ! (uNameType == mpType)) {
             diffType = 2;
         }
 
@@ -195,11 +222,11 @@ public class DiffProcessor {
         String date_str = DateUtil.getCurrentDate();
         Long count = readJdbcTemplate.queryForObject(IS_EXIST_UNAME_MP, Long.class, unameInfo.getPassportId(), date_str);
         if(0 == count) {
-            writeJdbcTemplate.update(INSERT_UNAME_MP, unameInfo.getPassportId(), unameInfo.getOriginalUserName(),
-                    mpUserInfo.getUserName(), mpUserInfo.getAccountType(), Integer.parseInt(unameInfo.getType()), diffType, date_str);
+            writeJdbcTemplate.update(INSERT_UNAME_MP, unameInfo.getPassportId(), unameUserName,
+                    mpUsername, mpType, uNameType, diffType, date_str);
         } else {
-            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameInfo.getOriginalUserName(), mpUserInfo.getUserName(),
-                    mpUserInfo.getAccountType(), Integer.parseInt(unameInfo.getType()), diffType, unameInfo.getPassportId(), date_str);
+            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, uNameType, diffType,
+                    unameInfo.getPassportId(), date_str);
         }
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "saveUnameMpDiffToDB", null, null);
     }

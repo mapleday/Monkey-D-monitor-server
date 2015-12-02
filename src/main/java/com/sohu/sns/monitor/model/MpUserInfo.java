@@ -4,17 +4,17 @@ package com.sohu.sns.monitor.model;
  * Created by Gary on 2015/12/1.
  */
 public class MpUserInfo {
-    private int id;
+    private Integer id;
     private String userName;
     private String passport;
-    private int accountType;
-    private int status;
+    private Integer accountType;
+    private Integer status;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -34,19 +34,19 @@ public class MpUserInfo {
         this.passport = passport;
     }
 
-    public int getAccountType() {
+    public Integer getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(int accountType) {
+    public void setAccountType(Integer accountType) {
         this.accountType = accountType;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 }

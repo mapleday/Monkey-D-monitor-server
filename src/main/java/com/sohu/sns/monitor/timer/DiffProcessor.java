@@ -223,9 +223,9 @@ public class DiffProcessor {
         Long count = readJdbcTemplate.queryForObject(IS_EXIST_UNAME_MP, Long.class, unameInfo.getPassportId(), date_str);
         if(0 == count) {
             writeJdbcTemplate.update(INSERT_UNAME_MP, unameInfo.getPassportId(), unameUserName,
-                    mpUsername, mpType, uNameType, diffType, date_str);
+                    mpUsername, mpType, unameInfo.getType(), diffType, date_str);
         } else {
-            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, uNameType, diffType,
+            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, unameInfo.getType(), diffType,
                     unameInfo.getPassportId(), date_str);
         }
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "saveUnameMpDiffToDB", null, null);

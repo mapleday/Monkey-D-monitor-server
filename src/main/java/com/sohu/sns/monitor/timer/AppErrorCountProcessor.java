@@ -42,7 +42,7 @@ public class AppErrorCountProcessor{
         int random = new Random().nextInt(10000);
         writeJdbcTemplate.update(SET_STATUS, random);
         try {
-            Thread.currentThread().sleep(3000);
+            Thread.currentThread().sleep(30000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

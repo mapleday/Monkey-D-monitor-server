@@ -64,9 +64,9 @@ public class DiffProcessor {
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
             int random = new Random().nextInt(10000);
             writeJdbcTemplate.update(UPDATE_FLAG, random);
-            Thread.currentThread().sleep(5000);
+            Thread.currentThread().sleep(50000);
             Long flag = readJdbcTemplate.queryForObject(QUERY_FLAG, Long.class);
-            if(!(random == flag)) {
+            if(random != flag) {
                 return;
             }
             System.out.println("diff compare timer begin >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());

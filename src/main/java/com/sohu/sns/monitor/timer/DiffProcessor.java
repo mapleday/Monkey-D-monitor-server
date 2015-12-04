@@ -5,13 +5,13 @@ import com.sohu.sns.monitor.model.SnsUserInfo;
 import com.sohu.sns.monitor.model.UnameInfo;
 import com.sohu.sns.monitor.server.config.UNameMysqlClusterService;
 import com.sohu.sns.monitor.util.DateUtil;
+import com.sohu.sns.monitor.util.UserInfoUtil;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Gary on 2015/12/1.
@@ -34,8 +33,8 @@ public class DiffProcessor {
     private static final String QUERY_UNAME_INFO = "select * from u_user_info_%d where status = 1 and type <> '0'";
     private static final String QUERY_UNAME_SNS = "select * from u_user_info_%d where status = 1";
 
-    private static final String QUERY_MP_USER = "select * from profile where passport = ? and status = 1";
-    private static final String QUERY_SNS_USER = "select * from t_user where user_id = ?";
+    private static final String QUERY_MP_USER = "select * from profile where status = 1";
+    private static final String QUERY_SNS_USER = "select * from t_user";
 
     private static final String IS_EXIST_UNAME_MP = "select count(1) from uname_mp_diff where passportId = ? and date_str = ?";
     private static final String IS_EXIST_UNAME_SNS = "select count(1) from uname_sns_diff where passportId = ? and date_str = ?";
@@ -70,6 +69,16 @@ public class DiffProcessor {
                 return;
             }
             System.out.println("diff compare timer begin >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
+
+            /**查询出所有的mp与sns用户信息**/
+            JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
+            Map<String, MpUserInfo> mpUserInfoMap = new HashMap<String, MpUserInfo>();
+            List mpUserInfoList = mpReadJdbcTemplate.query(QUERY_MP_USER, new MpUserInfoMapper());
+            for(Object obj : mpUserInfoList) {
+                MpUserInfo mpUserInfo = (MpUserInfo) obj;
+                mpUserInfoMap.put(mpUserInfo.getPassport(), mpUserInfo);
+            }
+
             for(int i=0; i < 256; i++) {
                 String queryUnameForMp = String.format(QUERY_UNAME_INFO, i);
                 String queryUnameForSns = String.format(QUERY_UNAME_SNS, i);
@@ -81,34 +90,28 @@ public class DiffProcessor {
                 /**遍历uname与mp的不同**/
                 for(Object obj : uNameInfoForMpList) {
                     UnameInfo unameInfo = (UnameInfo) obj;
-                    JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
-                    MpUserInfo mpUserInfo = null;
-                    try {
-                        mpUserInfo = (MpUserInfo) mpReadJdbcTemplate.queryForObject(QUERY_MP_USER, new MpUserInfoMapper(), unameInfo.getPassportId());
-                    } catch (DataAccessException e) {
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
-                        continue;
+                    if(mpUserInfoMap.containsKey(unameInfo.getPassportId())) {
+                        saveUnameMpDiffToDB(unameInfo, mpUserInfoMap.get(unameInfo.getPassportId()));
                     }
-                    saveUnameMpDiffToDB(unameInfo, mpUserInfo);
                 }
 
                 /**遍历uname与sns的不同**/
                 for(Object obj : uNameInfoForSnsList) {
                     UnameInfo unameInfo = (UnameInfo) obj;
-                    JdbcTemplate snsReadJdbcTemplate = SpringContextUtil.getBean("snsReadJdbcTemplate");
-                    SnsUserInfo snsUserInfo = null;
-                    try {
-                        snsUserInfo = (SnsUserInfo) snsReadJdbcTemplate.queryForObject(QUERY_SNS_USER, new SnsUserInfoMapper(), unameInfo.getPassportId());
-                    } catch (DataAccessException e) {
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
-                        continue;
+                    List<Map<String, Object>> list = UserInfoUtil.getUserByHttp(Arrays.asList(unameInfo.getPassportId()), Arrays.asList("userId", "userName", "mType"), 5000);
+                    if(null != list.get(0)) {
+                        Map<String, Object> map = list.get(0);
+                        SnsUserInfo snsUserInfo = new SnsUserInfo();
+                        snsUserInfo.setPassportId((String) map.get("userId"));
+                        snsUserInfo.setUserName((String) map.get("userName"));
+                        snsUserInfo.setType((Integer) map.get("mType"));
+                        saveUnameSnsDiffToDB(unameInfo, snsUserInfo);
                     }
-                    saveUnameSnsDiffToDB(unameInfo, snsUserInfo);
                 }
             }
             System.out.println("diff compare timer end >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle.finish", null, null, e);
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
             e.printStackTrace();
         }
 

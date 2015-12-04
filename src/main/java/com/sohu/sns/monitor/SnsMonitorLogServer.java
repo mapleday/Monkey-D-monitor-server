@@ -1,10 +1,8 @@
 package com.sohu.sns.monitor;
 
 import com.sohu.sns.monitor.config.MySqlDBConfig;
-import com.sohu.sns.monitor.server.ApiStatusProfessor;
-import com.sohu.sns.monitor.server.LogMessageProcessor;
 import com.sohu.sns.monitor.server.config.UNameMysqlClusterService;
-import com.sohu.sns.monitor.thread.ErrorLogProcessor;
+import com.sohu.sns.monitor.timer.DiffProcessor;
 import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
 import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import com.sohu.snscommon.utils.zk.ZkUtils;
@@ -29,11 +27,13 @@ public class SnsMonitorLogServer {
             UNameMysqlClusterService uNameBean = SpringContextUtil.getBean(UNameMysqlClusterService.class);
             uNameBean.init(null);
 
-            new LogMessageProcessor().start();  //接收错误日志
-
-            new ApiStatusProfessor().start();   //接收api使用情况日志
-
-            new Thread(new ErrorLogProcessor(bean)).start();
+            DiffProcessor processor = SpringContextUtil.getBean(DiffProcessor.class);
+            processor.handle();
+//            new LogMessageProcessor().start();  //接收错误日志
+//
+//            new ApiStatusProfessor().start();   //接收api使用情况日志
+//
+//            new Thread(new ErrorLogProcessor(bean)).start();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -17,6 +17,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.net.SocketTimeoutException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -70,7 +71,7 @@ public class DiffProcessor {
             }
             System.out.println("diff compare timer begin >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
 
-            /**查询出所有的mp与sns用户信息**/
+            /**查询出所有的mp用户信息**/
             JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
             Map<String, MpUserInfo> mpUserInfoMap = new HashMap<String, MpUserInfo>();
             List mpUserInfoList = mpReadJdbcTemplate.query(QUERY_MP_USER, new MpUserInfoMapper());
@@ -79,6 +80,10 @@ public class DiffProcessor {
                 mpUserInfoMap.put(mpUserInfo.getPassport(), mpUserInfo);
             }
 
+            List<String> uNamePassPorts = new LinkedList<String>(); //存放唯一名passport的容器，便于批量请求接口
+            List<UnameInfo> unameInfoList = new LinkedList<UnameInfo>();//存放唯一名用户信息
+int timeoutCount = 0;
+int totalCount = 0;
             for(int i=0; i < 256; i++) {
                 String queryUnameForMp = String.format(QUERY_UNAME_INFO, i);
                 String queryUnameForSns = String.format(QUERY_UNAME_SNS, i);
@@ -96,17 +101,46 @@ public class DiffProcessor {
                 }
 
                 /**遍历uname与sns的不同**/
+                int currentPos = 0;
                 for(Object obj : uNameInfoForSnsList) {
                     UnameInfo unameInfo = (UnameInfo) obj;
-                    List<Map<String, Object>> list = UserInfoUtil.getUserByHttp(Arrays.asList(unameInfo.getPassportId()), Arrays.asList("userId", "userName", "mType"), 5000);
-                    if(null != list.get(0)) {
-                        Map<String, Object> map = list.get(0);
-                        SnsUserInfo snsUserInfo = new SnsUserInfo();
-                        snsUserInfo.setPassportId((String) map.get("userId"));
-                        snsUserInfo.setUserName((String) map.get("userName"));
-                        snsUserInfo.setType((Integer) map.get("mType"));
-                        saveUnameSnsDiffToDB(unameInfo, snsUserInfo);
+                    uNamePassPorts.add(unameInfo.getPassportId());
+                    unameInfoList.add(unameInfo);
+                    ++ currentPos;
+                    if(5 > uNamePassPorts.size() && currentPos < uNameInfoForSnsList.size()) {
+                        continue;
                     }
+totalCount++;
+                    List<Map<String, Object>> list = null;
+                    try {
+                        list = UserInfoUtil.getUserByHttp(uNamePassPorts, Arrays.asList("userId", "userName", "mType"), 10000);
+                    } catch (SocketTimeoutException e) {
+                        Thread.currentThread().sleep(2000);
+                        list = new ArrayList<Map<String, Object>>();
+                        for(String uNamepassPort : uNamePassPorts) {
+                            try {
+                                list.add(UserInfoUtil.getUserByHttp(Arrays.asList(uNamepassPort), Arrays.asList("userId", "userName", "mType"), 5000).get(0));
+                            }catch (SocketTimeoutException e1) {
+System.out.println("totalCount:" + totalCount*5 + ", timeoutCount:" + (++timeoutCount)+", passportId : "+uNamepassPort);
+                                list.add(null);
+                                continue;
+                            }
+                        }
+                    }
+                    if(null != list) {
+                        for(int j = 0; j < unameInfoList.size(); j++) {
+                            if(null == list.get(j)) continue;
+                            UnameInfo newUnameInfo = unameInfoList.get(j);
+                            Map<String, Object> map = list.get(j);
+                            SnsUserInfo snsUserInfo = new SnsUserInfo();
+                            snsUserInfo.setPassportId((String) map.get("userId"));
+                            snsUserInfo.setUserName((String) map.get("userName"));
+                            snsUserInfo.setType((Integer) map.get("mType"));
+                            saveUnameSnsDiffToDB(newUnameInfo, snsUserInfo);
+                        }
+                    }
+                    uNamePassPorts.clear();
+                    unameInfoList.clear();
                 }
             }
             System.out.println("diff compare timer end >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
@@ -114,7 +148,6 @@ public class DiffProcessor {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "diff.handle", null, null, e);
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -124,7 +157,8 @@ public class DiffProcessor {
      * @throws MysqlClusterException
      */
     private void saveUnameSnsDiffToDB(UnameInfo unameInfo, SnsUserInfo snsUserInfo) throws Exception {
-        if(null == unameInfo || null == snsUserInfo) return;
+        if(null == unameInfo || null == snsUserInfo || null == snsUserInfo.getPassportId()
+                || ! snsUserInfo.getPassportId().equals(unameInfo.getPassportId())) return;
         Integer uNameType, snsUserType = 10000;
         try {
             uNameType = Integer.parseInt(unameInfo.getType());

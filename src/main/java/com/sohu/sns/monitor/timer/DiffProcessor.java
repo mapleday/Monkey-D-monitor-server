@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.timer;
 
+import com.mysql.jdbc.MysqlDataTruncation;
 import com.sohu.sns.monitor.model.MpUserInfo;
 import com.sohu.sns.monitor.model.SnsUserInfo;
 import com.sohu.sns.monitor.model.UnameInfo;
@@ -136,7 +137,13 @@ System.out.println("totalCount:" + totalCount*5 + ", timeoutCount:" + (++timeout
                             snsUserInfo.setPassportId((String) map.get("userId"));
                             snsUserInfo.setUserName((String) map.get("userName"));
                             snsUserInfo.setType((Integer) map.get("mType"));
-                            saveUnameSnsDiffToDB(newUnameInfo, snsUserInfo);
+                            try {
+                                saveUnameSnsDiffToDB(newUnameInfo, snsUserInfo);
+                            } catch (MysqlDataTruncation e) {
+                    System.out.println("Can't insert data : passportId ,unamepassportId : " + newUnameInfo.getPassportId()+"snsUserPassport : " + snsUserInfo.getUserName()) ;
+                                continue;
+                            }
+
                         }
                     }
                     uNamePassPorts.clear();

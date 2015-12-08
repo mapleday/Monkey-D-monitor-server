@@ -14,6 +14,7 @@ import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.SocketTimeoutException;
@@ -55,7 +56,7 @@ public class DiffProcessor {
     private UNameMysqlClusterService uNameMysqlClusterService;
 
 //    @Scheduled(cron = "0 0/5 * * * ? ")
-//    @Scheduled(cron = "0 45 0 * * ? ")
+    @Scheduled(cron = "0 45 0 * * ? ")
     public void handle(){
         try {
 

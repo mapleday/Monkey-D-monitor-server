@@ -8,10 +8,7 @@ import com.sohu.snscommon.utils.http.HttpClientUtil;
 import com.sohu.snscommon.utils.service.SignatureUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by jinyingshi on 2015/9/21.
@@ -62,5 +59,9 @@ public class UserInfoUtil {
             return userList;
         }
         return null;
+    }
+
+    public static void main(String[] args) throws Exception {
+        UserInfoUtil.getUserByHttp(Arrays.asList("2545CE8730E7652D32375B5D5DA15798@qq.sohu.com"), Arrays.asList("userId", "userName", "mType"), 5000).get(0);
     }
 }

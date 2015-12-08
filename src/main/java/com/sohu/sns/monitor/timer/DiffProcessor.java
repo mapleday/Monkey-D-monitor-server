@@ -136,6 +136,7 @@ System.out.println("totalCount:" + totalCount*5 + ", timeoutCount:" + (++timeout
                             snsUserInfo.setPassportId((String) map.get("userId"));
                             snsUserInfo.setUserName((String) map.get("userName"));
                             snsUserInfo.setType((Integer) map.get("mType"));
+System.out.println("unamepassportId : " + newUnameInfo.getPassportId() + "snsUserPassport : " + snsUserInfo.getUserName()+"snsUserName : " + snsUserInfo.getUserName()) ;
                             try {
                                 saveUnameSnsDiffToDB(newUnameInfo, snsUserInfo);
                             } catch (Exception e) {

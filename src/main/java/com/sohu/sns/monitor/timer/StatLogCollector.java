@@ -63,7 +63,7 @@ public class StatLogCollector {
 
             String beginTime = DateUtil.getBeforeCurrentHour(0);
             String endTime = DateUtil.getBeforeCurrentHour(1);
-            String currentDate = DateUtil.getCurrentDate();
+            String currentDate = DateUtil.getCollectDate();
             int beforeCurrentHour = DateUtil.getHourBefore();
             List statLogList = readJdbcTemplate.query(QUERY_STORM_RESULT, new StormResultMapper(), beginTime, endTime);
             List statLogListByInstance = readJdbcTemplate.query(QUERY_STORM_RESULT_INSTANCE, new StormResultByInstanceMapper(), beginTime, endTime);

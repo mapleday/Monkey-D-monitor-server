@@ -119,6 +119,13 @@ public class DateUtil {
         return new SimpleDateFormat("yyyy-MM-dd").format(new Date());
     }
 
+    public static String getCollectDate() {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.MINUTE, -5);
+        Date date = now.getTime();
+        return new SimpleDateFormat("yyyy-MM-dd").format(date);
+    }
+
     /**
      * 得到当前的时间
      * @return

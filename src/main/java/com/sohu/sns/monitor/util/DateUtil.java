@@ -138,10 +138,11 @@ public class DateUtil {
         }
         Calendar now = Calendar.getInstance();
         StringBuilder stringBuilder = new StringBuilder();
+        now.add(Calendar.HOUR_OF_DAY, -1);
         int year = now.get(Calendar.YEAR);
         int month = now.get(Calendar.MONTH) + 1;
         int day = now.get(Calendar.DAY_OF_MONTH);
-        int hour = now.get(Calendar.HOUR_OF_DAY) - 1;
+        int hour = now.get(Calendar.HOUR_OF_DAY);
         if (0 == flag) {
             return stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
                     .append(day < 10 ? "0" + day : day).append(" ").append(hour < 10 ? "0" + hour : hour).append(":00:00").toString();

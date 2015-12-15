@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.timer;
 
+import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -50,8 +51,8 @@ public class AppErrorCountProcessor{
             return;
         }
         System.out.println("count app error times start ...... time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        String startTime = getBeforeCurrentHour(0);
-        String endTime = getBeforeCurrentHour(1);
+        String startTime = DateUtil.getBeforeCurrentHour(0);
+        String endTime = DateUtil.getBeforeCurrentHour(1);
         List list = readJdbcTemplate.query(QUERY_ERROR_PER_HOUR, new PullPushCountByDayMapper(), startTime, endTime);
         for(Object obj : list) {
             CountPair countPair = (CountPair) obj;
@@ -159,30 +160,6 @@ public class AppErrorCountProcessor{
                 break;
         }
         return current;
-    }
-
-    /**
-     * 获取当前时间的上一个小时的开始时间和结束时间
-     * @param flag 0：上个小时的开始时间， 1：上个小时的结束时间
-     * @return
-     */
-    private String getBeforeCurrentHour(int flag) {
-        if (flag > 1 || flag < 0) {
-            return null;
-        }
-        Calendar now = Calendar.getInstance();
-        StringBuilder stringBuilder = new StringBuilder();
-        int year = now.get(Calendar.YEAR);
-        int month = now.get(Calendar.MONTH) + 1;
-        int day = now.get(Calendar.DAY_OF_MONTH);
-        int hour = now.get(Calendar.HOUR_OF_DAY) - 1;
-        if (0 == flag) {
-            return stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
-                    .append(day < 10 ? "0" + day : day).append(" ").append(hour < 10 ? "0" + hour : hour).append(":00:00").toString();
-        } else {
-            return stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
-                    .append(day < 10 ? "0" + day : day).append(" ").append(hour < 10 ? "0" + hour : hour).append(":59:59").toString();
-        }
     }
 
     private class PullPushCountByDayMapper implements RowMapper {

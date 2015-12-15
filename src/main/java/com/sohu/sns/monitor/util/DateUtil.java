@@ -19,6 +19,12 @@ public class DateUtil {
         return getCurrentHourStr(hour);
     }
 
+    public static int getHourBefore() {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.MINUTE, -2);
+        return now.get(Calendar.HOUR_OF_DAY);
+    }
+
     /**
      * 将小时装换成相应的字符串
      * @param currentHour
@@ -121,4 +127,27 @@ public class DateUtil {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     }
 
+    /**
+     * 获取当前时间的上一个小时的开始时间和结束时间
+     * @param flag 0：上个小时的开始时间， 1：上个小时的结束时间
+     * @return
+     */
+    public static String getBeforeCurrentHour(int flag) {
+        if (flag > 1 || flag < 0) {
+            return null;
+        }
+        Calendar now = Calendar.getInstance();
+        StringBuilder stringBuilder = new StringBuilder();
+        int year = now.get(Calendar.YEAR);
+        int month = now.get(Calendar.MONTH) + 1;
+        int day = now.get(Calendar.DAY_OF_MONTH);
+        int hour = now.get(Calendar.HOUR_OF_DAY) - 1;
+        if (0 == flag) {
+            return stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
+                    .append(day < 10 ? "0" + day : day).append(" ").append(hour < 10 ? "0" + hour : hour).append(":00:00").toString();
+        } else {
+            return stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
+                    .append(day < 10 ? "0" + day : day).append(" ").append(hour < 10 ? "0" + hour : hour).append(":59:59").toString();
+        }
+    }
 }

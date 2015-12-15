@@ -8,8 +8,6 @@ import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -18,7 +16,7 @@ import java.util.Random;
 /**
  * Created by Gary on 2015/11/6.
  */
-@Component
+//@Component
 public class ApiStatusProcessor {
 
     @Autowired
@@ -43,7 +41,7 @@ public class ApiStatusProcessor {
             "appId = ? and moduleName = ? and methodName = ? and date_str = ?";
 
 
-    @Scheduled(cron = "0 0/5 * * * ? ")
+    //@Scheduled(cron = "0 0/5 * * * ? ")
     //@Scheduled(cron = "0/60 * * * * ? ")
     public void process() {
         Map<String, ApiStatus> bucket = ApiStatusBucket.exchange();

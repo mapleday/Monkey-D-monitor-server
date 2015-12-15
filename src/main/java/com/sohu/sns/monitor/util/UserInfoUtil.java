@@ -62,6 +62,6 @@ public class UserInfoUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        UserInfoUtil.getUserByHttp(Arrays.asList("2545CE8730E7652D32375B5D5DA15798@qq.sohu.com"), Arrays.asList("userId", "userName", "mType"), 5000).get(0);
+        UserInfoUtil.getUserByHttp(Arrays.asList("346869583@qq.com"), Arrays.asList("userId", "userName", "mType"), 5000).get(0);
     }
 }

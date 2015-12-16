@@ -53,7 +53,7 @@ public class StatLogCollector {
 
             int random = new Random().nextInt(10000);
             writeJdbcTemplate.update(UPDATE_FLAG, random);
-            Thread.currentThread().sleep(5000);
+            Thread.currentThread().sleep(35000);
 
             Long flag = readJdbcTemplate.queryForObject(QUERY_FLAG, Long.class);
             if(flag != random) {

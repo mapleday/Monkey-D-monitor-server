@@ -21,7 +21,7 @@ public class DateUtil {
 
     public static int getHourBefore() {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, -2);
+        now.add(Calendar.HOUR_OF_DAY, -1);
         return now.get(Calendar.HOUR_OF_DAY);
     }
 
@@ -121,7 +121,7 @@ public class DateUtil {
 
     public static String getCollectDate() {
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.MINUTE, -5);
+        now.add(Calendar.HOUR_OF_DAY, -1);
         Date date = now.getTime();
         return new SimpleDateFormat("yyyy-MM-dd").format(date);
     }

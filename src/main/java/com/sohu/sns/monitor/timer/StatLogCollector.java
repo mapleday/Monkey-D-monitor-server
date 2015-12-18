@@ -44,8 +44,8 @@ public class StatLogCollector {
             "moduleName = ?, methodName = ?, visitCount = ?, timeoutCount = ?, avgCompill = ?, currentHour = ?, date_str = ?, updateTime = now()";
 
 
-    @Scheduled(cron = "0 0/60 * * * ? ")
-    //@Scheduled(cron = "0/60 * * * * ? ")
+    @Scheduled(cron = "0 0 0/1 * * ? ")
+    //@Scheduled(cron = "0/30 * * * * ? ")
     public void handle() {
         try {
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);

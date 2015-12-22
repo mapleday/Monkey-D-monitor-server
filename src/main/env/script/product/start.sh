@@ -1,8 +1,9 @@
 #!/bin/sh
 
 ZK_CONF=/opt/src/config/zk.json
+PORT=8080
 
-APP_MAINCLASS=
+APP_MAINCLASS=com.sohu.sns.monitor.SnsMonitorLogServer
 
 CLASSPATH='.'
 for i in /opt/src/lib/*.jar; do
@@ -21,6 +22,6 @@ JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
 -Dfile.encoding=UTF-8"
 
 
-JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=/opt/src/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF"
+JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=/opt/src/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $PORT"
 echo $JAVA_CMD
 $JAVA_CMD

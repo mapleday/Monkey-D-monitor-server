@@ -144,7 +144,7 @@ public class ErrorLog implements Serializable {
     }
 
     public String genParams() {
-        return "?module="+getModule()+"&method="+getMethod()+"&exceptionName="+getExceptionName();
+        return "?appId="+getAppId()+"&instanceId="+getInstanceId()+"&module="+getModule()+"&method="+getMethod()+"&exceptionName="+getExceptionName();
     }
 
     public String warpHtml() {

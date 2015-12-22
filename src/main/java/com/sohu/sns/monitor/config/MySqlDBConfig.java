@@ -5,9 +5,6 @@ import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.ZkUtils;
-import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 /**
  * Created by morgan on 15/7/1.

@@ -3,6 +3,7 @@ package com.sohu.sns.monitor.server.consumer;
 import com.google.common.base.Function;
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ErrorLogBucket;
+import com.sohu.sns.monitor.bucket.TimeoutBucket;
 import com.sohu.sns.monitor.model.ErrorLog;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
@@ -11,9 +12,7 @@ import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.annotation.Nullable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Gary on 2015/10/19.
@@ -26,9 +25,11 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
     private MysqlClusterService mysqlClusterService;
+    private List<String> exceptionList;
 
-    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService) {
+    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, List<String> exceptionList) {
         this.mysqlClusterService = mysqlClusterService;
+        this.exceptionList = exceptionList;
     }
 
     @Nullable
@@ -72,6 +73,12 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         errorLog.setTime(new Date());
 
         ErrorLogBucket.insertData(errorLog);
+
+        /**超时统计*/
+        if(exceptionList.contains(errorLog.getExceptionName())) {
+            TimeoutBucket.insertData(errorLog.getAppId()+"_"+errorLog.getModule()+"_"+errorLog.getMethod());
+        }
+
         saveToDB(errorLog);
     }
 

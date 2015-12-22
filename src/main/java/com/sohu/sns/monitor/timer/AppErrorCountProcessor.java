@@ -16,7 +16,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Gary on 2015/11/4.
@@ -32,33 +31,26 @@ public class AppErrorCountProcessor{
     private static final String QUERY_IS_EXIST = "select count(1) from app_error_count_per_hour where appId = ? and date_str = ?";
     private static final String INSERT_RECORD = "replace into app_error_count_per_hour set appId = ?, allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_RECORD = "update app_error_count_per_hour set allCount = ifnull(allCount, 0)+?, %s = ? where appId = ? and date_str = ?";
-    private static final String QUERY_STATUS = "select status from count_status where id = 1";
-    private static final String SET_STATUS = "update count_status set status = ? where id = 1";
 
     @Scheduled(cron = "0 0/60 * * * ? ")
 //   @Scheduled(cron = "0/30 * * * * ? ")
     public void process() {
+        System.out.println("count app error times start ...... time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-        int random = new Random().nextInt(10000);
-        writeJdbcTemplate.update(SET_STATUS, random);
-        try {
-            Thread.currentThread().sleep(30000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        if(random != readJdbcTemplate.queryForObject(QUERY_STATUS, Integer.class)) {
-            return;
-        }
-        System.out.println("count app error times start ...... time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
         String startTime = DateUtil.getBeforeCurrentHour(0);
         String endTime = DateUtil.getBeforeCurrentHour(1);
         List list = readJdbcTemplate.query(QUERY_ERROR_PER_HOUR, new PullPushCountByDayMapper(), startTime, endTime);
+        if(list.isEmpty()) return;
+
+        /**取得要统计时间的日期和小时信息**/
+        String date_str = DateUtil.getCollectDate();
+        String current = getCurrentHourStr(getHourBeforeThis());
         for(Object obj : list) {
             CountPair countPair = (CountPair) obj;
-            String date_str = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             Long count = readJdbcTemplate.queryForObject(QUERY_IS_EXIST, Long.class, countPair.getAppId(), date_str);
-            String current = getCurrentHourStr(getHourBeforeThis());
             if(0 == count) {
                 String insertLog = String.format(INSERT_RECORD, current);
                 writeJdbcTemplate.update(insertLog, countPair.getAppId(), countPair.getCount(), countPair.getCount(), date_str);
@@ -67,7 +59,7 @@ public class AppErrorCountProcessor{
                 writeJdbcTemplate.update(updateLog, countPair.getCount(), countPair.getCount(), countPair.getAppId(), date_str);
             }
         }
-        LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "countAppErrors", null, "handled errors count:"+list.size());
+        LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "countAppErrorsByHour", null, "handled errors count:" + list.size());
     }
 
     /**
@@ -75,7 +67,9 @@ public class AppErrorCountProcessor{
      * @return
      */
     private int getHourBeforeThis() {
-        return Calendar.getInstance().get(Calendar.HOUR_OF_DAY) - 1;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR_OF_DAY, -1);
+        return calendar.get(Calendar.HOUR_OF_DAY);
     }
 
     /**

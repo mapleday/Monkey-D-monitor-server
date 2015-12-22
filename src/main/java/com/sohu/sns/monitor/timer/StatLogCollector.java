@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by Gary on 2015/12/15.
@@ -24,6 +23,7 @@ public class StatLogCollector {
 
     @Autowired
     private MysqlClusterService mysqlClusterService;
+
     private static final String UPDATE_FLAG = "update statlog_status set status = ? where id = 1";
     private static final String QUERY_FLAG = "select status from statlog_status where id = 1";
     private static final String QUERY_STORM_RESULT = "select appId, moduleName, methodName, count(distinct(instanceId)) instanceNum, " +
@@ -48,19 +48,11 @@ public class StatLogCollector {
     //@Scheduled(cron = "0/30 * * * * ? ")
     public void handle() {
         try {
-            JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
-            JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
 
-            int random = new Random().nextInt(10000);
-            writeJdbcTemplate.update(UPDATE_FLAG, random);
-            Thread.currentThread().sleep(35000);
-
-            Long flag = readJdbcTemplate.queryForObject(QUERY_FLAG, Long.class);
-            if(flag != random) {
-                return;
-            }
             System.out.println("statLog collector begin ...  time : " + DateUtil.getCurrentTime());
 
+            JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
+            JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
             String beginTime = DateUtil.getBeforeCurrentHour(0);
             String endTime = DateUtil.getBeforeCurrentHour(1);
             String currentDate = DateUtil.getCollectDate();

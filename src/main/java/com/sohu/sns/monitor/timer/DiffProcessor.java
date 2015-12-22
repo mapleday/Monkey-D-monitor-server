@@ -28,10 +28,7 @@ import java.util.*;
 @Component
 public class DiffProcessor {
 
-    private static final String UPDATE_FLAG = "update diff_status set status = ? where id = 1";
-    private static final String QUERY_FLAG = "select status from diff_status where id = 1";
-
-    private static final String QUERY_UNAME_INFO = "select * from u_user_info_%d where status = 1 and type <> '0'";
+    private static final String QUERY_UNAME_INFO = "select * from u_user_info_%d where status = 1 and type != '0'";
     private static final String QUERY_UNAME_SNS = "select * from u_user_info_%d where status = 1";
 
     private static final String QUERY_MP_USER = "select * from profile where status = 1";
@@ -60,16 +57,10 @@ public class DiffProcessor {
     public void handle(){
         try {
 
+            System.out.println("diff compare timer begin >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
+
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-            int random = new Random().nextInt(10000);
-            writeJdbcTemplate.update(UPDATE_FLAG, random);
-            Thread.currentThread().sleep(50000);
-            Long flag = readJdbcTemplate.queryForObject(QUERY_FLAG, Long.class);
-            if(random != flag) {
-                return;
-            }
-            System.out.println("diff compare timer begin >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
 
             /**查询出所有的mp用户信息**/
             JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
@@ -82,8 +73,6 @@ public class DiffProcessor {
 
             List<String> uNamePassPorts = new LinkedList<String>(); //存放唯一名passport的容器，便于批量请求接口
             List<UnameInfo> unameInfoList = new LinkedList<UnameInfo>();//存放唯一名用户信息
-int timeoutCount = 0;
-int totalCount = 0;
             for(int i=0; i < 256; i++) {
                 String queryUnameForMp = String.format(QUERY_UNAME_INFO, i);
                 String queryUnameForSns = String.format(QUERY_UNAME_SNS, i);
@@ -110,7 +99,6 @@ int totalCount = 0;
                     if(5 > uNamePassPorts.size() && currentPos < uNameInfoForSnsList.size()) {
                         continue;
                     }
-totalCount++;
                     List<Map<String, Object>> list = null;
                     try {
                         list = UserInfoUtil.getUserByHttp(uNamePassPorts, Arrays.asList("userId", "userName", "mType"), 10000);
@@ -121,7 +109,6 @@ totalCount++;
                             try {
                                 list.add(UserInfoUtil.getUserByHttp(Arrays.asList(uNamepassPort), Arrays.asList("userId", "userName", "mType"), 5000).get(0));
                             }catch (SocketTimeoutException e1) {
-System.out.println("totalCount:" + totalCount*5 + ", timeoutCount:" + (++timeoutCount)+", passportId : "+uNamepassPort);
                                 list.add(null);
                                 continue;
                             }

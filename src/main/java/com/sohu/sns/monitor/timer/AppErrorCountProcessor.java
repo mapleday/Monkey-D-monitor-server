@@ -7,7 +7,6 @@ import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -32,8 +31,6 @@ public class AppErrorCountProcessor{
     private static final String INSERT_RECORD = "replace into app_error_count_per_hour set appId = ?, allCount = ?, %s = ?, date_str = ?";
     private static final String UPDATE_RECORD = "update app_error_count_per_hour set allCount = ifnull(allCount, 0)+?, %s = ? where appId = ? and date_str = ?";
 
-    @Scheduled(cron = "0 0/60 * * * ? ")
-//   @Scheduled(cron = "0/30 * * * * ? ")
     public void process() {
         System.out.println("count app error times start ...... time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 

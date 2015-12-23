@@ -8,7 +8,6 @@ import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -44,8 +43,6 @@ public class StatLogCollector {
             "moduleName = ?, methodName = ?, visitCount = ?, timeoutCount = ?, avgCompill = ?, currentHour = ?, date_str = ?, updateTime = now()";
 
 
-    @Scheduled(cron = "0 0 0/1 * * ? ")
-    //@Scheduled(cron = "0/30 * * * * ? ")
     public void handle() {
         try {
 

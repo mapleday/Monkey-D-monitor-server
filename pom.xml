@@ -93,6 +93,12 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-rest</artifactId>
             <version>0.98.13-hadoop2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-log4j12</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- hbase end-->
 

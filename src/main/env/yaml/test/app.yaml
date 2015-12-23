@@ -1,4 +1,4 @@
-appid: 11527
+appid: 11569
 install: [jdk1.7.0]
 setenv: {'JVM_ARGS':' -server -Xms2048m -Xmx2048m -Xss256k -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/logs/ -Djava.awt.headless=true -XX:MaxPermSize=512m -Dfile.encoding=UTF-8'}
 start: $USER_DIR/bin/start.sh

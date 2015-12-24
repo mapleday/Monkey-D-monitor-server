@@ -28,7 +28,7 @@ public class SelectPersonServiceImpl implements SelectPersonService {
     @Override
     public void send(String total) throws Exception {
         int max = Integer.parseInt(total);
-        int random = new Random().nextInt(max);
+        int random = new Random(System.currentTimeMillis()).nextInt(max);
 
         int id = random % personInfos.size();
 

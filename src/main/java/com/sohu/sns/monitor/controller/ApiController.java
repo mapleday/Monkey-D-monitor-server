@@ -2,10 +2,7 @@ package com.sohu.sns.monitor.controller;
 
 import com.sohu.sns.monitor.constant.RequestValue;
 import com.sohu.sns.monitor.controller.annotation.RequestParams;
-import com.sohu.sns.monitor.service.CollectStatLogService;
-import com.sohu.sns.monitor.service.CountAppErrorService;
-import com.sohu.sns.monitor.service.DiffCompareService;
-import com.sohu.sns.monitor.service.Test;
+import com.sohu.sns.monitor.service.*;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,8 @@ public class ApiController {
     private DiffCompareService diffCompareService;
     @Autowired
     private CountAppErrorService countAppErrorService;
+    @Autowired
+    private SelectPersonService selectPersonService;
     @Autowired
     private Test test;
 
@@ -68,6 +67,13 @@ public class ApiController {
             return FAILURE;
         }
         LOGGER.statLog(ModuleEnum.MONITOR_SERVICE, "Monitor.countAppError", null, null, System.currentTimeMillis() - start, 0, 0);
+        return SUCCESS;
+    }
+
+    @RequestParams(path = "/monitor/select_person",  method = {"get", "post"}, required = {"total"})
+    public String selectPerson(Map<String, RequestValue> params) throws Exception {
+        String total = params.get("total").value.toString();
+        selectPersonService.send(total);
         return SUCCESS;
     }
 

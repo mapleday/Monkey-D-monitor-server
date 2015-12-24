@@ -14,7 +14,6 @@ import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.net.SocketTimeoutException;
@@ -32,7 +31,6 @@ public class DiffProcessor {
     private static final String QUERY_UNAME_SNS = "select * from u_user_info_%d where status = 1";
 
     private static final String QUERY_MP_USER = "select * from profile where status = 1";
-    private static final String QUERY_SNS_USER = "select * from t_user";
 
     private static final String IS_EXIST_UNAME_MP = "select count(1) from uname_mp_diff where passportId = ? and date_str = ?";
     private static final String IS_EXIST_UNAME_SNS = "select count(1) from uname_sns_diff where passportId = ? and date_str = ?";
@@ -57,13 +55,11 @@ public class DiffProcessor {
 
             System.out.println("diff compare timer begin >>>>>>>>>>>， time : " + DateUtil.getCurrentTime());
 
-            JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
-            JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-
             /**查询出所有的mp用户信息**/
             JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
             Map<String, MpUserInfo> mpUserInfoMap = new HashMap<String, MpUserInfo>();
             List mpUserInfoList = mpReadJdbcTemplate.query(QUERY_MP_USER, new MpUserInfoMapper());
+            System.out.println("MP USER SIZE : " + mpUserInfoList);
             for(Object obj : mpUserInfoList) {
                 MpUserInfo mpUserInfo = (MpUserInfo) obj;
                 mpUserInfoMap.put(mpUserInfo.getPassport(), mpUserInfo);

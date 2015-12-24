@@ -23,8 +23,6 @@ public class StatLogCollector {
     @Autowired
     private MysqlClusterService mysqlClusterService;
 
-    private static final String UPDATE_FLAG = "update statlog_status set status = ? where id = 1";
-    private static final String QUERY_FLAG = "select status from statlog_status where id = 1";
     private static final String QUERY_STORM_RESULT = "select appId, moduleName, methodName, count(distinct(instanceId)) instanceNum, " +
             "sum(visitCount) visitCount, sum(timeoutCount) timeoutCount, sum(allCompileTime) allCompileTime from statLog_info where " +
             "updateTime >= ? and updateTime <= ? group by appId, moduleName, methodName";

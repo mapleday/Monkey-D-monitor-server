@@ -117,11 +117,10 @@ public class DiffProcessor {
                             snsUserInfo.setPassportId((String) map.get("userId"));
                             snsUserInfo.setUserName((String) map.get("userName"));
                             snsUserInfo.setType((Integer) map.get("mType"));
-System.out.println("unamepassportId : " + newUnameInfo.getPassportId() + "snsUserPassport : " + snsUserInfo.getUserName()+"snsUserName : " + snsUserInfo.getUserName()) ;
                             try {
                                 saveUnameSnsDiffToDB(newUnameInfo, snsUserInfo);
                             } catch (Exception e) {
-System.out.println("Can't insert data : passportId ,unamepassportId : " + newUnameInfo.getPassportId()+"snsUserPassport : " + snsUserInfo.getUserName()) ;
+                                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "save_uName_Sns", null, null, e);
                                 continue;
                             }
 
@@ -248,9 +247,9 @@ System.out.println("Can't insert data : passportId ,unamepassportId : " + newUna
         Long count = readJdbcTemplate.queryForObject(IS_EXIST_UNAME_MP, Long.class, unameInfo.getPassportId(), date_str);
         if(0 == count) {
             writeJdbcTemplate.update(INSERT_UNAME_MP, unameInfo.getPassportId(), unameUserName,
-                    mpUsername, mpType, unameInfo.getType(), diffType, date_str);
+                    mpUsername, mpType, uNameType, diffType, date_str);
         } else {
-            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, unameInfo.getType(), diffType,
+            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, uNameType, diffType,
                     unameInfo.getPassportId(), date_str);
         }
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "saveUnameMpDiffToDB", null, null);

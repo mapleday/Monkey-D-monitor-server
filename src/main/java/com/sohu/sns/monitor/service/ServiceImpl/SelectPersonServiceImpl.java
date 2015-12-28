@@ -2,10 +2,13 @@ package com.sohu.sns.monitor.service.ServiceImpl;
 
 import com.sohu.sns.monitor.model.PersonInfo;
 import com.sohu.sns.monitor.service.SelectPersonService;
-import com.sohu.snscommon.utils.http.HttpClientUtil;
+import com.sohu.snscommon.utils.EmailUtil;
+import com.sohu.snscommon.utils.SMS;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Gary on 2015/12/24.
@@ -34,19 +37,10 @@ public class SelectPersonServiceImpl implements SelectPersonService {
 
         PersonInfo personInfo = personInfos.get(id);
 
-        Map<String, String> privateEmailMap = new HashMap<String, String>();
-        privateEmailMap.put("subject", "今日值班提醒");
-        privateEmailMap.put("text", String.format(PRIVATE_CONTENT, personInfo.getName()));
-        privateEmailMap.put("to", personInfo.getEmail());
-        new HttpClientUtil().getByUtf(BASE_URL + "/sendSimpleEmail", privateEmailMap);
-
-        Map<String, String> privateSmsMap = new HashMap<String, String>();
-        privateSmsMap.put("phoneNo", personInfo.getPhone());
-        privateSmsMap.put("msg", String.format(PRIVATE_CONTENT, personInfo.getName()));
-        new HttpClientUtil().getByUtf(BASE_URL + "/sendSms", privateSmsMap);
+        EmailUtil.sendSimpleEmail("今日值班提醒", String.format(PRIVATE_CONTENT, personInfo.getName()), personInfo.getEmail());
+        SMS.sendMessage(personInfo.getPhone(), String.format(PRIVATE_CONTENT, personInfo.getName()));
 
         StringBuilder smsSb = new StringBuilder();
-        StringBuilder emailSb = new StringBuilder();
 
         for(PersonInfo p : personInfos) {
             if(personInfo.getName().equals(p.getName())) {
@@ -57,21 +51,8 @@ public class SelectPersonServiceImpl implements SelectPersonService {
             }
             smsSb.append(p.getPhone());
 
-            if(emailSb.length() != 0) {
-                emailSb.append("|");
-            }
-            emailSb.append(p.getEmail());
+            EmailUtil.sendSimpleEmail("今日值班人通知", String.format(CONTENT, personInfo.getName()), p.getEmail());
         }
-
-        Map<String, String> publicEmailMap = new HashMap<String, String>();
-        publicEmailMap.put("subject", "值班人通知");
-        publicEmailMap.put("text", String.format(CONTENT, personInfo.getName()));
-        publicEmailMap.put("to", emailSb.toString());
-        new HttpClientUtil().getByUtf(BASE_URL + "/sendSimpleEmail", publicEmailMap);
-
-        Map<String, String> publicSmsMap = new HashMap<String, String>();
-        publicSmsMap.put("phoneNo", smsSb.toString());
-        publicSmsMap.put("msg", String.format(CONTENT, personInfo.getName()));
-        new HttpClientUtil().getByUtf(BASE_URL + "/sendSms", publicSmsMap);
+        SMS.sendMessage(smsSb.toString(), String.format(CONTENT, personInfo.getName()));
     }
 }

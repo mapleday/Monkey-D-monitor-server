@@ -39,6 +39,7 @@ public class StatLogCollector {
             "instanceNum = ?, visitCount = ?, timeoutCount = ?, avgCompill = ?, currentHour = ?, date_str = ?, updateTime = now()";
     private static final String INSERT_STAT_LOG_BYHOUR_INSTANCE = "replace into statLog_info_byhour_instanceid set instanceId = ?, appId = ?, " +
             "moduleName = ?, methodName = ?, visitCount = ?, timeoutCount = ?, avgCompill = ?, currentHour = ?, date_str = ?, updateTime = now()";
+    private static final String DELETE_RECORD = "delete from statLog_info where updateTime >= ? and updateTime <= ?";
 
 
     public void handle() {
@@ -85,6 +86,8 @@ public class StatLogCollector {
                         statLogInfo.getMethodName(), statLogInfo.getVisitCount(), statLogInfo.getTimeoutCount(),
                         statLogInfo.getAllCompileTime()/statLogInfo.getVisitCount(), beforeCurrentHour, currentDate);
             }
+
+            writeJdbcTemplate.update(DELETE_RECORD, beginTime, endTime);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "statLog.collector", null, null, e);
             e.printStackTrace();

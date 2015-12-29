@@ -199,16 +199,18 @@ public class DiffProcessor {
 
         if(null == unameInfo || null == mpUserInfo) return;
 
-        Integer uNameType, mpType = 10000;
+        Integer oriUnameType, mpType = 10000;
         try {
-            uNameType = Integer.parseInt(unameInfo.getType());
+            oriUnameType = Integer.parseInt(unameInfo.getType());
             if(null != mpUserInfo.getAccountType()) {
                 mpType = mpUserInfo.getAccountType();
             }
         } catch (NumberFormatException e) {
-            uNameType = 1000;
+            oriUnameType = 1000;
         }
-        switch (uNameType) {
+
+        Integer uNameType;
+        switch (oriUnameType) {
             case 1:
                 uNameType = 0;
                 break;
@@ -217,6 +219,9 @@ public class DiffProcessor {
                 break;
             case 4:
                 uNameType = 2;
+                break;
+            default:
+                uNameType = oriUnameType;
                 break;
         }
 
@@ -247,9 +252,9 @@ public class DiffProcessor {
         Long count = readJdbcTemplate.queryForObject(IS_EXIST_UNAME_MP, Long.class, unameInfo.getPassportId(), date_str);
         if(0 == count) {
             writeJdbcTemplate.update(INSERT_UNAME_MP, unameInfo.getPassportId(), unameUserName,
-                    mpUsername, mpType, uNameType, diffType, date_str);
+                    mpUsername, mpType, oriUnameType, diffType, date_str);
         } else {
-            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, uNameType, diffType,
+            writeJdbcTemplate.update(UPDATE_UNAME_MP, unameUserName, mpUsername, mpType, oriUnameType, diffType,
                     unameInfo.getPassportId(), date_str);
         }
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "saveUnameMpDiffToDB", null, null);

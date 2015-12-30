@@ -16,7 +16,6 @@ import java.util.Random;
 @Component
 public class SelectPersonServiceImpl implements SelectPersonService {
 
-    private static final String BASE_URL = "http://sns-mail-sms.apps.sohuno.com";
     private static final String CONTENT = "友情提示你，今天是%s值班";
     private static final String PRIVATE_CONTENT = "亲爱的%s，今天你值班，请不要忘记";
 
@@ -40,19 +39,17 @@ public class SelectPersonServiceImpl implements SelectPersonService {
         EmailUtil.sendSimpleEmail("今日值班提醒", String.format(PRIVATE_CONTENT, personInfo.getName()), personInfo.getEmail());
         SMS.sendMessage(personInfo.getPhone(), String.format(PRIVATE_CONTENT, personInfo.getName()));
 
-        StringBuilder smsSb = new StringBuilder();
-
         for(PersonInfo p : personInfos) {
             if(personInfo.getName().equals(p.getName())) {
                 continue;
             }
-            if(smsSb.length() != 0) {
-                smsSb.append(",");
-            }
-            smsSb.append(p.getPhone());
-
             EmailUtil.sendSimpleEmail("今日值班人通知", String.format(CONTENT, personInfo.getName()), p.getEmail());
+            SMS.sendMessage(p.getPhone(), String.format(CONTENT, personInfo.getName()));
         }
-        SMS.sendMessage(smsSb.toString(), String.format(CONTENT, personInfo.getName()));
+
+    }
+
+    public static void main(String[] args) throws Exception {
+        new SelectPersonServiceImpl().send("10000");
     }
 }

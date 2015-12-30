@@ -2,8 +2,11 @@ package com.sohu.sns.monitor.service.ServiceImpl;
 
 import com.sohu.sns.monitor.model.PersonInfo;
 import com.sohu.sns.monitor.service.SelectPersonService;
+import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.snscommon.utils.EmailUtil;
+import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.SMS;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -29,24 +32,29 @@ public class SelectPersonServiceImpl implements SelectPersonService {
 
     @Override
     public void send(String total) throws Exception {
-        int max = Integer.parseInt(total);
-        int random = new Random(System.currentTimeMillis()).nextInt(max);
+        try {
+            int max = Integer.parseInt(total);
+            int random = new Random(System.currentTimeMillis()).nextInt(max);
 
-        int id = random % personInfos.size();
+            int id = random % personInfos.size();
 
-        PersonInfo personInfo = personInfos.get(id);
+            PersonInfo personInfo = personInfos.get(id);
 
-        EmailUtil.sendSimpleEmail("今日值班提醒", String.format(PRIVATE_CONTENT, personInfo.getName()), personInfo.getEmail());
-        SMS.sendMessage(personInfo.getPhone(), String.format(PRIVATE_CONTENT, personInfo.getName()));
+            EmailUtil.sendSimpleEmail("今日值班提醒", String.format(PRIVATE_CONTENT, personInfo.getName()), personInfo.getEmail());
+            SMS.sendMessage(personInfo.getPhone(), String.format(PRIVATE_CONTENT, personInfo.getName()));
 
-        for(PersonInfo p : personInfos) {
-            if(personInfo.getName().equals(p.getName())) {
-                continue;
+            for(PersonInfo p : personInfos) {
+                if(personInfo.getName().equals(p.getName())) {
+                    continue;
+                }
+                EmailUtil.sendSimpleEmail("今日值班人通知", String.format(CONTENT, personInfo.getName()), p.getEmail());
+                SMS.sendMessage(p.getPhone(), String.format(CONTENT, personInfo.getName()));
             }
-            EmailUtil.sendSimpleEmail("今日值班人通知", String.format(CONTENT, personInfo.getName()), p.getEmail());
-            SMS.sendMessage(p.getPhone(), String.format(CONTENT, personInfo.getName()));
+            System.out.println("值班人：" + personInfo.getName() + "time : " + DateUtil.getCurrentTime());
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person", total, null, e);
+            e.printStackTrace();
         }
-
     }
 
     public static void main(String[] args) throws Exception {

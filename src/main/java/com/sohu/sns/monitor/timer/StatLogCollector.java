@@ -4,6 +4,7 @@ import com.sohu.sns.monitor.model.StatLogInfo;
 import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.sns.monitor.util.MathsUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
+import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.EmailUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -54,18 +56,20 @@ public class StatLogCollector {
     private static final String EMAIL_CONTENT = "你好，日期:%s, %d时，以下接口访问次数异常,请着重查看：\n";
 
 
-    public void handle() {
+    public void handle() throws MysqlClusterException, ParseException {
+
+        initEnv();
+        System.out.println("statLog collector begin ...  time : " + DateUtil.getCurrentTime());
+        JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
+        JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
+        String beginTime = DateUtil.getBeforeCurrentHour(0);
+        String endTime = DateUtil.getBeforeCurrentHour(1);
+        String currentDate = DateUtil.getCollectDate();
+        int beforeCurrentHour = DateUtil.getHourBefore();
+        Date beginDate = DateUtil.getBeginDate();   //获取从当前时间开始往前推30天
+        StringBuilder sb = new StringBuilder();
+
         try {
-            initEnv();
-            System.out.println("statLog collector begin ...  time : " + DateUtil.getCurrentTime());
-            JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
-            JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-            String beginTime = DateUtil.getBeforeCurrentHour(0);
-            String endTime = DateUtil.getBeforeCurrentHour(1);
-            String currentDate = DateUtil.getCollectDate();
-            int beforeCurrentHour = DateUtil.getHourBefore();
-            Date beginDate = DateUtil.getBeginDate();   //获取从当前时间开始往前推30天
-            StringBuilder sb = new StringBuilder();
             List statLogList = readJdbcTemplate.query(QUERY_STORM_RESULT, new StormResultMapper(), beginTime, endTime);
 
             for(Object obj : statLogList) {
@@ -111,11 +115,11 @@ public class StatLogCollector {
                     }
                 }
             }
-
-            writeJdbcTemplate.update(DELETE_RECORD, beginTime, endTime);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "statLog.collector", null, null, e);
             e.printStackTrace();
+        } finally {
+            writeJdbcTemplate.update(DELETE_RECORD, beginTime, endTime);
         }
 
     }

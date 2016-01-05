@@ -59,7 +59,7 @@ public class DiffProcessor {
             JdbcTemplate mpReadJdbcTemplate = SpringContextUtil.getBean("mpReadJdbcTemplate");
             Map<String, MpUserInfo> mpUserInfoMap = new HashMap<String, MpUserInfo>();
             List mpUserInfoList = mpReadJdbcTemplate.query(QUERY_MP_USER, new MpUserInfoMapper());
-            System.out.println("MP USER SIZE : " + mpUserInfoList);
+            System.out.println("MP USER SIZE : " + mpUserInfoList.size());
             for(Object obj : mpUserInfoList) {
                 MpUserInfo mpUserInfo = (MpUserInfo) obj;
                 mpUserInfoMap.put(mpUserInfo.getPassport(), mpUserInfo);

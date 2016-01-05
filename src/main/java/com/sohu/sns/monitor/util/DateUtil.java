@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.util;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -157,5 +158,22 @@ public class DateUtil {
             return stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
                     .append(day < 10 ? "0" + day : day).append(" ").append(hour < 10 ? "0" + hour : hour).append(":59:59").toString();
         }
+    }
+
+    /**
+     * 获取从当前时间往前推30天的开始时间
+     * @return
+     * @throws ParseException
+     */
+    public static Date getBeginDate() throws ParseException {
+        StringBuilder stringBuilder = new StringBuilder();
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.DAY_OF_MONTH, -30);
+        int year = now.get(Calendar.YEAR);
+        int month = now.get(Calendar.MONTH) + 1;
+        int day = now.get(Calendar.DAY_OF_MONTH);
+        stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
+                .append(day < 10 ? "0" + day : day).append(" 00:00:00");
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(stringBuilder.toString());
     }
 }

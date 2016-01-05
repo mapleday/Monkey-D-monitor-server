@@ -2,9 +2,11 @@ package com.sohu.sns.monitor.service.ServiceImpl;
 
 import com.sohu.sns.monitor.service.CollectStatLogService;
 import com.sohu.sns.monitor.timer.StatLogCollector;
+import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -24,7 +26,13 @@ public class CollectStatLogServiceImpl implements CollectStatLogService {
         processor.execute(new Runnable() {
             @Override
             public void run() {
-                statLogCollector.handle();
+                try {
+                    statLogCollector.handle();
+                } catch (MysqlClusterException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

@@ -3,13 +3,15 @@ package com.sohu.sns.monitor.service.ServiceImpl;
 import com.sohu.sns.monitor.model.PersonInfo;
 import com.sohu.sns.monitor.service.SelectPersonService;
 import com.sohu.sns.monitor.util.DateUtil;
-import com.sohu.snscommon.utils.EmailUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.SMS;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -18,20 +20,17 @@ import java.util.Random;
 @Component
 public class SelectPersonServiceImpl implements SelectPersonService {
 
+    private static final String SMS_EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com";
+    private static final String PERSON_DEV = "13121556477";
+
     @Value("#{myProperties[on_duty_person]}")
     private String person_config;
 
     @Value("#{myProperties[duty_msg]}")
     private String dutyMsg;
 
-    @Value("#{myProperties[un_duty_msg]}")
-    private String unDutyMsg;
-
     @Value("#{myProperties[duty_mail_subject]}")
     private String dutyMailSubject;
-
-    @Value("#{myProperties[un_duty_mail_subject]}")
-    private String unDutyMailSubject;
 
     private PersonInfo[] personInfos = null;
 
@@ -40,7 +39,7 @@ public class SelectPersonServiceImpl implements SelectPersonService {
     public void send(String total) throws Exception {
         try {
 
-            initEnv();
+            initEnv();  //解析值班人信息
             int max = Integer.parseInt(total);
             int random = new Random(System.currentTimeMillis()).nextInt(max);
 
@@ -48,19 +47,42 @@ public class SelectPersonServiceImpl implements SelectPersonService {
 
             PersonInfo personInfo = personInfos[id];
 
-            /**给值班人发送提醒邮件和短信**/
+            /**发送值班提醒邮件和短信**/
             String dutyContent = String.format(dutyMsg, personInfo.getName());
-            EmailUtil.sendSimpleEmail(dutyMailSubject, dutyContent, personInfo.getEmail());
-            SMS.sendMessage(personInfo.getPhone(), dutyContent);
-
-            /***给非值班人发送邮件和短信**/
-            String unDutyContent = String.format(unDutyMsg, personInfo.getName());
+            dutyMailSubject = String.format(dutyMailSubject, DateUtil.getCurrentDate());
+            StringBuilder emailSb = new StringBuilder();
+            StringBuilder smsSb = new StringBuilder();
             for(PersonInfo p : personInfos) {
-                if(personInfo.getName().equals(p.getName())) {
-                    continue;
+                if(0 != emailSb.length()) {
+                    emailSb.append("|");
                 }
-                EmailUtil.sendSimpleEmail(unDutyMailSubject, unDutyContent, p.getEmail());
-                SMS.sendMessage(p.getPhone(), unDutyContent);
+                if(0 != smsSb.length()) {
+                    smsSb.append(",");
+                }
+                emailSb.append(p.getEmail());
+                smsSb.append(p.getPhone());
+            }
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("subject", dutyMailSubject);
+            map.put("text", dutyContent);
+            map.put("to", emailSb.toString());
+            try {
+                new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
+            } catch (Exception e) {
+                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendEmail", total, null, e);
+                SMS.sendMessage(PERSON_DEV, "当天值班人邮件信息发送失败，请重试");
+            } finally {
+                map.clear();
+            }
+            map.put("phoneNo", smsSb.toString());
+            map.put("msg", dutyContent);
+            try {
+                new HttpClientUtil().getByUtf(SMS_EMAIL_URL+"/sendSms", map);
+            } catch (Exception e) {
+                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendSms", total, null, e);
+                SMS.sendMessage(PERSON_DEV, "当天值班人短信发送失败，请重试");
+            } finally {
+                map.clear();
             }
             System.out.println("值班人：" + personInfo.getName() + "time : " + DateUtil.getCurrentTime());
         } catch (Exception e) {
@@ -105,27 +127,11 @@ public class SelectPersonServiceImpl implements SelectPersonService {
         this.dutyMsg = dutyMsg;
     }
 
-    public String getUnDutyMsg() {
-        return unDutyMsg;
-    }
-
-    public void setUnDutyMsg(String unDutyMsg) {
-        this.unDutyMsg = unDutyMsg;
-    }
-
     public String getDutyMailSubject() {
         return dutyMailSubject;
     }
 
     public void setDutyMailSubject(String dutyMailSubject) {
         this.dutyMailSubject = dutyMailSubject;
-    }
-
-    public String getUnDutyMailSubject() {
-        return unDutyMailSubject;
-    }
-
-    public void setUnDutyMailSubject(String unDutyMailSubject) {
-        this.unDutyMailSubject = unDutyMailSubject;
     }
 }

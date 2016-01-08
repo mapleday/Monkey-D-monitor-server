@@ -5,9 +5,9 @@ import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.sns.monitor.util.MathsUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
-import com.sohu.snscommon.utils.EmailUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,9 +17,7 @@ import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Gary on 2015/12/15.
@@ -27,6 +25,7 @@ import java.util.List;
 @Component
 public class StatLogCollector {
 
+    private static final String EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com/sendSimpleEmail";
     @Autowired
     private MysqlClusterService mysqlClusterService;
 
@@ -35,8 +34,6 @@ public class StatLogCollector {
 
     @Value("#{myProperties[mail_to]}")
     private String mailTo;
-
-    private String[] emailAddress = null;
 
     private static final String QUERY_STORM_RESULT = "select appId, moduleName, methodName, count(distinct(instanceId)) instanceNum, " +
             "sum(visitCount) visitCount, sum(timeoutCount) timeoutCount, sum(allCompileTime) allCompileTime from statLog_info where " +
@@ -58,7 +55,6 @@ public class StatLogCollector {
 
     public void handle() throws MysqlClusterException, ParseException {
 
-        initEnv();
         System.out.println("statLog collector begin ...  time : " + DateUtil.getCurrentTime());
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
@@ -107,13 +103,11 @@ public class StatLogCollector {
             /**发送告警邮件**/
             if(0 != sb.length()) {
                 String content = String.format(EMAIL_CONTENT, currentDate, beforeCurrentHour) + sb.toString();
-                if(null == emailAddress) {
-                    initEnv();
-                } else {
-                    for(String mail : emailAddress) {
-                        EmailUtil.sendSimpleEmail(subject, content, mail);
-                    }
-                }
+                Map<String, String> map = new HashMap<String, String>();
+                map.put("subject", subject);
+                map.put("text", content);
+                map.put("to", mailTo);
+                new HttpClientUtil().postByUtf(EMAIL_URL, map, null);
             }
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "statLog.collector", null, null, e);
@@ -147,15 +141,6 @@ public class StatLogCollector {
         @Override
         public Integer mapRow(ResultSet resultSet, int i) throws SQLException {
             return resultSet.getInt("visitCount");
-        }
-    }
-
-    /**
-     * 初始化发送邮件的人
-     */
-    private void initEnv() {
-        if(null == emailAddress) {
-            emailAddress = mailTo.split("\\|");
         }
     }
 

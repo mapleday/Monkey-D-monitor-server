@@ -46,7 +46,7 @@ public class StatLogCollector {
             "updateTime = now() where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
     private static final String INSERT_STAT_LOG_BYHOUR = "replace into statLog_info_byhour set appId = ?, moduleName = ?, methodName = ?, " +
             "instanceNum = ?, visitCount = ?, timeoutCount = ?, avgCompill = ?, currentHour = ?, date_str = ?, updateTime = now()";
-    private static final String DELETE_RECORD = "delete from statLog_info where last_update >= ? and last_update <= ?";
+    private static final String DELETE_RECORD = "delete from statLog_info where last_update <= ?";
     private static final String QUERY_HISTORY_VISITCOUNT = "select visitCount from statlog_info_byhour where appId = ? and moduleName = ? and methodName = ? and " +
             "currentHour = ? and updateTime >= ? order by date_str desc";
     private static final String VISIT_EXCEPTION = "%s_%s_%s, 访问次数:%d \n";
@@ -113,7 +113,7 @@ public class StatLogCollector {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "statLog.collector", null, null, e);
             e.printStackTrace();
         } finally {
-            writeJdbcTemplate.update(DELETE_RECORD, beginTime, endTime);
+            writeJdbcTemplate.update(DELETE_RECORD, endTime);
         }
 
     }

@@ -1,6 +1,7 @@
 package com.sohu.sns.monitor.util;
 
-import java.util.Arrays;
+import com.sohu.sns.monitor.model.ExceptionValue;
+
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  */
 public class MathsUtils {
 
-    public static List<Double> getStatus(List<Integer> nums) {
+    public static ExceptionValue getStatus(List<Integer> nums) {
         if(null == nums || nums.size() <= 2) {
             return null;
         }
@@ -33,9 +34,9 @@ public class MathsUtils {
                 secondIndex = i;
             }
         }
-        double max = nums.get(firstIndex+1);
-        double min = nums.get(firstIndex+1);
-        double sum = 0.0;
+        Integer max = nums.get(firstIndex+1);
+        Integer min = nums.get(firstIndex+1);
+        Integer sum = 0;
 
         for(int i = firstIndex+1; i <= secondIndex; i++) {
             sum += nums.get(i);
@@ -46,8 +47,12 @@ public class MathsUtils {
                 min = nums.get(i);
             }
         }
-        return Arrays.asList(max, min, sum/(Math.abs(secondIndex-firstIndex)-1));
-    }
+        ExceptionValue exceptionValue = new ExceptionValue();
+        exceptionValue.setMaxVisitCount(max);
+        exceptionValue.setMinVisitCount(min);
+        exceptionValue.setAvgVisitCount(sum/(Math.abs(secondIndex-firstIndex)-1));
+        return exceptionValue;
+}
 
     private static double getSum(List<Integer> list, int pos) {
         double sum = 0;

@@ -9,6 +9,20 @@ import java.util.Date;
  * Created by Gary on 2015/11/12.
  */
 public class DateUtil {
+
+    public static Integer getCurrentPeriod() {
+        Double min = Double.parseDouble(new SimpleDateFormat("mm").format(new Date()));
+        if(0 == min % 5.0) {
+            return (int)(min/5.0 + 1);
+        } else {
+            return (int)Math.ceil(min/5.0);
+        }
+    }
+
+    public static Integer getCurrentHour() {
+        return Integer.parseInt(new SimpleDateFormat("HH").format(new Date()));
+    }
+
     /**
      * 获得小时
      * @return
@@ -161,19 +175,26 @@ public class DateUtil {
     }
 
     /**
-     * 获取从当前时间往前推30天的开始时间
+     * 获取从当前时间往前推60天的开始时间
      * @return
      * @throws ParseException
      */
-    public static Date getBeginDate() throws ParseException {
+    public static Date getBeginDate(int delay) throws ParseException {
         StringBuilder stringBuilder = new StringBuilder();
         Calendar now = Calendar.getInstance();
-        now.add(Calendar.DAY_OF_MONTH, -30);
+        now.add(Calendar.DAY_OF_MONTH, delay);
         int year = now.get(Calendar.YEAR);
         int month = now.get(Calendar.MONTH) + 1;
         int day = now.get(Calendar.DAY_OF_MONTH);
         stringBuilder.append(year).append("-").append(month < 10 ? "0" + month : month).append("-")
                 .append(day < 10 ? "0" + day : day).append(" 00:00:00");
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(stringBuilder.toString());
+    }
+
+    public static Integer getCollectHour() {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.HOUR_OF_DAY, -1);
+        String hour = new SimpleDateFormat("HH").format(now.getTime());
+        return Integer.parseInt(hour);
     }
 }

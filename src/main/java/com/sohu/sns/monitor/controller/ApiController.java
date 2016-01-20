@@ -72,8 +72,7 @@ public class ApiController {
 
     @RequestParams(path = "/monitor/select_person",  method = {"get", "post"}, required = {"total"})
     public String selectPerson(Map<String, RequestValue> params) throws Exception {
-        String total = params.get("total").value.toString();
-        selectPersonService.send(total);
+        selectPersonService.send();
         return SUCCESS;
     }
 

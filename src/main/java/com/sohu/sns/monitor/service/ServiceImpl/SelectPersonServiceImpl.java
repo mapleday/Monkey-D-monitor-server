@@ -10,9 +10,7 @@ import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Gary on 2015/12/24.
@@ -21,7 +19,8 @@ import java.util.Random;
 public class SelectPersonServiceImpl implements SelectPersonService {
 
     private static final String SMS_EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com";
-    private static final String PERSON_DEV = "13121556477";
+    private static final String PERSON_DEV = "18910556026";
+    private int flag = 0;
 
     @Value("#{myProperties[on_duty_person]}")
     private String person_config;
@@ -32,21 +31,15 @@ public class SelectPersonServiceImpl implements SelectPersonService {
     @Value("#{myProperties[duty_mail_subject]}")
     private String dutyMailSubject;
 
-    private PersonInfo[] personInfos = null;
+    private List<PersonInfo> personInfos = null;
 
 
     @Override
-    public void send(String total) throws Exception {
+    public void send() throws Exception {
         try {
 
             initEnv();  //解析值班人信息
-            int max = Integer.parseInt(total);
-            int random = new Random(System.currentTimeMillis()).nextInt(max);
-
-            int id = random % personInfos.length;
-
-            PersonInfo personInfo = personInfos[id];
-
+            PersonInfo personInfo = personInfos.get(flag++);
             /**发送值班提醒邮件和短信**/
             String dutyContent = String.format(dutyMsg, personInfo.getName());
             dutyMailSubject = String.format(dutyMailSubject, DateUtil.getCurrentDate());
@@ -69,7 +62,7 @@ public class SelectPersonServiceImpl implements SelectPersonService {
             try {
                 new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
             } catch (Exception e) {
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendEmail", total, null, e);
+                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendEmail", null, null, e);
                 SMS.sendMessage(PERSON_DEV, "当天值班人邮件信息发送失败，请重试");
             } finally {
                 map.clear();
@@ -79,14 +72,18 @@ public class SelectPersonServiceImpl implements SelectPersonService {
             try {
                 new HttpClientUtil().getByUtf(SMS_EMAIL_URL+"/sendSms", map);
             } catch (Exception e) {
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendSms", total, null, e);
+                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendSms", null, null, e);
                 SMS.sendMessage(PERSON_DEV, "当天值班人短信发送失败，请重试");
             } finally {
                 map.clear();
             }
             System.out.println("值班人：" + personInfo.getName() + "time : " + DateUtil.getCurrentTime());
+            if(flag == personInfos.size()) {
+                flag = 0;
+                Collections.shuffle(personInfos);
+            }
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person", total, null, e);
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person", null, null, e);
             e.printStackTrace();
         }
     }
@@ -97,18 +94,18 @@ public class SelectPersonServiceImpl implements SelectPersonService {
     private void initEnv() {
         if(null == personInfos) {
             String[] arr = person_config.split("\\|");
-            personInfos = new PersonInfo[arr.length];
+            personInfos = new ArrayList<PersonInfo>();
             for(int i=0; i<arr.length; i++) {
                 String[] everyPerson = arr[i].split(",");
                 if(3 == everyPerson.length) {
-                    personInfos[i] = new PersonInfo(everyPerson[0], everyPerson[1], everyPerson[2]);
+                    personInfos.add(new PersonInfo(everyPerson[0], everyPerson[1], everyPerson[2]));
                 }
             }
         }
     }
 
     public static void main(String[] args) throws Exception {
-        new SelectPersonServiceImpl().send("10000");
+        new SelectPersonServiceImpl().send();
     }
 
     public String getPerson_config() {

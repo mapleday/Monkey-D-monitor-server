@@ -4,14 +4,13 @@ package com.sohu.sns.monitor.model;
  * Created by Gary on 2015/12/15.
  */
 public class StatLogInfo {
+
     private String appId;
-    private String instanceId;
     private String moduleName;
     private String methodName;
-    private int instanceNum;
     private Long visitCount;
     private Long timeoutCount;
-    private Long allCompileTime;
+    private Double avgCompill;
 
     public String getAppId() {
         return appId;
@@ -19,14 +18,6 @@ public class StatLogInfo {
 
     public void setAppId(String appId) {
         this.appId = appId;
-    }
-
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
     }
 
     public String getModuleName() {
@@ -45,14 +36,6 @@ public class StatLogInfo {
         this.methodName = methodName;
     }
 
-    public int getInstanceNum() {
-        return instanceNum;
-    }
-
-    public void setInstanceNum(int instanceNum) {
-        this.instanceNum = instanceNum;
-    }
-
     public Long getVisitCount() {
         return visitCount;
     }
@@ -69,11 +52,11 @@ public class StatLogInfo {
         this.timeoutCount = timeoutCount;
     }
 
-    public Long getAllCompileTime() {
-        return allCompileTime;
+    public Double getAvgCompill() {
+        return avgCompill;
     }
 
-    public void setAllCompileTime(Long allCompileTime) {
-        this.allCompileTime = allCompileTime;
+    public void setAvgCompill(Double avgCompill) {
+        this.avgCompill = avgCompill;
     }
 }

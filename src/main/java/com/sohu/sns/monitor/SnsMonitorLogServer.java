@@ -22,13 +22,12 @@ public class SnsMonitorLogServer {
         try {
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
-
             new ClassPathXmlApplicationContext("classpath:monitor/monitor-spring.xml");
 
             MysqlClusterServiceImpl bean = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
             bean.init(new MySqlDBConfig());
 
-            // 唯一名线上数据库数据源
+            /** 唯一名线上数据库数据源**/
             UNameMysqlClusterService uNameBean = SpringContextUtil.getBean(UNameMysqlClusterService.class);
             uNameBean.init(null);
 

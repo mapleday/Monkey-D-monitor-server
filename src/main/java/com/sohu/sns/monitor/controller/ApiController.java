@@ -29,6 +29,8 @@ public class ApiController {
     @Autowired
     private SelectPersonService selectPersonService;
     @Autowired
+    private DelErrorLogsService delErrorLogsService;
+    @Autowired
     private Test test;
 
     @RequestParams(path = "/monitor/collect_statLog", method = {"get", "post"}, required = {"extra"})
@@ -73,6 +75,12 @@ public class ApiController {
     @RequestParams(path = "/monitor/select_person",  method = {"get", "post"}, required = {"total"})
     public String selectPerson(Map<String, RequestValue> params) throws Exception {
         selectPersonService.send();
+        return SUCCESS;
+    }
+
+    @RequestParams(path = "/monitor/del_error_logs",  method = {"get", "post"}, required = {"extra"})
+    public String deleteErrorLogs(Map<String, RequestValue> params) throws Exception {
+        delErrorLogsService.deleteRecord();
         return SUCCESS;
     }
 

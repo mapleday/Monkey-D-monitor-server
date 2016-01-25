@@ -9,6 +9,7 @@ import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.annotation.Nullable;
@@ -38,10 +39,11 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         String msg = null;
         try {
             msg = new String(bytes, "UTF-8");
-            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "applyErrorLog", msg, null);
+//            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "applyErrorLog", msg, null);
             handle(msg);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "apply.msg.handleMsg", msg, null, e);
+            e.printStackTrace();
         }
         return true;
     }
@@ -51,18 +53,18 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
      * @param msg
      * @throws MysqlClusterException
      */
-    private void handle(String msg) throws MysqlClusterException {
+    private void handle(String msg) throws Exception {
         Map<String, Object> msgMap = jsonMapper.fromJson(msg, HashMap.class);
-        if(null == msgMap || 0 == msgMap.size()) {
+        if(null == msgMap || msgMap.isEmpty()) {
             return;
         }
-        String[] arr = ((String)msgMap.get("appId")).split("_");
+        String[] arr = StringUtils.split((String) msgMap.get("appId"), "_");
         if(2 != arr.length) {
             return;
         }
         ErrorLog errorLog = new ErrorLog();
-        errorLog.setAppId(arr[0]);
-        errorLog.setInstanceId(arr[1]);
+        errorLog.setAppId(arr[0].replaceAll("\"", ""));
+        errorLog.setInstanceId(arr[1].replaceAll("\"", ""));
         errorLog.setModule((String) msgMap.get("module"));
         errorLog.setMethod((String) msgMap.get("method"));
         errorLog.setParam((String) msgMap.get("param"));
@@ -87,7 +89,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
      * @param errorLog
      * @throws MysqlClusterException
      */
-    private void saveToDB(ErrorLog errorLog) throws MysqlClusterException {
+    private void saveToDB(ErrorLog errorLog) throws Exception {
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
         writeJdbcTemplate.update(INSERT_DATA, errorLog.getAppId(), errorLog.getInstanceId(),
                 errorLog.getModule(), errorLog.getMethod(), errorLog.getParam(),

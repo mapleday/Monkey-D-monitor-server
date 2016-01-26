@@ -34,6 +34,9 @@ public class MathsUtils {
                 secondIndex = i;
             }
         }
+        if(Math.abs(secondIndex-firstIndex)-1 <= 0) {
+            return null;
+        }
         Integer max = nums.get(firstIndex+1);
         Integer min = nums.get(firstIndex+1);
         Integer sum = 0;

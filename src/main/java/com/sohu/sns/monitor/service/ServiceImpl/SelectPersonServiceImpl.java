@@ -3,6 +3,7 @@ package com.sohu.sns.monitor.service.ServiceImpl;
 import com.sohu.sns.monitor.model.PersonInfo;
 import com.sohu.sns.monitor.service.SelectPersonService;
 import com.sohu.sns.monitor.util.DateUtil;
+import com.sohu.snscommon.utils.EmailUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.SMS;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -19,7 +20,9 @@ import java.util.*;
 public class SelectPersonServiceImpl implements SelectPersonService {
 
     private static final String SMS_EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com";
-    private static final String PERSON_DEV = "18910556026";
+    private static final String PERSON_PHONE_DEV = "18910556026";
+    private static final String PERSON_EMAIL_DEV = "shouqinchen@sohu-inc.com";
+
     private int flag = 0;
 
     @Value("#{myProperties[on_duty_person]}")
@@ -60,20 +63,30 @@ public class SelectPersonServiceImpl implements SelectPersonService {
             map.put("text", dutyContent);
             map.put("to", emailSb.toString());
             try {
-                new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
+                //String result = new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
+                //if(!"success".equals(result)) {
+                    EmailUtil.sendSimpleEmail("值班邮件发送失败提醒", "值班邮件发送失败，今天的值班人是"+personInfo.getName()+"，请及时提醒", PERSON_EMAIL_DEV);
+                    SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人邮件信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
+                //}
             } catch (Exception e) {
                 LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendEmail", null, null, e);
-                SMS.sendMessage(PERSON_DEV, "当天值班人邮件信息发送失败，请重试");
+                EmailUtil.sendSimpleEmail("值班邮件发送失败提醒", "值班邮件发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);
+                SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人邮件信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
             } finally {
                 map.clear();
             }
             map.put("phoneNo", smsSb.toString());
             map.put("msg", dutyContent);
             try {
-                new HttpClientUtil().getByUtf(SMS_EMAIL_URL+"/sendSms", map);
+                String result = new HttpClientUtil().getByUtf(SMS_EMAIL_URL+"/sendSms", map);
+                if(!"success".equals(result)) {
+                    EmailUtil.sendSimpleEmail("值班短信发送失败提醒", "值班短信发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);
+                    SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人短信信息发送失败，值班人：" + personInfo.getName() + "，请及时提醒");
+                }
             } catch (Exception e) {
                 LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendSms", null, null, e);
-                SMS.sendMessage(PERSON_DEV, "当天值班人短信发送失败，请重试");
+                EmailUtil.sendSimpleEmail("值班短信发送失败提醒", "值班短信发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);
+                SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人短信信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
             } finally {
                 map.clear();
             }

@@ -37,11 +37,19 @@ public class MathsUtils {
         if(Math.abs(secondIndex-firstIndex)-1 <= 0) {
             return null;
         }
-        Integer max = nums.get(firstIndex+1);
-        Integer min = nums.get(firstIndex+1);
+        Integer begin, end;
+        if(firstIndex < secondIndex) {
+            begin = firstIndex;
+            end = secondIndex;
+        } else {
+            begin = secondIndex;
+            end = firstIndex;
+        }
+        Integer max = nums.get(begin+1);
+        Integer min = nums.get(begin+1);
         Integer sum = 0;
 
-        for(int i = firstIndex+1; i <= secondIndex; i++) {
+        for(int i = begin+1; i <= end; i++) {
             sum += nums.get(i);
             if(max <= nums.get(i)) {
                 max = nums.get(i);

@@ -34,7 +34,7 @@ public class MathsUtils {
                 secondIndex = i;
             }
         }
-        if(Math.abs(secondIndex-firstIndex)-1 <= 0) {
+        if(Math.abs(secondIndex-firstIndex)<= 0) {
             return null;
         }
         Integer begin, end;
@@ -61,7 +61,7 @@ public class MathsUtils {
         ExceptionValue exceptionValue = new ExceptionValue();
         exceptionValue.setMaxVisitCount(max);
         exceptionValue.setMinVisitCount(min);
-        exceptionValue.setAvgVisitCount(sum/(Math.abs(secondIndex-firstIndex)-1));
+        exceptionValue.setAvgVisitCount(sum/(Math.abs(secondIndex-firstIndex)));
         return exceptionValue;
 }
 

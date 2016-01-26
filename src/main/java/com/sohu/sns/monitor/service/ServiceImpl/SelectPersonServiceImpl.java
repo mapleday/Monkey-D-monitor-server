@@ -63,11 +63,11 @@ public class SelectPersonServiceImpl implements SelectPersonService {
             map.put("text", dutyContent);
             map.put("to", emailSb.toString());
             try {
-                //String result = new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
-                //if(!"success".equals(result)) {
+                String result = new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
+                if(!"success".equals(result)) {
                     EmailUtil.sendSimpleEmail("值班邮件发送失败提醒", "值班邮件发送失败，今天的值班人是"+personInfo.getName()+"，请及时提醒", PERSON_EMAIL_DEV);
                     SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人邮件信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
-                //}
+                }
             } catch (Exception e) {
                 LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendEmail", null, null, e);
                 EmailUtil.sendSimpleEmail("值班邮件发送失败提醒", "值班邮件发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);

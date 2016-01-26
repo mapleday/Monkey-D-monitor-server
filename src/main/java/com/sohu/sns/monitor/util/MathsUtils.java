@@ -34,7 +34,7 @@ public class MathsUtils {
                 secondIndex = i;
             }
         }
-        if(Math.abs(secondIndex-firstIndex)<= 0) {
+        if(Math.abs(secondIndex-firstIndex)-1<= 0) {
             return null;
         }
         Integer begin, end;

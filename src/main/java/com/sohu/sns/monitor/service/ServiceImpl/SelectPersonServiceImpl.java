@@ -21,9 +21,9 @@ public class SelectPersonServiceImpl implements SelectPersonService {
 
     private static final String SMS_EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com";
     private static final String PERSON_PHONE_DEV = "18910556026";
-    private static final String PERSON_EMAIL_DEV = "shouqinchen@sohu-inc.com";
+    private static final String PERSON_EMAIL_DEV = "jinyingshi@sohu-inc.com";
 
-    private int flag = 0;
+    private Integer flag;
 
     @Value("#{myProperties[on_duty_person]}")
     private String person_config;
@@ -114,6 +114,9 @@ public class SelectPersonServiceImpl implements SelectPersonService {
                     personInfos.add(new PersonInfo(everyPerson[0], everyPerson[1], everyPerson[2]));
                 }
             }
+        }
+        if(null == flag) {
+           flag = new Random().nextInt(personInfos.size()-1);
         }
     }
 

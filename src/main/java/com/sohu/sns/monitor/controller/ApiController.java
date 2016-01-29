@@ -33,6 +33,7 @@ public class ApiController {
     @Autowired
     private Test test;
 
+    //收集statlog，分析访问次数是否异常
     @RequestParams(path = "/monitor/collect_statLog", method = {"get", "post"}, required = {"extra"})
     public String CollectStatLog(Map<String, RequestValue> params) throws Exception {
         Long start = System.currentTimeMillis();
@@ -46,6 +47,7 @@ public class ApiController {
         return SUCCESS;
     }
 
+    //唯一名数据和sns缓存数据是否一致
     @RequestParams(path = "/monitor/diff_compare", method = {"get", "post"}, required = {"extra"})
     public String diffCompare(Map<String, RequestValue> params) throws Exception {
         Long start = System.currentTimeMillis();
@@ -59,6 +61,7 @@ public class ApiController {
         return SUCCESS;
     }
 
+    //统计LOGGER.errlog出现次数，根据appid
     @RequestParams(path = "/monitor/count_app_error",  method = {"get", "post"}, required = {"extra"})
     public String countAppError(Map<String, RequestValue> params) throws Exception {
         Long start = System.currentTimeMillis();
@@ -72,12 +75,14 @@ public class ApiController {
         return SUCCESS;
     }
 
+    //值班短信
     @RequestParams(path = "/monitor/select_person",  method = {"get", "post"}, required = {"total"})
     public String selectPerson(Map<String, RequestValue> params) throws Exception {
         selectPersonService.send();
         return SUCCESS;
     }
 
+    //定时清理mysql错误日志
     @RequestParams(path = "/monitor/del_error_logs",  method = {"get", "post"}, required = {"extra"})
     public String deleteErrorLogs(Map<String, RequestValue> params) throws Exception {
         delErrorLogsService.deleteRecord();

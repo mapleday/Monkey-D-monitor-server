@@ -63,12 +63,13 @@ public class StatLogVisitAnalyzer {
         try {
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             Date beginDate = DateUtil.getBeginDate(-60);   //获取从当前时间开始往前推60天
-            Date endDate = DateUtil.getBeginDate(0);
+            Date endDate = DateUtil.getBeginDate(0); //前一天
             List<ExceptionValue> exceptionValues = new LinkedList<ExceptionValue>();
+            //当前时间段访问请求数
             List statLogList = readJdbcTemplate.query(QUERY_RECORD_BY_MIN, new ResultMapper(), dateStr, hour, period);
             for(Object obj : statLogList) {
                 StatLogInfo statLogInfo = (StatLogInfo) obj;
-                /**预测是不是访问异常**/
+                /**查看历史访问记录，预测是不是访问异常**/
                 List<Integer> visitCountList = readJdbcTemplate.query(QUERY_HISTORY_VISITCOUNT, new AlarmVisitCountMapper(), statLogInfo.getAppId(),
                         statLogInfo.getModuleName(), statLogInfo.getMethodName(), hour, period, endDate, beginDate);
                 Collections.sort(visitCountList);

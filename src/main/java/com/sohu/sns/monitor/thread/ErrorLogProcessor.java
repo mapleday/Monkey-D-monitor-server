@@ -134,6 +134,7 @@ public class ErrorLogProcessor implements Runnable {
                 } finally {
                     LOGGER.statLog(ModuleEnum.MONITOR_SERVICE, "ErrorLogProcessor.Timer.run", "", "", System.currentTimeMillis() - startTime, 0, 0);
                 }
+            }
         }, random, random);
     }
 

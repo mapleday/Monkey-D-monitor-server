@@ -7,7 +7,6 @@ import com.sohu.sns.monitor.util.MathsUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
-import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -117,7 +116,8 @@ public class StatLogVisitAnalyzer {
                 map.put("subject", subject);
                 map.put("text", sb.toString());
                 map.put("to", mailTo);
-                new HttpClientUtil().postByUtf(EMAIL_URL, map, null);
+                //2016-2-18 11:11:00 暂时去掉发送邮件，邮件太多，没有意义，后期优化
+//                new HttpClientUtil().postByUtf(EMAIL_URL, map, null);
             }
 
             System.out.println("statLog visit analyser end ...  time : " + DateUtil.getCurrentTime());

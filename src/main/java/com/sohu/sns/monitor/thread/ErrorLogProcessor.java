@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -68,10 +69,14 @@ public class ErrorLogProcessor implements Runnable {
                                     "<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"800\" style=\"border-collapse: collapse; table-layout:fixed;\">");
                             Map<String, MergedErrorLog> map = new HashMap<String, MergedErrorLog>();
 
+                            AtomicInteger errorParamsCount = new AtomicInteger(0);
                             for (ErrorLog errorLog : errorLogs) {
                                 String key = errorLog.getKey();
                                 if (map.containsKey(key)) {
-                                    map.get(key).addParams(errorLog.getParam());
+//                                    map.get(key).addParams(errorLog.getParam());
+                                    if (errorParamsCount.incrementAndGet() <= 10){
+                                        map.get(key).addParams(errorLog.getParam());
+                                    }
                                     map.get(key).addTimes(1);
                                 } else {
                                     MergedErrorLog mergedErrorLog = new MergedErrorLog();

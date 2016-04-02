@@ -5,9 +5,7 @@ import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ErrorLogBucket;
 import com.sohu.sns.monitor.bucket.TimeoutBucket;
 import com.sohu.sns.monitor.model.ErrorLog;
-import com.sohu.sns.monitor.model.MergedErrorLog;
 import com.sohu.sns.monitor.util.DateUtil;
-import com.sohu.sns.monitor.util.EmailStringFormatUtils;
 import com.sohu.sns.monitor.util.ZipUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
@@ -26,10 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ErrorLogProcessor implements Runnable {
 
-
-    private static final String INSTANCE_COUNT = "instanceCount";
-    private static final String ERROR_COUNT = "errorCount";
-    private static final String ERROR_DETAIL = "errorDetail";
     public static String baseUrl, stackTraceUrl, emailErrorlogInterface, smsErrorlogInterface, smsTimeoutWarnInterface;
 
     private static final String IS_EXISTS = "select count(1) from timeout_api_collect where appId = ? and moduleName = ?" +
@@ -60,75 +54,35 @@ public class ErrorLogProcessor implements Runnable {
             @Override
             public void run() {
                 long startTime = System.currentTimeMillis();
+
+                if (inProcess) return;
+
+                /**错误信息统计桶**/
+                ConcurrentHashMap<String, List<ErrorLog>> bucket = ErrorLogBucket.exchange();
+                /**超时统计桶*/
+                ConcurrentHashMap<String, AtomicInteger> timeoutBucket = TimeoutBucket.exchange();
+
                 try {
-                    if (inProcess) return;
-                    ConcurrentHashMap<String, List<ErrorLog>> bucket = ErrorLogBucket.exchange();
                     if (null != bucket && ! bucket.isEmpty()) {
                         System.out.println("error_log_send_to_server timer, bucket_size : " + bucket.size() +
                                 ", time : "+ DateUtil.getCurrentTime());
+
+                        Map<String, String> convertedMap = new HashMap<String, String>();
                         Set<String> keySet = bucket.keySet();
-                        Map<String, String> smsMap = new HashMap<String, String>();
-                        Map<String, String> emailMap = new HashMap<String, String>();
-                        StringBuilder emailSb = new StringBuilder();
-                        smsMap.put(INSTANCE_COUNT, String.valueOf(keySet.size()));
-                        emailMap.put(INSTANCE_COUNT, String.valueOf(keySet.size()));
-
-                        int total = 0;
-                        for (String instance : keySet) {
-                            List<ErrorLog> errorLogs = bucket.get(instance);
-                            emailSb.append(EmailStringFormatUtils.formatHead(instance));
-                            Map<String, MergedErrorLog> map = new HashMap<String, MergedErrorLog>();
-                            AtomicInteger errorParamsCount = new AtomicInteger(0);
-                            for (ErrorLog errorLog : errorLogs) {
-                                String key = errorLog.getKey();
-                                if (map.containsKey(key)) {
-                                    if (errorParamsCount.incrementAndGet() <= 10){
-                                        map.get(key).addParams(errorLog.getParam());
-                                    }
-                                    map.get(key).addTimes(1);
-                                } else {
-                                    MergedErrorLog mergedErrorLog = new MergedErrorLog();
-                                    mergedErrorLog.setErrorLog(errorLog);
-                                    mergedErrorLog.addParams(errorLog.getParam());
-                                    mergedErrorLog.addTimes(1);
-                                    map.put(key, mergedErrorLog);
-                                }
-                            }
-
-                            Set<Map.Entry<String, MergedErrorLog>> set = map.entrySet();
-                            for (Map.Entry<String, MergedErrorLog> entry : set) {
-
-                                emailSb.append(entry.getValue().getErrorLog().warpHtml())
-                                        .append(EmailStringFormatUtils.formatTail(
-                                                entry.getValue().getParams().toString(),
-                                                stackTraceUrl + entry.getValue().getErrorLog().genParams(),
-                                                entry.getValue().getTimes()));
-
-                                total += entry.getValue().getTimes();
-                            }
-                            emailSb.append("</table>");
+                        for(String key : keySet) {
+                            convertedMap.put(key, jsonMapper.toJson(bucket.get(key)));
                         }
-                        /**清理当前的桶**/
-                        bucket.clear();
-
-                        smsMap.put(ERROR_COUNT, String.valueOf(total));
-                        emailMap.put(ERROR_DETAIL, ZipUtils.gzip(emailSb.toString()));  //发送的数据进行了压缩
-
+                        String errorLogs = ZipUtils.gzip(jsonMapper.toJson(convertedMap));
+                        Map<String, String> errorMap = new HashMap<String, String>();
+                        errorMap.put("errorLogs", errorLogs);
                         try {
-                            HttpClientUtil.getStringByGet(baseUrl+smsErrorlogInterface, smsMap);
+                            HttpClientUtil.getStringByPost(baseUrl+emailErrorlogInterface, errorMap, null);
                         } catch (Exception e) {
-                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_sms", smsMap.size()+"", null, e);
+                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_email", errorMap.size()+"", null, e);
+                            e.printStackTrace();
                         }
-                        try {
-                            HttpClientUtil.getStringByPost(baseUrl+emailErrorlogInterface, emailMap, null);
-                        } catch (Exception e) {
-                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_email", emailMap.size()+"", null, e);
-                        }
-
                     }
 
-                    /**发送超时统计*/
-                    ConcurrentHashMap<String, AtomicInteger> timeoutBucket = TimeoutBucket.exchange();
                     if (null != timeoutBucket && ! timeoutBucket.isEmpty()) {
                         System.out.println("timeout_count_send_to_server timer, bucket_size : " + timeoutBucket.size() +
                                 ", time : "+ DateUtil.getCurrentTime());
@@ -144,10 +98,12 @@ public class ErrorLogProcessor implements Runnable {
                             timeoutBucket.clear();
                         }
                     }
-                    inProcess = false;
                 } catch (Exception e) {
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "ErrorLogProcessor.Timer.run", DateUtilTool.getToday(), "", e);
                 } finally {
+                    inProcess = false;
+                    bucket.clear();
+                    timeoutBucket.clear();
                     LOGGER.statLog(ModuleEnum.MONITOR_SERVICE, "ErrorLogProcessor.Timer.run", "", "", System.currentTimeMillis() - startTime, 0, 0);
                 }
             }

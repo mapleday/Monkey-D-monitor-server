@@ -30,8 +30,6 @@ public class ApiController {
     private SelectPersonService selectPersonService;
     @Autowired
     private DelErrorLogsService delErrorLogsService;
-    @Autowired
-    private Test test;
 
     //收集statlog，分析访问次数是否异常
     @RequestParams(path = "/monitor/collect_statLog", method = {"get", "post"}, required = {"extra"})
@@ -86,17 +84,6 @@ public class ApiController {
     @RequestParams(path = "/monitor/del_error_logs",  method = {"get", "post"}, required = {"extra"})
     public String deleteErrorLogs(Map<String, RequestValue> params) throws Exception {
         delErrorLogsService.deleteRecord();
-        return SUCCESS;
-    }
-
-    @RequestParams(path = "/monitor/test",  method = {"get", "post"}, required = {"extra"})
-    public String test(Map<String, RequestValue> params) throws Exception {
-        try {
-            test.handle();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return FAILURE;
-        }
         return SUCCESS;
     }
 }

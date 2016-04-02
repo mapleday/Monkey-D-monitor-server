@@ -25,7 +25,7 @@ import java.util.Map;
  */
 
 @Component("uNameMysqlClusterService")
-public class UNameMysqlClusterService {
+public class UniqNameDBClusterService {
 
     private ConsistHashCircle circle = new ConsistHashCircle();
     private List<JdbcTemplate> readJdbcTemplates = new ArrayList<JdbcTemplate>();

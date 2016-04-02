@@ -56,18 +56,18 @@ public class ErrorLogBucket {
         if (Strings.isNullOrEmpty(key)) {
             return;
         }
-        ConcurrentHashMap<String, List<ErrorLog>> b = getBucket();
-        List<ErrorLog> errorLogs = b.get(key);
+        ConcurrentHashMap<String, List<ErrorLog>> bucket = getBucket();
+        List<ErrorLog> errorLogs = bucket.get(key);
         if (null != errorLogs) {
             errorLogs.add(errorLog);
         } else {
             synchronized (ErrorLogBucket.class) {
-                if(null != b.get(key)) {
+                if(null != bucket.get(key)) {
                     insertData(errorLog);
                 } else {
                     List<ErrorLog> list = new LinkedList<ErrorLog>();
                     list.add(errorLog);
-                    b.put(key, list);
+                    bucket.put(key, list);
                 }
             }
         }

@@ -3,7 +3,7 @@ package com.sohu.sns.monitor.timer;
 import com.sohu.sns.monitor.model.MpUserInfo;
 import com.sohu.sns.monitor.model.SnsUserInfo;
 import com.sohu.sns.monitor.model.UnameInfo;
-import com.sohu.sns.monitor.server.config.UNameMysqlClusterService;
+import com.sohu.sns.monitor.server.config.UniqNameDBClusterService;
 import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.sns.monitor.util.UserInfoUtil;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
@@ -25,7 +25,7 @@ import java.util.*;
  * Created by Gary on 2015/12/1.
  */
 @Component
-public class DiffProcessor {
+public class DiffCompareProcessor {
 
     private static final String QUERY_UNAME_INFO = "select * from u_user_info_%d where status = 1 and type != '0'";
     private static final String QUERY_UNAME_SNS = "select * from u_user_info_%d where status = 1";
@@ -48,7 +48,7 @@ public class DiffProcessor {
     @Autowired
     private MysqlClusterService mysqlClusterService;
     @Autowired
-    private UNameMysqlClusterService uNameMysqlClusterService;
+    private UniqNameDBClusterService uniqNameDBClusterService;
 
     public void handle(){
         try {
@@ -71,7 +71,7 @@ public class DiffProcessor {
                 String queryUnameForMp = String.format(QUERY_UNAME_INFO, i);
                 String queryUnameForSns = String.format(QUERY_UNAME_SNS, i);
 
-                JdbcTemplate uNameReadJdbcTemplate = uNameMysqlClusterService.getReadJdbcTemplate(null);
+                JdbcTemplate uNameReadJdbcTemplate = uniqNameDBClusterService.getReadJdbcTemplate(null);
                 List uNameInfoForMpList = uNameReadJdbcTemplate.query(queryUnameForMp, new UnameInfoMapper());
                 List uNameInfoForSnsList = uNameReadJdbcTemplate.query(queryUnameForSns, new UnameInfoMapper());
 

@@ -1,9 +1,11 @@
 package com.sohu.sns.monitor.server.consumer;
 
 import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ErrorLogBucket;
 import com.sohu.sns.monitor.bucket.TimeoutBucket;
+import com.sohu.sns.monitor.enums.ErrorLogFields;
 import com.sohu.sns.monitor.model.ErrorLog;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
@@ -21,16 +23,17 @@ import java.util.*;
 public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private static final String INSERT_DATA = "replace into error_logs set appId = ?, instanceId = ?, " +
-            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, stackTrace = ?, updateTime = now()";
+            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, " +
+            "stackTrace = ?, updateTime = now()";
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
     private MysqlClusterService mysqlClusterService;
-    private List<String> exceptionList;
+    private Set<String> timeoutTypes;
 
-    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, List<String> exceptionList) {
+    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, Set<String> timeoutTypes) {
         this.mysqlClusterService = mysqlClusterService;
-        this.exceptionList = exceptionList;
+        this.timeoutTypes = (null == timeoutTypes ? new HashSet<String>() : timeoutTypes);
     }
 
     @Nullable
@@ -39,7 +42,6 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         String msg = null;
         try {
             msg = new String(bytes, "UTF-8");
-//            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "applyErrorLog", msg, null);
             handle(msg);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "apply.msg.handleMsg", msg, null, e);
@@ -54,30 +56,27 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
      * @throws MysqlClusterException
      */
     private void handle(String msg) throws Exception {
+        if(Strings.isNullOrEmpty(msg)) return;
         Map<String, Object> msgMap = jsonMapper.fromJson(msg, HashMap.class);
-        if(null == msgMap || msgMap.isEmpty()) {
-            return;
-        }
-        String[] arr = StringUtils.split((String) msgMap.get("appId"), "_");
-        if(2 != arr.length) {
-            return;
-        }
+        if(null == msgMap || msgMap.isEmpty()) return;
+        String[] arr = StringUtils.split((String) msgMap.get(ErrorLogFields.APP_ID.getName()), "_");
+        if(2 != arr.length) return;
         ErrorLog errorLog = new ErrorLog();
         errorLog.setAppId(arr[0].replaceAll("\"", ""));
         errorLog.setInstanceId(arr[1].replaceAll("\"", ""));
-        errorLog.setModule((String) msgMap.get("module"));
-        errorLog.setMethod((String) msgMap.get("method"));
-        errorLog.setParam((String) msgMap.get("param"));
-        errorLog.setReturnValue((String) msgMap.get("returnValue"));
-        errorLog.setExceptionName((String) msgMap.get("exceptionName"));
-        errorLog.setExceptionDesc((String) msgMap.get("exceptionDesc"));
-        errorLog.setStackTrace((String) msgMap.get("stackTrace"));
+        errorLog.setModule((String) msgMap.get(ErrorLogFields.MODULE.getName()));
+        errorLog.setMethod((String) msgMap.get(ErrorLogFields.METHOD.getName()));
+        errorLog.setParam((String) msgMap.get(ErrorLogFields.PARAM.getName()));
+        errorLog.setReturnValue((String) msgMap.get(ErrorLogFields.RETURN_VALUE.getName()));
+        errorLog.setExceptionName((String) msgMap.get(ErrorLogFields.EXCEPTION_NAME.getName()));
+        errorLog.setExceptionDesc((String) msgMap.get(ErrorLogFields.EXCEPTION_DESC.getName()));
+        errorLog.setStackTrace((String) msgMap.get(ErrorLogFields.STACK_TRACE.getName()));
         errorLog.setTime(new Date());
 
         ErrorLogBucket.insertData(errorLog);
 
         /**超时统计*/
-        if(exceptionList.contains(errorLog.getExceptionName())) {
+        if(timeoutTypes.contains(errorLog.getExceptionName())) {
             TimeoutBucket.insertData(errorLog.getAppId()+"_"+errorLog.getModule()+"_"+errorLog.getMethod());
         }
 

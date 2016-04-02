@@ -4,6 +4,7 @@ package com.sohu.sns.monitor.model;
  * Created by Gary on 2015/10/28.
  */
 public class MergedErrorLog {
+
     private ErrorLog errorLog;
     private StringBuffer params = new StringBuffer();
     private int times = 0;

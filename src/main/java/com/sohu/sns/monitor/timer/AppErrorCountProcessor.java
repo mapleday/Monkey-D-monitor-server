@@ -32,7 +32,8 @@ public class AppErrorCountProcessor{
     private static final String UPDATE_RECORD = "update app_error_count_per_hour set allCount = ifnull(allCount, 0)+?, %s = ? where appId = ? and date_str = ?";
 
     public void process() {
-        System.out.println("count app error times start ...... time :" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
+        System.out.println("count app error times start ...... time :" + DateUtil.getCurrentTime());
 
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);

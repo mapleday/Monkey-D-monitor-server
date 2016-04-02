@@ -1,14 +1,13 @@
 package com.sohu.sns.monitor.service.ServiceImpl;
 
+import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.model.PersonInfo;
 import com.sohu.sns.monitor.service.SelectPersonService;
 import com.sohu.sns.monitor.util.DateUtil;
-import com.sohu.snscommon.utils.EmailUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.SMS;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -19,82 +18,68 @@ import java.util.*;
 @Component
 public class SelectPersonServiceImpl implements SelectPersonService {
 
-    private static final String SMS_EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com";
-    private static final String PERSON_PHONE_DEV = "18910556026";
-    private static final String PERSON_EMAIL_DEV = "jinyingshi@sohu-inc.com";
-
-    private Integer flag;
-
-    @Value("#{myProperties[on_duty_person]}")
-    private String person_config;
-
-    @Value("#{myProperties[duty_msg]}")
-    private String dutyMsg;
-
-    @Value("#{myProperties[duty_mail_subject]}")
-    private String dutyMailSubject;
-
-    private List<PersonInfo> personInfos = null;
-
+    private static String sms_email_baseUrl = "";
+    private static String simpleEmailInterface = "";
+    private static String sendSmsInterface = "";
+    private static String person_admin_phone = "";
+    private static String person_admin_email = "";
+    private static List<PersonInfo> dutyPersonInfos;
+    private static String dutyContent = "";
+    private static String dutyMailSubject = "";
+    private static String failSubject = "";
+    private static String failContent = "";
+    private static Integer flag;
 
     @Override
     public void send() throws Exception {
         try {
 
-            initEnv();  //解析值班人信息
-            PersonInfo personInfo = personInfos.get(flag++);
+            PersonInfo personInfo = dutyPersonInfos.get(flag++);
+
             /**发送值班提醒邮件和短信**/
-            String dutyContent = String.format(dutyMsg, personInfo.getName());
+            dutyContent = String.format(dutyContent, personInfo.getName());
             dutyMailSubject = String.format(dutyMailSubject, DateUtil.getCurrentDate());
-            StringBuilder emailSb = new StringBuilder();
-            StringBuilder smsSb = new StringBuilder();
-            for(PersonInfo p : personInfos) {
-                if(0 != emailSb.length()) {
-                    emailSb.append("|");
+            StringBuilder emailBuffer = new StringBuilder();
+            StringBuilder smsBuffer = new StringBuilder();
+            for(PersonInfo p : dutyPersonInfos) {
+                if(0 != emailBuffer.length()) {
+                    emailBuffer.append("|");
                 }
-                if(0 != smsSb.length()) {
-                    smsSb.append(",");
+                if(0 != smsBuffer.length()) {
+                    smsBuffer.append(",");
                 }
-                emailSb.append(p.getEmail());
-                smsSb.append(p.getPhone());
+                emailBuffer.append(p.getEmail());
+                smsBuffer.append(p.getPhone());
             }
             Map<String, String> map = new HashMap<String, String>();
             map.put("subject", dutyMailSubject);
             map.put("text", dutyContent);
-            map.put("to", emailSb.toString());
+            map.put("to", emailBuffer.toString());
             try {
-                String result = new HttpClientUtil().postByUtf(SMS_EMAIL_URL + "/sendSimpleEmail", map, null);
-                if(!"success".equals(result)) {
-                    EmailUtil.sendSimpleEmail("值班邮件发送失败提醒", "值班邮件发送失败，今天的值班人是"+personInfo.getName()+"，请及时提醒", PERSON_EMAIL_DEV);
-                    SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人邮件信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
-                }
+                HttpClientUtil.getStringByPost(sms_email_baseUrl+simpleEmailInterface, map, null);
             } catch (Exception e) {
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendEmail", null, null, e);
-                EmailUtil.sendSimpleEmail("值班邮件发送失败提醒", "值班邮件发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);
-                SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人邮件信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
+                SMS.sendMessage(person_admin_phone, String.format(failContent, personInfo.getName()));
             } finally {
                 map.clear();
             }
-            map.put("phoneNo", smsSb.toString());
+
+            map.put("phoneNo", smsBuffer.toString());
             map.put("msg", dutyContent);
             try {
-                String result = new HttpClientUtil().getByUtf(SMS_EMAIL_URL+"/sendSms", map);
-                if(!"success".equals(result)) {
-                    EmailUtil.sendSimpleEmail("值班短信发送失败提醒", "值班短信发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);
-                    SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人短信信息发送失败，值班人：" + personInfo.getName() + "，请及时提醒");
-                }
+                HttpClientUtil.getStringByPost(sms_email_baseUrl+sendSmsInterface, map, null);
             } catch (Exception e) {
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person.sendSms", null, null, e);
-                EmailUtil.sendSimpleEmail("值班短信发送失败提醒", "值班短信发送失败，今天的值班人是" + personInfo.getName() + "，请及时提醒", PERSON_EMAIL_DEV);
-                SMS.sendMessage(PERSON_PHONE_DEV, "当天值班人短信信息发送失败，值班人："+personInfo.getName()+"，请及时提醒");
+                SMS.sendMessage(person_admin_phone, String.format(failContent, personInfo.getName()));
             } finally {
                 map.clear();
             }
+
             System.out.println("值班人：" + personInfo.getName() + "time : " + DateUtil.getCurrentTime());
-            if(flag == personInfos.size()) {
+
+            if(flag == dutyPersonInfos.size()) {
                 flag = 0;
-                Collections.shuffle(personInfos);
+                Collections.shuffle(dutyPersonInfos);
             }
+
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "select_person", null, null, e);
             e.printStackTrace();
@@ -104,47 +89,32 @@ public class SelectPersonServiceImpl implements SelectPersonService {
     /**
      * 初始化值班人员信息
      */
-    private void initEnv() {
-        if(null == personInfos) {
-            String[] arr = person_config.split("\\|");
-            personInfos = new ArrayList<PersonInfo>();
+    public static void initEnv(String monitorUrl, String dutyInfo) {
+        JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
+        Map<String, Object> urls = jsonMapper.fromJson(monitorUrl, HashMap.class);
+        Map<String, Object> dutyInfoMap = jsonMapper.fromJson(dutyInfo, HashMap.class);
+        sms_email_baseUrl = (String) urls.get("base_url");
+        simpleEmailInterface = (String) urls.get("simple_email_interface");
+        sendSmsInterface = (String) urls.get("send_sms_interface");
+        person_admin_email = (String) dutyInfoMap.get("person_admin_email");
+        person_admin_phone = (String) dutyInfoMap.get("person_admin_phone");
+        dutyContent = (String) dutyInfoMap.get("duty_content");
+        dutyMailSubject = (String) dutyInfoMap.get("mail_subject");
+        failSubject = (String) dutyInfoMap.get("fail_subject");
+        failContent = (String) dutyInfoMap.get("fail_content");
+        String dutyPersonInfo = (String) dutyInfoMap.get("person_info");
+        if(null != dutyPersonInfo) {
+            String[] arr = dutyPersonInfo.split("\\|");
+            dutyPersonInfos = new ArrayList<PersonInfo>();
             for(int i=0; i<arr.length; i++) {
                 String[] everyPerson = arr[i].split(",");
                 if(3 == everyPerson.length) {
-                    personInfos.add(new PersonInfo(everyPerson[0], everyPerson[1], everyPerson[2]));
+                    dutyPersonInfos.add(new PersonInfo(everyPerson[0], everyPerson[1], everyPerson[2]));
                 }
             }
         }
         if(null == flag) {
-           flag = new Random().nextInt(personInfos.size()-1);
+           flag = new Random().nextInt(dutyPersonInfos.size()-1);
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        new SelectPersonServiceImpl().send();
-    }
-
-    public String getPerson_config() {
-        return person_config;
-    }
-
-    public void setPerson_config(String person_config) {
-        this.person_config = person_config;
-    }
-
-    public String getDutyMsg() {
-        return dutyMsg;
-    }
-
-    public void setDutyMsg(String dutyMsg) {
-        this.dutyMsg = dutyMsg;
-    }
-
-    public String getDutyMailSubject() {
-        return dutyMailSubject;
-    }
-
-    public void setDutyMailSubject(String dutyMailSubject) {
-        this.dutyMailSubject = dutyMailSubject;
     }
 }

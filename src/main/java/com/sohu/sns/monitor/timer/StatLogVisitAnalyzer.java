@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.timer;
 
+import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.model.ExceptionValue;
 import com.sohu.sns.monitor.model.StatLogInfo;
 import com.sohu.sns.monitor.util.DateUtil;
@@ -7,6 +8,7 @@ import com.sohu.sns.monitor.util.MathsUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -23,25 +25,24 @@ import java.util.*;
 @Component
 public class StatLogVisitAnalyzer {
 
-    private static final String EMAIL_URL = "http://sns-mail-sms.apps.sohuno.com/sendSimpleEmail";
+    private static String emailBaseUrl;
+    private static String simpleEmailInterface;
+    private static String subject;
+    private static String mailTo;
+    private static String emailBegin;
+    private static String emailDetail;
     @Autowired
     private MysqlClusterService mysqlClusterService;
-
-    @Value("#{myProperties[mail_subject]}")
-    private String subject;
-
-    @Value("#{myProperties[mail_to]}")
-    private String mailTo;
 
     private static String dateStr = DateUtil.getCurrentDate();
     private static Integer hour = DateUtil.getCurrentHour();
     private static Integer period = DateUtil.getCurrentPeriod();
 
-    private static final String QUERY_RECORD_BY_MIN = "select * from statlog_info_bymin where date_str = ? and currentHour = ? and currentPeriod = ?";
-    private static final String QUERY_HISTORY_VISITCOUNT = "select visitCount from statlog_info_bymin where appId = ? and moduleName = ? " +
-            "and methodName = ? and currentHour = ? and currentPeriod = ? and updateTime < ? and updateTime >= ?";
-    private static final String VISIT_EXCEPTION = "%s_%s_%s, 访问次数:%d, 历史平均访问次数:%d, 最高次数:%d, 最低次数:%d\n\n";
-    private static final String EMAIL_CONTENT = "你好，日期:%s, %d时, %s分钟内，以下接口访问次数异常,请着重查看：\n\n";
+    private static final String QUERY_RECORD_BY_MIN = "select * from statlog_info_bymin where date_str = ? " +
+            "and currentHour = ? and currentPeriod = ?";
+    private static final String QUERY_HISTORY_VISITCOUNT = "select visitCount from statlog_info_bymin where appId = ? " +
+            "and moduleName = ? and methodName = ? and currentHour = ? and currentPeriod = ? and updateTime < ? " +
+            "and updateTime >= ?";
 
     public void handle() {
 
@@ -102,10 +103,10 @@ public class StatLogVisitAnalyzer {
                     case 12 : miniute = "55-60"; break;
                     default : miniute = "unknown"; break;
                 }
-                sb.append(String.format(EMAIL_CONTENT, dateStr, hour, miniute));
+                sb.append(String.format(emailBegin, dateStr, hour, miniute));
             }
             for(ExceptionValue exceptionValue : exceptionValues) {
-                sb.append(String.format(VISIT_EXCEPTION, exceptionValue.getAppId(), exceptionValue.getModuleName(),
+                sb.append(String.format(emailDetail, exceptionValue.getAppId(), exceptionValue.getModuleName(),
                         exceptionValue.getMethodName(), exceptionValue.getVisitCount(), exceptionValue.getAvgVisitCount(),
                         exceptionValue.getMaxVisitCount(), exceptionValue.getMinVisitCount()));
             }
@@ -116,8 +117,7 @@ public class StatLogVisitAnalyzer {
                 map.put("subject", subject);
                 map.put("text", sb.toString());
                 map.put("to", mailTo);
-                //2016-2-18 11:11:00 暂时去掉发送邮件，邮件太多，没有意义，后期优化
-//                new HttpClientUtil().postByUtf(EMAIL_URL, map, null);
+                HttpClientUtil.getStringByPost(emailBaseUrl+simpleEmailInterface, map, null);
             }
 
             System.out.println("statLog visit analyser end ...  time : " + DateUtil.getCurrentTime());
@@ -168,19 +168,15 @@ public class StatLogVisitAnalyzer {
         }
     }
 
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getMailTo() {
-        return mailTo;
-    }
-
-    public void setMailTo(String mailTo) {
-        this.mailTo = mailTo;
+    public static void initEnv(String monitorUrls, String visitAnalyserInfo) {
+        JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
+        Map<String, Object> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
+        Map<String, Object> visitInfoMap = jsonMapper.fromJson(visitAnalyserInfo, HashMap.class);
+        emailBaseUrl = (String) urls.get("base_url");
+        simpleEmailInterface = (String) urls.get("simple_email_interface");
+        subject = (String) visitInfoMap.get("email_subject");
+        mailTo = (String) visitInfoMap.get("emails_to");
+        emailBegin = (String) visitInfoMap.get("email_begin");
+        emailDetail = (String) visitInfoMap.get("email_detail");
     }
 }

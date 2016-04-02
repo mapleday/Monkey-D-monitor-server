@@ -6,20 +6,22 @@ import com.sohu.sns.monitor.bucket.ErrorLogBucket;
 import com.sohu.sns.monitor.bucket.TimeoutBucket;
 import com.sohu.sns.monitor.model.ErrorLog;
 import com.sohu.sns.monitor.model.MergedErrorLog;
+import com.sohu.sns.monitor.util.DateUtil;
+import com.sohu.sns.monitor.util.EmailStringFormatUtils;
+import com.sohu.sns.monitor.util.ZipUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * ErrorLog数据的处理器
+ * ErrorLog数据处理定时器
  * Created by Gary on 2015年10月20日
  */
 public class ErrorLogProcessor implements Runnable {
@@ -28,17 +30,27 @@ public class ErrorLogProcessor implements Runnable {
     private static final String INSTANCE_COUNT = "instanceCount";
     private static final String ERROR_COUNT = "errorCount";
     private static final String ERROR_DETAIL = "errorDetail";
-    private static final String BASE_URL = "http://sns-mail-sms.apps.sohuno.com";
-    private static final String QUERY_STACKTRACE_URL = "http://sns-monitor-web-test.sohusce.com/queryStackTrace";
-    private static final String IS_EXISTS = "select count(1) from timeout_api_collect where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
-    private static final String INSERT_DATA = "replace into timeout_api_collect set appId = ?, moduleName = ?, methodName = ?, timeoutCount = ?, date_str = ?, updateTime = now()";
-    private static final String UPDATE_DATA = "update timeout_api_collect set timeoutCount = ifnull(timeoutCount, 0)+?, updateTime = now() where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
-    private int random = new Random().nextInt(200000) + 100000;
+    public static String baseUrl, stackTraceUrl, emailErrorlogInterface, smsErrorlogInterface, smsTimeoutWarnInterface;
+
+    private static final String IS_EXISTS = "select count(1) from timeout_api_collect where appId = ? and moduleName = ?" +
+            " and methodName = ? and date_str = ?";
+    private static final String INSERT_DATA = "replace into timeout_api_collect set appId = ?, moduleName = ?, " +
+            "methodName = ?, timeoutCount = ?, date_str = ?, updateTime = now()";
+    private static final String UPDATE_DATA = "update timeout_api_collect set timeoutCount = ifnull(timeoutCount, 0)+?, " +
+            "updateTime = now() where appId = ? and moduleName = ? and methodName = ? and date_str = ?";
+
+    private int random = new Random().nextInt(100000) + 200000;
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
     private MysqlClusterService mysqlClusterService;
     private boolean inProcess = false;
 
-    public ErrorLogProcessor(MysqlClusterService mysqlClusterService) {
+    public ErrorLogProcessor(MysqlClusterService mysqlClusterService, String monitorUrls) {
+        Map<String, Object> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
+        this.baseUrl = (String) urls.get("base_url");
+        this.stackTraceUrl = (String) urls.get("stackTrace_base_url");
+        this.emailErrorlogInterface = (String) urls.get("email_errorlog_interface");
+        this.smsErrorlogInterface = (String) urls.get("sms_errorlog_interface");
+        this.smsTimeoutWarnInterface = (String) urls.get("sms_timeout_warn_interface");
         this.mysqlClusterService = mysqlClusterService;
     }
 
@@ -49,12 +61,11 @@ public class ErrorLogProcessor implements Runnable {
             public void run() {
                 long startTime = System.currentTimeMillis();
                 try {
-                    if (inProcess) {
-                        return;
-                    }
+                    if (inProcess) return;
                     ConcurrentHashMap<String, List<ErrorLog>> bucket = ErrorLogBucket.exchange();
-                    System.out.println("errorLogProcessor timer ... " + bucket.size());
-                    if (bucket != null && !bucket.isEmpty()) {
+                    if (null != bucket && ! bucket.isEmpty()) {
+                        System.out.println("error_log_send_to_server timer, bucket_size : " + bucket.size() +
+                                ", time : "+ DateUtil.getCurrentTime());
                         Set<String> keySet = bucket.keySet();
                         Map<String, String> smsMap = new HashMap<String, String>();
                         Map<String, String> emailMap = new HashMap<String, String>();
@@ -65,15 +76,12 @@ public class ErrorLogProcessor implements Runnable {
                         int total = 0;
                         for (String instance : keySet) {
                             List<ErrorLog> errorLogs = bucket.get(instance);
-                            emailSb.append("<br><div><b><font color=\"red\">" + instance + " : </font></b></div><br>" +
-                                    "<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"800\" style=\"border-collapse: collapse; table-layout:fixed;\">");
+                            emailSb.append(EmailStringFormatUtils.formatHead(instance));
                             Map<String, MergedErrorLog> map = new HashMap<String, MergedErrorLog>();
-
                             AtomicInteger errorParamsCount = new AtomicInteger(0);
                             for (ErrorLog errorLog : errorLogs) {
                                 String key = errorLog.getKey();
                                 if (map.containsKey(key)) {
-//                                    map.get(key).addParams(errorLog.getParam());
                                     if (errorParamsCount.incrementAndGet() <= 10){
                                         map.get(key).addParams(errorLog.getParam());
                                     }
@@ -89,46 +97,49 @@ public class ErrorLogProcessor implements Runnable {
 
                             Set<Map.Entry<String, MergedErrorLog>> set = map.entrySet();
                             for (Map.Entry<String, MergedErrorLog> entry : set) {
-                                emailSb.append(entry.getValue().getErrorLog().warpHtml() +
-                                        "<tr><td align=\"center\" ><b>Params</b></td><td style=\"word-wrap:break-word;\">" + entry.getValue().getParams().toString() + "</td></tr>" +
-                                        "<tr><td align=\"center\" ><b>StackTrace</b></td><td style=\"word-wrap:break-word;\"><a href=\"" + QUERY_STACKTRACE_URL + entry.getValue().getErrorLog().genParams() + "\">点击查看</a></td></tr>" +
-                                        "<tr><td align=\"center\"><b>出现次数</b></td><td style=\"word-wrap:break-word;\">" + entry.getValue().getTimes() + "</td></tr>" +
-                                        "<tr><td colspan=\"2\">&nbsp;</td></tr>");
+
+                                emailSb.append(entry.getValue().getErrorLog().warpHtml())
+                                        .append(EmailStringFormatUtils.formatTail(
+                                                entry.getValue().getParams().toString(),
+                                                stackTraceUrl + entry.getValue().getErrorLog().genParams(),
+                                                entry.getValue().getTimes()));
+
                                 total += entry.getValue().getTimes();
                             }
                             emailSb.append("</table>");
                         }
-                        //清理切换到的桶
+                        /**清理当前的桶**/
                         bucket.clear();
+
                         smsMap.put(ERROR_COUNT, String.valueOf(total));
-                        emailMap.put(ERROR_DETAIL, emailSb.toString());
-                        String smsResult = null, emailResult = null;
-                        HttpClientUtil httpClientUtil = new HttpClientUtil();
+                        emailMap.put(ERROR_DETAIL, ZipUtils.gzip(emailSb.toString()));  //发送的数据进行了压缩
+
                         try {
-                            smsResult = httpClientUtil.getByUtf(BASE_URL + "/sendErrorLogSms", smsMap);
+                            HttpClientUtil.getStringByGet(baseUrl+smsErrorlogInterface, smsMap);
                         } catch (Exception e) {
-                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendErrorLogSms", smsMap.size() + "", smsResult, e);
+                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_sms", smsMap.size()+"", null, e);
                         }
                         try {
-                            emailResult = httpClientUtil.postByUtf(BASE_URL + "/sendErrorLogEmail", emailMap, null);
+                            HttpClientUtil.getStringByPost(baseUrl+emailErrorlogInterface, emailMap, null);
                         } catch (Exception e) {
-                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendErrorLogEmail", emailMap.size() + "", emailResult, e);
+                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_email", emailMap.size()+"", null, e);
                         }
 
                     }
 
                     /**发送超时统计*/
-                    ConcurrentHashMap<String, AtomicLong> timeoutBucket = TimeoutBucket.exchange();
-                    System.out.println("timeoutCountProcessor timer ... " + timeoutBucket.size());
-                    if (timeoutBucket != null && !timeoutBucket.isEmpty()) {
+                    ConcurrentHashMap<String, AtomicInteger> timeoutBucket = TimeoutBucket.exchange();
+                    if (null != timeoutBucket && ! timeoutBucket.isEmpty()) {
+                        System.out.println("timeout_count_send_to_server timer, bucket_size : " + timeoutBucket.size() +
+                                ", time : "+ DateUtil.getCurrentTime());
                         saveToDB(timeoutBucket);    //保存超时次数到数据库
                         String content = jsonMapper.toJson(timeoutBucket);
                         Map<String, String> sendMap = new HashMap<String, String>();
                         sendMap.put("timeoutCount", content);
                         try {
-                            new HttpClientUtil().postByUtf(BASE_URL + "/sendTimeoutCount", sendMap, null);
+                            HttpClientUtil.getStringByPost(baseUrl+smsTimeoutWarnInterface, sendMap, null);
                         } catch (Exception e) {
-                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "sendTimeoutCount", sendMap.size() + "", null, e);
+                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_timeout_warn_to_server", sendMap.size()+"", null, e);
                         } finally {
                             timeoutBucket.clear();
                         }
@@ -147,19 +158,19 @@ public class ErrorLogProcessor implements Runnable {
      * 保存数据到数据库
      * @param map
      */
-    private void saveToDB(ConcurrentHashMap<String, AtomicLong> map) {
-        System.out.println("saveToDBTimeoutCount timer ...... time : " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) + " ,bucket:" + map.size());
+    private void saveToDB(ConcurrentHashMap<String, AtomicInteger> map) {
+        System.out.println("saveToDBTimeoutCount timer ...... time : " + DateUtil.getCurrentTime()
+                + ", bucketSize:" + map.size());
         try {
             JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
             JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-            String date_str = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+            String date_str = DateUtil.getCurrentDate();
             Set<String> keySet = map.keySet();
             for (String key : keySet) {
-                String[] arr = key.split("_");
-                String appId = arr[0];
-                String moduleName = arr[1];
-                String methodName = arr[2];
-                Long timeoutCount = map.get(key).get();
+                String[] arr = StringUtils.split(key, "_");
+                if(3 != arr.length) continue;
+                String appId = arr[0], moduleName = arr[1], methodName = arr[2];
+                Integer timeoutCount = map.get(key).get();
                 Long count = readJdbcTemplate.queryForObject(IS_EXISTS, Long.class, appId, moduleName, methodName, date_str);
                 if (0 != count) {
                     writeJdbcTemplate.update(UPDATE_DATA, timeoutCount, appId, moduleName, methodName, date_str);

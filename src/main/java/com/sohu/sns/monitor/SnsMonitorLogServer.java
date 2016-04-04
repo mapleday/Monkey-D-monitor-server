@@ -34,7 +34,7 @@ public class SnsMonitorLogServer {
             /**读取kafka的配置**/
             String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka"));
             /**读取超时异常的种类**/
-            String timeoutTypesStr = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/timeout_types"));
+            String timeoutConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/timeout_config"));
             /**读取所有的kafka_topics**/
             String kafkaTopics = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka_topics"));
             /**监控各种urls**/
@@ -59,7 +59,7 @@ public class SnsMonitorLogServer {
             uniqNameBean.init(null);
 
             /**启动监控错误日志的消费者**/
-            new LogMessageProcessor(kafkaTopics, kafkaConfig, timeoutTypesStr).start();
+            new LogMessageProcessor(kafkaTopics, kafkaConfig, timeoutConfig).start();
 
             /**启动定时将日志信息发送到汇总服务器类**/
             new Thread(new ErrorLogProcessor(bean, monitorUrls)).start();

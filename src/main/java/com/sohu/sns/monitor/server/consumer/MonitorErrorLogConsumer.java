@@ -1,6 +1,8 @@
 package com.sohu.sns.monitor.server.consumer;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.bucket.ErrorLogBucket;
@@ -21,6 +23,8 @@ import java.util.*;
  * Created by Gary on 2015/10/19.
  */
 public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
+
+    private static final Joiner JOINER = Joiner.on("_").skipNulls();
 
     private static final String INSERT_DATA = "replace into error_logs set appId = ?, instanceId = ?, " +
             "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, " +
@@ -57,27 +61,27 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
      */
     private void handle(String msg) throws Exception {
         if(Strings.isNullOrEmpty(msg)) return;
-        Map<String, Object> msgMap = jsonMapper.fromJson(msg, HashMap.class);
+        Map<String, String> msgMap = jsonMapper.fromJson(msg, HashMap.class);
         if(null == msgMap || msgMap.isEmpty()) return;
-        String[] arr = StringUtils.split((String) msgMap.get(ErrorLogFields.APP_ID.getName()), "_");
+        String[] arr = StringUtils.split(msgMap.get(ErrorLogFields.APP_ID.getName()), "_");
         if(2 != arr.length) return;
         ErrorLog errorLog = new ErrorLog();
         errorLog.setAppId(arr[0].replaceAll("\"", ""));
         errorLog.setInstanceId(arr[1].replaceAll("\"", ""));
-        errorLog.setModule((String) msgMap.get(ErrorLogFields.MODULE.getName()));
-        errorLog.setMethod((String) msgMap.get(ErrorLogFields.METHOD.getName()));
-        errorLog.setParam((String) msgMap.get(ErrorLogFields.PARAM.getName()));
-        errorLog.setReturnValue((String) msgMap.get(ErrorLogFields.RETURN_VALUE.getName()));
-        errorLog.setExceptionName((String) msgMap.get(ErrorLogFields.EXCEPTION_NAME.getName()));
-        errorLog.setExceptionDesc((String) msgMap.get(ErrorLogFields.EXCEPTION_DESC.getName()));
-        errorLog.setStackTrace((String) msgMap.get(ErrorLogFields.STACK_TRACE.getName()));
+        errorLog.setModule(msgMap.get(ErrorLogFields.MODULE.getName()));
+        errorLog.setMethod(msgMap.get(ErrorLogFields.METHOD.getName()));
+        errorLog.setParam(msgMap.get(ErrorLogFields.PARAM.getName()));
+        errorLog.setReturnValue(msgMap.get(ErrorLogFields.RETURN_VALUE.getName()));
+        errorLog.setExceptionName(msgMap.get(ErrorLogFields.EXCEPTION_NAME.getName()));
+        errorLog.setExceptionDesc(msgMap.get(ErrorLogFields.EXCEPTION_DESC.getName()));
+        errorLog.setStackTrace(msgMap.get(ErrorLogFields.STACK_TRACE.getName()));
         errorLog.setTime(new Date());
 
         ErrorLogBucket.insertData(errorLog);
 
         /**超时统计*/
         if(timeoutTypes.contains(errorLog.getExceptionName())) {
-            TimeoutBucket.insertData(errorLog.getAppId()+"_"+errorLog.getModule()+"_"+errorLog.getMethod());
+            TimeoutBucket.insertData(JOINER.join(errorLog.getAppId(), errorLog.getModule(), errorLog.getMethod()));
         }
 
         saveToDB(errorLog);

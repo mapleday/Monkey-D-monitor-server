@@ -39,12 +39,12 @@ public class ErrorLogProcessor implements Runnable {
     private boolean inProcess = false;
 
     public ErrorLogProcessor(MysqlClusterService mysqlClusterService, String monitorUrls) {
-        Map<String, Object> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
-        this.baseUrl = (String) urls.get("base_url");
-        this.stackTraceUrl = (String) urls.get("stackTrace_base_url");
-        this.emailErrorlogInterface = (String) urls.get("email_errorlog_interface");
-        this.smsErrorlogInterface = (String) urls.get("sms_errorlog_interface");
-        this.smsTimeoutWarnInterface = (String) urls.get("sms_timeout_warn_interface");
+        Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
+        this.baseUrl = urls.get("base_url");
+        this.stackTraceUrl = urls.get("stackTrace_base_url");
+        this.emailErrorlogInterface = urls.get("email_errorlog_interface");
+        this.smsErrorlogInterface = urls.get("sms_errorlog_interface");
+        this.smsTimeoutWarnInterface = urls.get("sms_timeout_warn_interface");
         this.mysqlClusterService = mysqlClusterService;
     }
 

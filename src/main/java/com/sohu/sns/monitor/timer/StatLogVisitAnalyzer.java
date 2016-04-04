@@ -170,13 +170,13 @@ public class StatLogVisitAnalyzer {
 
     public static void initEnv(String monitorUrls, String visitAnalyserInfo) {
         JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
-        Map<String, Object> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
-        Map<String, Object> visitInfoMap = jsonMapper.fromJson(visitAnalyserInfo, HashMap.class);
-        emailBaseUrl = (String) urls.get("base_url");
-        simpleEmailInterface = (String) urls.get("simple_email_interface");
-        subject = (String) visitInfoMap.get("email_subject");
-        mailTo = (String) visitInfoMap.get("emails_to");
-        emailBegin = (String) visitInfoMap.get("email_begin");
-        emailDetail = (String) visitInfoMap.get("email_detail");
+        Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
+        Map<String, String> visitInfoMap = jsonMapper.fromJson(visitAnalyserInfo, HashMap.class);
+        emailBaseUrl = urls.get("base_url");
+        simpleEmailInterface = urls.get("simple_email_interface");
+        subject = visitInfoMap.get("email_subject");
+        mailTo = visitInfoMap.get("emails_to");
+        emailBegin = visitInfoMap.get("email_begin");
+        emailDetail = visitInfoMap.get("email_detail");
     }
 }

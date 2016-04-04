@@ -91,18 +91,18 @@ public class SelectPersonServiceImpl implements SelectPersonService {
      */
     public static void initEnv(String monitorUrl, String dutyInfo) {
         JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
-        Map<String, Object> urls = jsonMapper.fromJson(monitorUrl, HashMap.class);
-        Map<String, Object> dutyInfoMap = jsonMapper.fromJson(dutyInfo, HashMap.class);
-        sms_email_baseUrl = (String) urls.get("base_url");
-        simpleEmailInterface = (String) urls.get("simple_email_interface");
-        sendSmsInterface = (String) urls.get("send_sms_interface");
-        person_admin_email = (String) dutyInfoMap.get("person_admin_email");
-        person_admin_phone = (String) dutyInfoMap.get("person_admin_phone");
-        dutyContent = (String) dutyInfoMap.get("duty_content");
-        dutyMailSubject = (String) dutyInfoMap.get("mail_subject");
-        failSubject = (String) dutyInfoMap.get("fail_subject");
-        failContent = (String) dutyInfoMap.get("fail_content");
-        String dutyPersonInfo = (String) dutyInfoMap.get("person_info");
+        Map<String, String> urls = jsonMapper.fromJson(monitorUrl, HashMap.class);
+        Map<String, String> dutyInfoMap = jsonMapper.fromJson(dutyInfo, HashMap.class);
+        sms_email_baseUrl = urls.get("base_url");
+        simpleEmailInterface = urls.get("simple_email_interface");
+        sendSmsInterface = urls.get("send_sms_interface");
+        person_admin_email = dutyInfoMap.get("person_admin_email");
+        person_admin_phone = dutyInfoMap.get("person_admin_phone");
+        dutyContent = dutyInfoMap.get("duty_content");
+        dutyMailSubject = dutyInfoMap.get("mail_subject");
+        failSubject = dutyInfoMap.get("fail_subject");
+        failContent = dutyInfoMap.get("fail_content");
+        String dutyPersonInfo = dutyInfoMap.get("person_info");
         if(null != dutyPersonInfo) {
             String[] arr = dutyPersonInfo.split("\\|");
             dutyPersonInfos = new ArrayList<PersonInfo>();

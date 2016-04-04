@@ -28,12 +28,13 @@ public class LogMessageProcessor {
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
-    public LogMessageProcessor(String kafkaTopics, String kafkaConfig, String timeoutTypesStr) {
+    public LogMessageProcessor(String kafkaTopics, String kafkaConfig, String timeoutConfig) {
         Map<String, Object> kafkaTopicsMap = jsonMapper.fromJson(kafkaTopics, HashMap.class);
+        Map<String, Object> timeoutConfigMap = jsonMapper.fromJson(timeoutConfig, HashMap.class);
         this.topicName = (String) kafkaTopicsMap.get("monitor_log_topic");
         this.groupName = (String) kafkaTopicsMap.get("monitor_log_group");
         this.kafkaConfig = kafkaConfig;
-        this.timeoutTypesStr = timeoutTypesStr;
+        this.timeoutTypesStr = (String) timeoutConfigMap.get("timeout_exceptions");
     }
 
     /**'

@@ -2,6 +2,7 @@ package com.sohu.sns.monitor;
 
 import com.sohu.sns.monitor.config.MySqlDBConfig;
 import com.sohu.sns.monitor.server.LogMessageProcessor;
+import com.sohu.sns.monitor.server.MessageProcessor;
 import com.sohu.sns.monitor.server.config.UniqNameDBClusterService;
 import com.sohu.sns.monitor.service.ServiceImpl.SelectPersonServiceImpl;
 import com.sohu.sns.monitor.thread.ErrorLogProcessor;
@@ -60,6 +61,9 @@ public class SnsMonitorLogServer {
 
             /**启动监控错误日志的消费者**/
             new LogMessageProcessor(kafkaTopics, kafkaConfig, timeoutConfig).start();
+
+            /**启动url_log的监控**/
+            //new MessageProcessor().start();
 
             /**启动定时将日志信息发送到汇总服务器类**/
             new Thread(new ErrorLogProcessor(bean, monitorUrls)).start();

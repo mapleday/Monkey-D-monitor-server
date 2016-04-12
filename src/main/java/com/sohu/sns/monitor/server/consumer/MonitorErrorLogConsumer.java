@@ -34,10 +34,12 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private MysqlClusterService mysqlClusterService;
     private Set<String> timeoutTypes;
+    private Set<String> methodsTypes;
 
-    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, Set<String> timeoutTypes) {
+    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, Set<String> timeoutTypes, Set<String> methodsTypes) {
         this.mysqlClusterService = mysqlClusterService;
         this.timeoutTypes = (null == timeoutTypes ? new HashSet<String>() : timeoutTypes);
+        this.methodsTypes = methodsTypes;
     }
 
     @Nullable
@@ -82,6 +84,12 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         /**超时统计*/
         if(timeoutTypes.contains(errorLog.getExceptionName())) {
             TimeoutBucket.insertData(JOINER.join(errorLog.getAppId(), errorLog.getModule(), errorLog.getMethod()));
+        }
+
+        /**特定方法短信监控**/
+        String method = JOINER.join(errorLog.getAppId(), errorLog.getModule(), errorLog.getMethod());
+        if(methodsTypes.contains(method)) {
+            TimeoutBucket.insertData(method);
         }
 
         saveToDB(errorLog);

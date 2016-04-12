@@ -25,6 +25,7 @@ public class LogMessageProcessor {
     private String groupName;   //kafka_group
     private String kafkaConfig; //kafka配置
     private String timeoutTypesStr;  //超时异常的种类
+    private String monitorMethods;    //需要发送监控短信的接口
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
@@ -35,6 +36,7 @@ public class LogMessageProcessor {
         this.groupName = (String) kafkaTopicsMap.get("monitor_log_group");
         this.kafkaConfig = kafkaConfig;
         this.timeoutTypesStr = (String) timeoutConfigMap.get("timeout_exceptions");
+        this.monitorMethods = (String) timeoutConfigMap.get("monitor_methods");
     }
 
     /**'
@@ -55,7 +57,17 @@ public class LogMessageProcessor {
                 timeoutTypes.add(str.trim());
             }
         }
-        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer(SpringContextUtil.getBean(MysqlClusterServiceImpl.class), timeoutTypes));
+
+        /**解析需要发送监控短信的接口**/
+        Set<String> methodsTypes = new HashSet<String>();
+        if(null != monitorMethods) {
+            String[] methodsArray = StringUtils.split(monitorMethods, ",");
+            for(String str : methodsArray) {
+                methodsTypes.add(str);
+            }
+        }
+
+        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer(SpringContextUtil.getBean(MysqlClusterServiceImpl.class), timeoutTypes, methodsTypes));
     }
 
     public void start() {

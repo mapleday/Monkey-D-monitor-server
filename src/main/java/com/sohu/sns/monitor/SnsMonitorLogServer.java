@@ -33,7 +33,7 @@ public class SnsMonitorLogServer {
                     ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
 
             /**读取kafka的配置**/
-            String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka"));
+            String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka_super"));
             /**读取超时异常的种类**/
             String timeoutConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/timeout_config"));
             /**读取所有的kafka_topics**/

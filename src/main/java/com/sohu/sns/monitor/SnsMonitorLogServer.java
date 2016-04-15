@@ -57,8 +57,6 @@ public class SnsMonitorLogServer {
             MysqlClusterServiceImpl bean = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
             bean.init(new MySqlDBConfig());
 
-            SpringContextUtil.getBean(RedisDataCheckProfessor.class).handle();
-
             /** 唯一名线上数据库数据源**/
             UniqNameDBClusterService uniqNameBean = SpringContextUtil.getBean(UniqNameDBClusterService.class);
             uniqNameBean.init(null);

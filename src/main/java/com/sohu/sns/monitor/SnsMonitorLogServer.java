@@ -1,11 +1,13 @@
 package com.sohu.sns.monitor;
 
 import com.sohu.sns.monitor.config.MySqlDBConfig;
+import com.sohu.sns.monitor.config.ZkPathConfig;
 import com.sohu.sns.monitor.server.LogMessageProcessor;
 import com.sohu.sns.monitor.server.MessageProcessor;
 import com.sohu.sns.monitor.server.config.UniqNameDBClusterService;
 import com.sohu.sns.monitor.service.ServiceImpl.SelectPersonServiceImpl;
 import com.sohu.sns.monitor.thread.ErrorLogProcessor;
+import com.sohu.sns.monitor.timer.RedisDataCheckProfessor;
 import com.sohu.sns.monitor.timer.StatLogVisitAnalyzer;
 import com.sohu.sns.monitor.util.HttpApiServer;
 import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
@@ -32,19 +34,18 @@ public class SnsMonitorLogServer {
             zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                     ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
 
-
             /**读取kafka的配置**/
-            String kafkaConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka_super"));
+            String kafkaConfig = new String(zk.getData(ZkPathConfig.KAFKA_CONFIG));
             /**读取超时异常的种类**/
-            String timeoutConfig = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/timeout_config"));
+            String timeoutConfig = new String(zk.getData(ZkPathConfig.TIMEOUT_CONFIG));
             /**读取所有的kafka_topics**/
-            String kafkaTopics = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_kafka_topics"));
+            String kafkaTopics = new String(zk.getData(ZkPathConfig.KAFKA_TOPICS_CONFIG));
             /**监控各种urls**/
-            String monitorUrls = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/monitor_urls"));
+            String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
             /**获取异常访问分析的相关配置**/
-            String visitAnalyserInfo = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/visit_analyser_info"));
+            String visitAnalyserInfo = new String(zk.getData(ZkPathConfig.VISIT_ANAL_CONFIG));
             /**获取值班配置信息**/
-            String dutyConfigInfo = new String(zk.getData(ZkPathConfigure.ROOT_NODE + "/sns_monitor/duty_person_info"));
+            String dutyConfigInfo = new String(zk.getData(ZkPathConfig.DUTY_CONFIG));
 
             /**初始化异常访问分析所需要的环境**/
             StatLogVisitAnalyzer.initEnv(monitorUrls, visitAnalyserInfo);
@@ -55,6 +56,8 @@ public class SnsMonitorLogServer {
 
             MysqlClusterServiceImpl bean = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
             bean.init(new MySqlDBConfig());
+
+            SpringContextUtil.getBean(RedisDataCheckProfessor.class).handle();
 
             /** 唯一名线上数据库数据源**/
             UniqNameDBClusterService uniqNameBean = SpringContextUtil.getBean(UniqNameDBClusterService.class);

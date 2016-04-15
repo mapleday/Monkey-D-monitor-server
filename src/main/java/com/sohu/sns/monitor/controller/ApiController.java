@@ -30,6 +30,8 @@ public class ApiController {
     private SelectPersonService selectPersonService;
     @Autowired
     private DelErrorLogsService delErrorLogsService;
+    @Autowired
+    private RedisCheckService redisCheckService;
 
     //收集statlog，分析访问次数是否异常
     @RequestParams(path = "/monitor/collect_statLog", method = {"get", "post"}, required = {"extra"})
@@ -85,5 +87,11 @@ public class ApiController {
     public String deleteErrorLogs(Map<String, RequestValue> params) throws Exception {
         delErrorLogsService.deleteRecord();
         return SUCCESS;
+    }
+
+    @RequestParams(path = "/monitor/redis",  method = {"get", "post"}, required = {"extra"})
+    public String redisCheck(Map<String, RequestValue> params) throws Exception {
+        redisCheckService.checkRedis();
+        return  SUCCESS;
     }
 }

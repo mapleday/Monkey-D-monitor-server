@@ -46,7 +46,7 @@ public class RedisDataCheckProfessor {
         String time = DateUtil.getCurrentMin();
 
         Map<String, String> redisConfig = getRedisClusterConfig();
-        if(null == redisConfig || redisConfig.isEmpty()) return;
+        if (null == redisConfig || redisConfig.isEmpty()) return;
         if (REDIS_CHECK_URL.isEmpty()) return;
         System.out.println("redis check start : " + redisConfig.size() + ", time:" + DateUtil.getCurrentTime());
         Set<String> uids = redisConfig.keySet();
@@ -55,12 +55,12 @@ public class RedisDataCheckProfessor {
         Map<String, List<RedisInfo>> redisClusterInfo = new HashMap<String, List<RedisInfo>>();
         Map<String, Long> currentRecordBucket = new HashMap<String, Long>();
 
-        for(String uid : uids) {
+        for (String uid : uids) {
             List<RedisIns> redisInses;
             try {
                 String redisInsStr = HttpClientUtil.getStringByGet(String.format(REDIS_CHECK_URL, uid), null);
                 redisInses = jsonMapper.fromJson(redisInsStr, collectionType);
-                if(null == redisInses || redisInses.isEmpty()) {
+                if (null == redisInses || redisInses.isEmpty()) {
                     redisVisitFailedList.add(joiner.join(uid, redisConfig.get(uid)));
                     continue;
                 }
@@ -70,13 +70,13 @@ public class RedisDataCheckProfessor {
                 e.printStackTrace();
                 continue;
             }
-            if(null == redisInses) continue;
-            for(RedisIns redisIns : redisInses) {
+            if (null == redisInses) continue;
+            for (RedisIns redisIns : redisInses) {
                 try {
                     String password = redisConfig.get(uid);
                     Jedis jedis = new Jedis(redisIns.getIp(), redisIns.getPort());
                     String result = jedis.auth(password);
-                    if(! "OK".equals(result)) {
+                    if (!"OK".equals(result)) {
                         redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), redisConfig.get(uid)));
                         LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.auth", password, result, null);
                         continue;
@@ -84,8 +84,8 @@ public class RedisDataCheckProfessor {
                     RedisInfo redisInfo = infoExtraction(jedis.info(), redisIns.getMaster(), redisIns.getIp());
 
                     /**分析数据是否一致用**/
-                    if(redisClusterInfo.containsKey(uid)) {
-                        if(null == redisClusterInfo.get(uid)) {
+                    if (redisClusterInfo.containsKey(uid)) {
+                        if (null == redisClusterInfo.get(uid)) {
                             List<RedisInfo> temp = new ArrayList<RedisInfo>();
                             temp.add(redisInfo);
                             redisClusterInfo.put(uid, temp);
@@ -99,7 +99,7 @@ public class RedisDataCheckProfessor {
                     }
 
                     /**分析数据变化趋势***/
-                    if(1 == redisIns.getMaster()) {
+                    if (1 == redisIns.getMaster()) {
                         currentRecordBucket.put(joiner.join(uid, redisIns.getIp()), redisInfo.getKeys());
                     }
                     //writeJdbcTemplate.update(INSERT_RECORD, uid, redisInfo.getIp(), redisInfo.getIsMaster(), redisInfo.getKeys(), time);
@@ -110,19 +110,20 @@ public class RedisDataCheckProfessor {
                     e.printStackTrace();
                 }
             }
+        }
 
-            String redisVisitFailedInfo = formatVisitFailedReidis(redisVisitFailedList);
-            String redisKeysNotSameInfo = formatKeysNotSameRedis(redisClusterInfo);
-            StringBuilder keyIncr = new StringBuilder();
-            StringBuilder keyDecline = new StringBuilder();
-            formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
+        String redisVisitFailedInfo = formatVisitFailedReidis(redisVisitFailedList);
+        String redisKeysNotSameInfo = formatKeysNotSameRedis(redisClusterInfo);
+        StringBuilder keyIncr = new StringBuilder();
+        StringBuilder keyDecline = new StringBuilder();
+        formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
 
-            if(!isChanged || null == mailTo || mailTo.isEmpty()) return;
+        if (!isChanged || null == mailTo || mailTo.isEmpty()) return;
 
-        String keysIncrException = String.format(RedisEmailUtil.GROW_EXCEPTION, keyIncr.toString().equals(CRLF)?
-                "None":keyIncr.toString());
+        String keysIncrException = String.format(RedisEmailUtil.GROW_EXCEPTION, keyIncr.toString().equals(CRLF) ?
+                "None" : keyIncr.toString());
         String KeysDeclineException = String.format(RedisEmailUtil.DECLINE_EXCEPTION, keyDecline.toString().
-                equals(CRLF)? "None":keyDecline.toString());
+                equals(CRLF) ? "None" : keyDecline.toString());
 
         StringBuilder emailContent = new StringBuilder();
         emailContent.append(redisVisitFailedInfo).append(redisKeysNotSameInfo)
@@ -135,18 +136,18 @@ public class RedisDataCheckProfessor {
         isChanged = false;
         try {
             HttpClientUtil.getStringByPost(baseEmailUrl + simpleEmailInterface, map, null);
+            System.out.println("mail_to" + mailTo);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.senEmail", null, null, e);
             e.printStackTrace();
         }
-
-    }
         System.out.println("execute time : " + (System.currentTimeMillis() - begin));
     }
 
 
     /**
      * get config on zk
+     *
      * @return
      * @throws IOException
      * @throws InterruptedException
@@ -169,57 +170,58 @@ public class RedisDataCheckProfessor {
     }
 
     private RedisInfo infoExtraction(String info, int isMater, String ip) {
-        if(Strings.isNullOrEmpty(info)) {
+        if (Strings.isNullOrEmpty(info)) {
             return null;
         }
         String[] array = StringUtils.split(info, "\r\n");
         RedisInfo redisInfo = new RedisInfo();
-        redisInfo.setIp(null == ip?"":ip);
+        redisInfo.setIp(null == ip ? "" : ip);
         redisInfo.setIsMaster(isMater);
-        for(String line : array) {
+        for (String line : array) {
             fillObject(line.trim(), redisInfo);
         }
         return redisInfo;
     }
 
     private void fillObject(String line, RedisInfo redisInfo) {
-        if(null == redisInfo || null == line) {
+        if (null == redisInfo || null == line) {
             return;
         }
-        if(line.startsWith("maxmemory:")) {
-            Long maxMemory = Long.parseLong(line.substring(line.indexOf(":")+1, line.length()));
-            redisInfo.setMaxMemory(null == maxMemory?0L:maxMemory);
+        if (line.startsWith("maxmemory:")) {
+            Long maxMemory = Long.parseLong(line.substring(line.indexOf(":") + 1, line.length()));
+            redisInfo.setMaxMemory(null == maxMemory ? 0L : maxMemory);
         }
-        if(line.startsWith("connected_clients:")) {
-            Long connectedClients = Long.parseLong(line.substring(line.indexOf(":")+1, line.length()));
-            redisInfo.setConnectedClients(null == connectedClients?0L:connectedClients);
+        if (line.startsWith("connected_clients:")) {
+            Long connectedClients = Long.parseLong(line.substring(line.indexOf(":") + 1, line.length()));
+            redisInfo.setConnectedClients(null == connectedClients ? 0L : connectedClients);
         }
-        if(line.startsWith("used_memory:")) {
-            Long usedMemory = Long.parseLong(line.substring(line.indexOf(":")+1, line.length()));
-            redisInfo.setUsedMemory(null == usedMemory?0L:usedMemory);
+        if (line.startsWith("used_memory:")) {
+            Long usedMemory = Long.parseLong(line.substring(line.indexOf(":") + 1, line.length()));
+            redisInfo.setUsedMemory(null == usedMemory ? 0L : usedMemory);
         }
-        if(line.startsWith("used_cpu_sys:")) {
-            String usedCpu = line.substring(line.indexOf(":")+1, line.length());
-            redisInfo.setUsedCpu(null == usedCpu?"":usedCpu);
+        if (line.startsWith("used_cpu_sys:")) {
+            String usedCpu = line.substring(line.indexOf(":") + 1, line.length());
+            redisInfo.setUsedCpu(null == usedCpu ? "" : usedCpu);
         }
-        if(line.startsWith("db0:keys=")) {
-            Long keys = Long.parseLong(line.substring(line.indexOf("=")+1, line.indexOf(",")));
-            redisInfo.setKeys(null == keys?0L:keys);
+        if (line.startsWith("db0:keys=")) {
+            Long keys = Long.parseLong(line.substring(line.indexOf("=") + 1, line.indexOf(",")));
+            redisInfo.setKeys(null == keys ? 0L : keys);
         }
     }
 
     /**
      * format visit failed redis info
+     *
      * @param redisVisitErrorList all visit failed info list
      * @return formatted visit failed info
      */
     private String formatVisitFailedReidis(List<String> redisVisitErrorList) {
         String result;
-        if(null == redisVisitErrorList || redisVisitErrorList.isEmpty()) {
+        if (null == redisVisitErrorList || redisVisitErrorList.isEmpty()) {
             result = String.format(RedisEmailUtil.VISIT_EXCEPTION, NONE);
         } else {
             StringBuilder strBuffer = new StringBuilder(CRLF);
-            for(String info : redisVisitErrorList) {
+            for (String info : redisVisitErrorList) {
                 strBuffer.append(info).append(CRLF);
             }
             result = String.format(RedisEmailUtil.VISIT_EXCEPTION, strBuffer.toString());
@@ -230,28 +232,29 @@ public class RedisDataCheckProfessor {
 
     /**
      * format key not same info
+     *
      * @param map
      * @return
      */
     private String formatKeysNotSameRedis(Map<String, List<RedisInfo>> map) {
         String result;
-        if(null == map || map.isEmpty()) {
+        if (null == map || map.isEmpty()) {
             result = String.format(RedisEmailUtil.KEYS_EXCEPTION, NONE);
         } else {
             StringBuilder strBuffer = new StringBuilder(CRLF);
             Set<String> uids = map.keySet();
-            for(String uid : uids) {
+            for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
                 int num = 1;
-                for(int i = 0; i < redisInfoGroup.size()-1; i++) {
-                    if(redisInfoGroup.get(i).getKeys() == redisInfoGroup.get(i+1).getKeys()) {
-                        num ++;
+                for (int i = 0; i < redisInfoGroup.size() - 1; i++) {
+                    if (redisInfoGroup.get(i).getKeys() == redisInfoGroup.get(i + 1).getKeys()) {
+                        num++;
                     }
                 }
-                if(redisInfoGroup.size() != num) {
+                if (redisInfoGroup.size() != num) {
                     strBuffer.append(uid).append(": ");
-                    for(RedisInfo redisInfo : redisInfoGroup) {
-                        strBuffer.append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster()?"(s)":"(m)")
+                    for (RedisInfo redisInfo : redisInfoGroup) {
+                        strBuffer.append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
                                 .append(": ").append(redisInfo.getKeys()).append(" | ");
                     }
                     strBuffer.append(CRLF);
@@ -267,21 +270,21 @@ public class RedisDataCheckProfessor {
         keysIncr.append(CRLF);
         keysDecline.append(CRLF);
 
-        if(null == map || map.isEmpty()) {
+        if (null == map || map.isEmpty()) {
             return;
         }
-        if(null == lastRecordBucket) {
+        if (null == lastRecordBucket) {
             lastRecordBucket = map;
             return;
         }
         Set<String> redisInses = map.keySet();
-        for(String redisIns : redisInses) {
+        for (String redisIns : redisInses) {
             Long curKeys = map.get(redisIns);
-            if(lastRecordBucket.containsKey(redisInses)) {
+            if (lastRecordBucket.containsKey(redisInses)) {
                 Long lastKeys = lastRecordBucket.get(redisIns);
-                if(curKeys > lastKeys) {
-                    double val = (curKeys-lastKeys)/lastKeys.doubleValue();
-                    if(val >= 0.1) {
+                if (curKeys > lastKeys) {
+                    double val = (curKeys - lastKeys) / lastKeys.doubleValue();
+                    if (val >= 0.1) {
                         keysIncr.append(redisIns).append(":").append(" lastKeys:").
                                 append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", incr:").append((int) (val * 100)).append("%");
@@ -289,8 +292,8 @@ public class RedisDataCheckProfessor {
                         isChanged = true;
                     }
                 } else {
-                    double val = Math.abs(curKeys - lastKeys)/lastKeys.doubleValue();
-                    if(val >= 0.1) {
+                    double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
+                    if (val >= 0.1) {
                         keysIncr.append(redisIns).append(":").append(" lastKeys:").
                                 append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", decline:").append((int) (val * 100)).append("%");
@@ -315,8 +318,8 @@ public class RedisDataCheckProfessor {
         simpleEmailInterface = urls.get("simple_email_interface");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
-        for(String email : emails) {
-            if(sb.length() != 0) {
+        for (String email : emails) {
+            if (sb.length() != 0) {
                 sb.append("|");
             }
             sb.append(email);

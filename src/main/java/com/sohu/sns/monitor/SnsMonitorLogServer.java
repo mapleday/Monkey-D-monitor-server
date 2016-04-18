@@ -3,9 +3,7 @@ package com.sohu.sns.monitor;
 import com.sohu.sns.monitor.config.MySqlDBConfig;
 import com.sohu.sns.monitor.config.ZkPathConfig;
 import com.sohu.sns.monitor.server.LogMessageProcessor;
-import com.sohu.sns.monitor.server.MessageProcessor;
 import com.sohu.sns.monitor.server.config.UniqNameDBClusterService;
-import com.sohu.sns.monitor.service.ServiceImpl.SelectPersonServiceImpl;
 import com.sohu.sns.monitor.thread.ErrorLogProcessor;
 import com.sohu.sns.monitor.timer.RedisDataCheckProfessor;
 import com.sohu.sns.monitor.timer.StatLogVisitAnalyzer;
@@ -44,13 +42,13 @@ public class SnsMonitorLogServer {
             String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
             /**获取异常访问分析的相关配置**/
             String visitAnalyserInfo = new String(zk.getData(ZkPathConfig.VISIT_ANAL_CONFIG));
-            /**获取值班配置信息**/
-            String dutyConfigInfo = new String(zk.getData(ZkPathConfig.DUTY_CONFIG));
+            /**获取发送错误信息的配置**/
+            String errorLogConfig = new String(zk.getData(ZkPathConfig.ERROR_LOG_CONFIG));
 
             /**初始化异常访问分析所需要的环境**/
             StatLogVisitAnalyzer.initEnv(monitorUrls, visitAnalyserInfo);
-            /**初始化值班相关配置**/
-            SelectPersonServiceImpl.initEnv(monitorUrls, dutyConfigInfo);
+            /**初始化Redis监控**/
+            RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig);
 
             new ClassPathXmlApplicationContext("classpath:monitor/monitor-spring.xml");
 

@@ -27,8 +27,6 @@ public class ApiController {
     @Autowired
     private CountAppErrorService countAppErrorService;
     @Autowired
-    private SelectPersonService selectPersonService;
-    @Autowired
     private DelErrorLogsService delErrorLogsService;
     @Autowired
     private RedisCheckService redisCheckService;
@@ -72,13 +70,6 @@ public class ApiController {
             return FAILURE;
         }
         LOGGER.statLog(ModuleEnum.MONITOR_SERVICE, "Monitor.countAppError", null, null, System.currentTimeMillis() - start, 0, 0);
-        return SUCCESS;
-    }
-
-    //值班短信
-    @RequestParams(path = "/monitor/select_person",  method = {"get", "post"}, required = {"total"})
-    public String selectPerson(Map<String, RequestValue> params) throws Exception {
-        selectPersonService.send();
         return SUCCESS;
     }
 

@@ -86,12 +86,16 @@ public class RedisDataCheckProfessor {
                     /**分析数据是否一致用**/
                     if(redisClusterInfo.containsKey(uid)) {
                         if(null == redisClusterInfo.get(uid)) {
-                            redisClusterInfo.put(uid, Arrays.asList(redisInfo));
+                            List<RedisInfo> temp = new ArrayList<RedisInfo>();
+                            temp.add(redisInfo);
+                            redisClusterInfo.put(uid, temp);
                         } else {
                             redisClusterInfo.get(uid).add(redisInfo);
                         }
                     } else {
-                        redisClusterInfo.put(uid, Arrays.asList(redisInfo));
+                        List<RedisInfo> temp = new ArrayList<RedisInfo>();
+                        temp.add(redisInfo);
+                        redisClusterInfo.put(uid, temp);
                     }
 
                     /**分析数据变化趋势***/

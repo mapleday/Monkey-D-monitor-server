@@ -224,7 +224,7 @@ public class RedisDataCheckProfessor {
         } else {
             StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF);
             for (String info : redisVisitErrorList) {
-                strBuffer.append(RedisEmailUtil.getSpace(2)).append(info).append(RedisEmailUtil.CRLF);
+                strBuffer.append(RedisEmailUtil.getSpace(6)).append(info).append(RedisEmailUtil.CRLF);
             }
             result = String.format(VISIT_EXCEPTION, strBuffer.toString());
             isChanged = true;
@@ -254,13 +254,13 @@ public class RedisDataCheckProfessor {
                 }
                 if (1 != set.size()) {
                     StringBuilder temp = new StringBuilder();
-                    temp.append(RedisEmailUtil.getSpace(2)).append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
+                    temp.append(RedisEmailUtil.getSpace(6)).append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
                     strBuffer.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
                     for (RedisInfo redisInfo : redisInfoGroup) {
-                        strBuffer.append(RedisEmailUtil.getSpace(4)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
+                        strBuffer.append(RedisEmailUtil.getSpace(10)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
                                 .append(" : ").append(redisInfo.getKeys()).append("  |  ");
                     }
-                    strBuffer.append(RedisEmailUtil.CRLF);
+                    strBuffer.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                 }
             }
             result = String.format(KEYS_EXCEPTION, strBuffer.toString());
@@ -288,31 +288,31 @@ public class RedisDataCheckProfessor {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
                         StringBuilder temp = new StringBuilder();
-                        temp.append(RedisEmailUtil.getSpace(2)).append(redisIns).append(" : ");
+                        temp.append(RedisEmailUtil.getSpace(6)).append(redisIns).append(" : ");
                         keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
-                        keysIncr.append(RedisEmailUtil.getSpace(4)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
+                        keysIncr.append(RedisEmailUtil.getSpace(10)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", incr:").append((int) (val * 100)).append("%");
-                        keysIncr.append(RedisEmailUtil.CRLF);
+                        keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                         isChanged = true;
                     }
                 } else if (curKeys < lastKeys){
                     double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
                         StringBuilder temp = new StringBuilder();
-                        temp.append(RedisEmailUtil.getSpace(2)).append(redisIns).append(" : ");
+                        temp.append(RedisEmailUtil.getSpace(6)).append(redisIns).append(" : ");
                         keysDecline.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
-                        keysDecline.append(RedisEmailUtil.getSpace(4)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
+                        keysDecline.append(RedisEmailUtil.getSpace(10)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", decline:").append((int) (val * 100)).append("%");
-                        keysDecline.append(RedisEmailUtil.CRLF);
+                        keysDecline.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                         isChanged = true;
                     }
                 }
             } else {
                 StringBuilder temp = new StringBuilder();
-                temp.append(RedisEmailUtil.getSpace(2)).append(redisIns).append(" : ");
+                temp.append(RedisEmailUtil.getSpace(6)).append(redisIns).append(" : ");
                 keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
-                keysIncr.append(RedisEmailUtil.getSpace(4)).append(" lastKeys:").append("UnKnown").append(", currentKeys:").append(curKeys);
-                keysIncr.append(RedisEmailUtil.CRLF);
+                keysIncr.append(RedisEmailUtil.getSpace(10)).append(" lastKeys:").append("UnKnown").append(", currentKeys:").append(curKeys);
+                keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                 isChanged = true;
             }
         }

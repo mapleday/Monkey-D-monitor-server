@@ -122,10 +122,14 @@ public class RedisDataCheckProfessor {
         /**若为第一次检查则不预警**/
         if(Strings.isNullOrEmpty(lastCheckTime)) {
            lastCheckTime = time;
+            System.out.println("execute time : " + (System.currentTimeMillis() - begin));
             return;
         }
 
-        if (!isChanged || null == mailTo || mailTo.isEmpty()) return;
+        if (!isChanged || null == mailTo || mailTo.isEmpty()) {
+            System.out.println("execute time : " + (System.currentTimeMillis() - begin));
+            return;
+        }
 
         String keysIncrException = String.format(RedisEmailUtil.GROW_EXCEPTION, keyIncr.toString().equals(CRLF) ?
                 NONE : keyIncr.toString());
@@ -141,6 +145,7 @@ public class RedisDataCheckProfessor {
         map.put("text", emailContent.toString());
         map.put("to", "gordonchen@sohu-inc.com");
         isChanged = false;
+        lastCheckTime = time;
         try {
             HttpClientUtil.getStringByPost(baseEmailUrl + simpleEmailInterface, map, null);
             System.out.println("mail_to : " + mailTo);

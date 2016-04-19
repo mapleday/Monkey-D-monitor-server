@@ -272,7 +272,7 @@ public class RedisDataCheckProfessor {
                         strBuffer.append(RedisEmailUtil.getSpace(10)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
                                 .append(" : ").append(redisInfo.getKeys()).append("  |  ");
                     }
-                    strBuffer.append("Max Diff : ").append(Math.abs(diff1) > Math.abs(diff2)?diff1:diff2);
+                    strBuffer.append("&nbsp; &nbsp; Max Diff : ").append(Math.abs(diff1) > Math.abs(diff2)?diff1:diff2);
                     strBuffer.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                 }
             }

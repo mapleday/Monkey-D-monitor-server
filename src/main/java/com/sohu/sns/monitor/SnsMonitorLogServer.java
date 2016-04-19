@@ -44,11 +44,13 @@ public class SnsMonitorLogServer {
             String visitAnalyserInfo = new String(zk.getData(ZkPathConfig.VISIT_ANAL_CONFIG));
             /**获取发送错误信息的配置**/
             String errorLogConfig = new String(zk.getData(ZkPathConfig.ERROR_LOG_CONFIG));
+            /**获取redis检查的缓存信息**/
+            String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
 
             /**初始化异常访问分析所需要的环境**/
             StatLogVisitAnalyzer.initEnv(monitorUrls, visitAnalyserInfo);
             /**初始化Redis监控**/
-            RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig);
+            RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig, swapData, zk);
 
             new ClassPathXmlApplicationContext("classpath:monitor/monitor-spring.xml");
 

@@ -9,8 +9,8 @@ import com.sohu.sns.monitor.model.RedisInfo;
 import com.sohu.sns.monitor.model.RedisIns;
 import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.sns.monitor.util.RedisEmailUtil;
+import com.sohu.sns.monitor.util.ZipUtils;
 import com.sohu.snscommon.utils.LOGGER;
-import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
 import com.sohu.snscommon.utils.zk.ZkUtils;
@@ -31,14 +31,14 @@ public class RedisDataCheckProfessor {
     private static JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
     private static JavaType collectionType = jsonMapper.contructCollectionType(ArrayList.class, RedisIns.class);
     private static Joiner joiner = Joiner.on("_").skipNulls();
-    private static final String CRLF = "\n\r";
     private static final String NONE = "None";
     private static String REDIS_CHECK_URL = "";
     private static String baseEmailUrl = "";
-    private static String simpleEmailInterface = "";
+    private static String emailInterface = "";
     private static String mailTo = "";
     private static boolean isChanged = false;
     private static String lastCheckTime = "";
+    private static ZkUtils zk;
     private static Map<String, Long> lastRecordBucket;
 
     public void handle() throws InterruptedException, IOException, KeeperException {
@@ -119,22 +119,16 @@ public class RedisDataCheckProfessor {
         StringBuilder keyDecline = new StringBuilder();
         formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
 
-        /**若为第一次检查则不预警**/
-        if(Strings.isNullOrEmpty(lastCheckTime)) {
-           lastCheckTime = time;
-            System.out.println("execute time : " + (System.currentTimeMillis() - begin));
-            return;
-        }
-
         if (!isChanged || null == mailTo || mailTo.isEmpty()) {
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
             return;
         }
-
-        String keysIncrException = String.format(RedisEmailUtil.GROW_EXCEPTION, keyIncr.toString().equals(CRLF) ?
-                NONE : keyIncr.toString());
-        String KeysDeclineException = String.format(RedisEmailUtil.DECLINE_EXCEPTION, keyDecline.toString().
-                equals(CRLF) ? NONE : keyDecline.toString());
+        String growException = RedisEmailUtil.boldLine(RedisEmailUtil.GROW_EXCEPTION);
+        String declineException = RedisEmailUtil.boldLine(RedisEmailUtil.DECLINE_EXCEPTION);
+        String keysIncrException = String.format(growException, keyIncr.toString().
+                equals(RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
+        String KeysDeclineException = String.format(declineException, keyDecline.toString().
+                equals(RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
 
         StringBuilder emailContent = new StringBuilder();
         emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).append(redisKeysNotSameInfo)
@@ -145,9 +139,9 @@ public class RedisDataCheckProfessor {
         map.put("text", emailContent.toString());
         map.put("to", "gordonchen@sohu-inc.com");
         isChanged = false;
-        lastCheckTime = time;
+        updateZkSwap(time, currentRecordBucket);
         try {
-            HttpClientUtil.getStringByPost(baseEmailUrl + simpleEmailInterface, map, null);
+            HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
             System.out.println("mail_to : " + mailTo);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.senEmail", null, null, e);
@@ -158,34 +152,28 @@ public class RedisDataCheckProfessor {
 
 
     /**
-     * get config on zk
-     *
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
+     * 更新zk暂存区
+     * @param time
+     * @param map
      * @throws KeeperException
+     * @throws InterruptedException
      */
-    private Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
-        ZkUtils zk = new ZkUtils();
-        zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
-                ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
-
-        String redisConfig = new String(zk.getData(ZkPathConfig.REDIS_CHECK_CONFIG));
-
-        Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
-
-        REDIS_CHECK_URL = (String) map.get("check_url");
-
-        System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
-
-        return (Map<String, Map<String, String>>) map.get("redis_config");
+    private static void updateZkSwap(String time, Map<String, Long> map) throws KeeperException, InterruptedException {
+        if(null == time) {
+            time = DateUtil.getCurrentMin();
+        }
+        if(null == map) {
+            map = new HashMap<String, Long>();
+        }
+        String swap = time + "|" + jsonMapper.toJson(map);
+        zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swap).getBytes(), -1);
     }
 
     private RedisInfo infoExtraction(String info, int isMater, String ip, String desc) {
         if (Strings.isNullOrEmpty(info)) {
             return null;
         }
-        String[] array = StringUtils.split(info, CRLF);
+        String[] array = StringUtils.split(info, "\n\r");
         RedisInfo redisInfo = new RedisInfo();
         redisInfo.setIp(null == ip ? "" : ip);
         redisInfo.setIsMaster(isMater);
@@ -229,15 +217,16 @@ public class RedisDataCheckProfessor {
      * @return formatted visit failed info
      */
     private String formatVisitFailedReidis(List<String> redisVisitErrorList) {
+        String VISIT_EXCEPTION = RedisEmailUtil.boldLine(RedisEmailUtil.VISIT_EXCEPTION);
         String result;
         if (null == redisVisitErrorList || redisVisitErrorList.isEmpty()) {
-            result = String.format(RedisEmailUtil.VISIT_EXCEPTION, NONE);
+            result = String.format(VISIT_EXCEPTION, NONE);
         } else {
-            StringBuilder strBuffer = new StringBuilder(CRLF);
+            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF);
             for (String info : redisVisitErrorList) {
-                strBuffer.append("\t").append(info).append(CRLF);
+                strBuffer.append(RedisEmailUtil.getSpace(2)).append(info).append(RedisEmailUtil.CRLF);
             }
-            result = String.format(RedisEmailUtil.VISIT_EXCEPTION, strBuffer.toString());
+            result = String.format(VISIT_EXCEPTION, strBuffer.toString());
             isChanged = true;
         }
         return result;
@@ -250,11 +239,12 @@ public class RedisDataCheckProfessor {
      * @return
      */
     private String formatKeysNotSameRedis(Map<String, List<RedisInfo>> map) {
+        String KEYS_EXCEPTION = RedisEmailUtil.boldLine(RedisEmailUtil.KEYS_EXCEPTION);
         String result;
         if (null == map || map.isEmpty()) {
-            result = String.format(RedisEmailUtil.KEYS_EXCEPTION, NONE);
+            result = String.format(KEYS_EXCEPTION, NONE);
         } else {
-            StringBuilder strBuffer = new StringBuilder(CRLF);
+            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF);
             Set<String> uids = map.keySet();
             for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
@@ -263,30 +253,31 @@ public class RedisDataCheckProfessor {
                     set.add(redisInfo.getKeys());
                 }
                 if (1 != set.size()) {
-                    strBuffer.append("  *").append(uid).append("(" + map.get(uid).get(0).getDesc() + ")").append(" : " + CRLF);
+                    StringBuilder temp = new StringBuilder();
+                    temp.append(RedisEmailUtil.getSpace(2)).append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
+                    strBuffer.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
                     for (RedisInfo redisInfo : redisInfoGroup) {
-                        strBuffer.append("\t").append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
+                        strBuffer.append(RedisEmailUtil.getSpace(4)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
                                 .append(" : ").append(redisInfo.getKeys()).append("  |  ");
                     }
-                    strBuffer.append(CRLF);
+                    strBuffer.append(RedisEmailUtil.CRLF);
                 }
             }
-            result = String.format(RedisEmailUtil.KEYS_EXCEPTION, strBuffer.toString());
+            result = String.format(KEYS_EXCEPTION, strBuffer.toString());
             isChanged = true;
         }
         return result;
     }
 
     private void formatKeysChangeExceptionRedis(Map<String, Long> map, StringBuilder keysIncr, StringBuilder keysDecline) {
-        keysIncr.append(CRLF);
-        keysDecline.append(CRLF);
+        keysIncr.append(RedisEmailUtil.CRLF);
+        keysDecline.append(RedisEmailUtil.CRLF);
 
         if (null == map || map.isEmpty()) {
             return;
         }
-        if (null == lastRecordBucket) {
+        if (null == lastRecordBucket || lastRecordBucket.isEmpty()) {
             lastRecordBucket = map;
-            return;
         }
         Set<String> redisInses = map.keySet();
         for (String redisIns : redisInses) {
@@ -296,37 +287,77 @@ public class RedisDataCheckProfessor {
                 if (curKeys > lastKeys) {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
-                        keysIncr.append("  *").append(redisIns).append(" : ").append(CRLF);
-                        keysIncr.append("\t").append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
+                        StringBuilder temp = new StringBuilder();
+                        temp.append(RedisEmailUtil.getSpace(2)).append(redisIns).append(" : ");
+                        keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
+                        keysIncr.append(RedisEmailUtil.getSpace(4)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", incr:").append((int) (val * 100)).append("%");
-                        keysIncr.append(CRLF);
+                        keysIncr.append(RedisEmailUtil.CRLF);
                         isChanged = true;
                     }
-                } else {
+                } else if (curKeys < lastKeys){
                     double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
-                        keysIncr.append("  *").append(redisIns).append(" : ").append(CRLF);
-                        keysIncr.append("\t").append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
+                        StringBuilder temp = new StringBuilder();
+                        temp.append(RedisEmailUtil.getSpace(2)).append(redisIns).append(" : ");
+                        keysDecline.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
+                        keysDecline.append(RedisEmailUtil.getSpace(4)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", decline:").append((int) (val * 100)).append("%");
-                        keysIncr.append(CRLF);
+                        keysDecline.append(RedisEmailUtil.CRLF);
                         isChanged = true;
                     }
                 }
             } else {
-                keysIncr.append("  *").append(redisIns).append(" : ").append(CRLF);
-                keysIncr.append("\t").append(" lastKeys:").append("UnKnown").append(", currentKeys:").append(curKeys);
-                keysIncr.append(CRLF);
+                StringBuilder temp = new StringBuilder();
+                temp.append(RedisEmailUtil.getSpace(2)).append(redisIns).append(" : ");
+                keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
+                keysIncr.append(RedisEmailUtil.getSpace(4)).append(" lastKeys:").append("UnKnown").append(", currentKeys:").append(curKeys);
+                keysIncr.append(RedisEmailUtil.CRLF);
                 isChanged = true;
             }
         }
-        lastRecordBucket = map;
     }
 
-    public static void initEnv(String monitorUrls, String errorLogConfig) {
+    /**
+     * get config on zk
+     *
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws KeeperException
+     */
+    private Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
+
+        String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
+        String redisConfig = new String(zk.getData(ZkPathConfig.REDIS_CHECK_CONFIG));
+
+        swapData = ZipUtils.gunzip(swapData);
+        lastCheckTime = swapData.substring(0, swapData.indexOf("|"));
+        lastRecordBucket = jsonMapper.fromJson(swapData.substring(swapData.indexOf("|")+1, swapData.length()), HashMap.class);
+
+        Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
+
+        REDIS_CHECK_URL = (String) map.get("check_url");
+
+        System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
+
+        return (Map<String, Map<String, String>>) map.get("redis_config");
+    }
+
+    public static void initEnv(String monitorUrls, String errorLogConfig, String swap, ZkUtils zkUtils) throws KeeperException, InterruptedException {
+        if(null == zk) {
+            zk = zkUtils;
+        }
+        if(Strings.isNullOrEmpty(swap)) {
+            String time = DateUtil.getCurrentMin();
+            Map<String, Long> map  = new HashMap<String, Long>();
+            String swapData = time + "|" + jsonMapper.toJson(map);
+            zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swapData).getBytes(), -1);
+        }
         Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
         Map<String, Object> errorLogConfigMap = jsonMapper.fromJson(errorLogConfig, HashMap.class);
         baseEmailUrl = urls.get("base_url");
-        simpleEmailInterface = urls.get("simple_email_interface");
+        emailInterface = urls.get("html_email_interface");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
         for (String email : emails) {

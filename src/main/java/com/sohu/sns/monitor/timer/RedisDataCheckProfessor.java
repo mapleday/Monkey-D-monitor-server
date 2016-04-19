@@ -126,9 +126,9 @@ public class RedisDataCheckProfessor {
         String growException = RedisEmailUtil.boldLine(RedisEmailUtil.GROW_EXCEPTION);
         String declineException = RedisEmailUtil.boldLine(RedisEmailUtil.DECLINE_EXCEPTION);
         String keysIncrException = String.format(growException, keyIncr.toString().
-                equals(RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
+                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
         String KeysDeclineException = String.format(declineException, keyDecline.toString().
-                equals(RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
+                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
 
         StringBuilder emailContent = new StringBuilder();
         emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).append(redisKeysNotSameInfo)
@@ -137,7 +137,7 @@ public class RedisDataCheckProfessor {
         Map<String, String> map = new HashMap<String, String>();
         map.put("subject", RedisEmailUtil.SUBJECT);
         map.put("text", emailContent.toString());
-        map.put("to", "gordonchen@sohu-inc.com");
+        map.put("to", mailTo);
         isChanged = false;
         updateZkSwap(time, currentRecordBucket);
         try {
@@ -222,7 +222,7 @@ public class RedisDataCheckProfessor {
         if (null == redisVisitErrorList || redisVisitErrorList.isEmpty()) {
             result = String.format(VISIT_EXCEPTION, NONE);
         } else {
-            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF);
+            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
             for (String info : redisVisitErrorList) {
                 strBuffer.append(RedisEmailUtil.getSpace(6)).append(info).append(RedisEmailUtil.CRLF);
             }
@@ -244,7 +244,7 @@ public class RedisDataCheckProfessor {
         if (null == map || map.isEmpty()) {
             result = String.format(KEYS_EXCEPTION, NONE);
         } else {
-            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF);
+            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
             Set<String> uids = map.keySet();
             for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
@@ -254,7 +254,7 @@ public class RedisDataCheckProfessor {
                 }
                 if (1 != set.size()) {
                     StringBuilder temp = new StringBuilder();
-                    temp.append(RedisEmailUtil.getSpace(6)).append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
+                    temp.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
                     strBuffer.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
                     for (RedisInfo redisInfo : redisInfoGroup) {
                         strBuffer.append(RedisEmailUtil.getSpace(10)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
@@ -270,8 +270,8 @@ public class RedisDataCheckProfessor {
     }
 
     private void formatKeysChangeExceptionRedis(Map<String, Integer> map, StringBuilder keysIncr, StringBuilder keysDecline) {
-        keysIncr.append(RedisEmailUtil.CRLF);
-        keysDecline.append(RedisEmailUtil.CRLF);
+        keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
+        keysDecline.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
 
         if (null == map || map.isEmpty()) {
             return;
@@ -288,7 +288,7 @@ public class RedisDataCheckProfessor {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
                         StringBuilder temp = new StringBuilder();
-                        temp.append(RedisEmailUtil.getSpace(6)).append(redisIns).append(" : ");
+                        temp.append(RedisEmailUtil.getSpace(6)).append("*").append(redisIns).append(" : ");
                         keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
                         keysIncr.append(RedisEmailUtil.getSpace(10)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", incr:").append((int) (val * 100)).append("%");
@@ -299,7 +299,7 @@ public class RedisDataCheckProfessor {
                     double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
                         StringBuilder temp = new StringBuilder();
-                        temp.append(RedisEmailUtil.getSpace(6)).append(redisIns).append(" : ");
+                        temp.append(RedisEmailUtil.getSpace(6)).append("*").append(redisIns).append(" : ");
                         keysDecline.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
                         keysDecline.append(RedisEmailUtil.getSpace(10)).append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", decline:").append((int) (val * 100)).append("%");
@@ -309,7 +309,7 @@ public class RedisDataCheckProfessor {
                 }
             } else {
                 StringBuilder temp = new StringBuilder();
-                temp.append(RedisEmailUtil.getSpace(6)).append(redisIns).append(" : ");
+                temp.append(RedisEmailUtil.getSpace(6)).append("*").append(redisIns).append(" : ");
                 keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
                 keysIncr.append(RedisEmailUtil.getSpace(10)).append(" lastKeys:").append("UnKnown").append(", currentKeys:").append(curKeys);
                 keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);

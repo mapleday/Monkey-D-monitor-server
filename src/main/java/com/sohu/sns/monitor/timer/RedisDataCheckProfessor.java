@@ -248,11 +248,23 @@ public class RedisDataCheckProfessor {
             Set<String> uids = map.keySet();
             for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
-                Set<Integer> set = new HashSet<Integer>();
+                int minSlaveKeys = Integer.MAX_VALUE, maxSlaveKeys = Integer.MIN_VALUE, masterKeys = 0;
                 for (RedisInfo redisInfo : redisInfoGroup) {
-                    set.add(redisInfo.getKeys());
+                    if(redisInfo.getKeys() < minSlaveKeys && 1 != redisInfo.getIsMaster()) {
+                        minSlaveKeys = redisInfo.getKeys();
+                    }
+                    if(redisInfo.getKeys() > maxSlaveKeys && 1 != redisInfo.getIsMaster()) {
+                        maxSlaveKeys = redisInfo.getKeys();
+                    }
+                    if(1 == redisInfo.getIsMaster()) {
+                        masterKeys = redisInfo.getKeys();
+                    }
                 }
-                if (1 != set.size()) {
+
+                int diff1 = masterKeys - minSlaveKeys;
+                int diff2 = masterKeys - maxSlaveKeys;
+
+                if (0 != diff1 || 0 != diff2) {
                     StringBuilder temp = new StringBuilder();
                     temp.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
                     strBuffer.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
@@ -260,6 +272,7 @@ public class RedisDataCheckProfessor {
                         strBuffer.append(RedisEmailUtil.getSpace(10)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
                                 .append(" : ").append(redisInfo.getKeys()).append("  |  ");
                     }
+                    strBuffer.append("Max Diff : ").append(Math.abs(diff1) > Math.abs(diff2)?diff1:diff2);
                     strBuffer.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                 }
             }

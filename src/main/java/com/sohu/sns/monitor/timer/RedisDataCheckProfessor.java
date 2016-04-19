@@ -111,7 +111,6 @@ public class RedisDataCheckProfessor {
                 }
             }
         }
-
         String redisVisitFailedInfo = formatVisitFailedReidis(redisVisitFailedList);
         String redisKeysNotSameInfo = formatKeysNotSameRedis(redisClusterInfo);
         StringBuilder keyIncr = new StringBuilder();
@@ -245,17 +244,15 @@ public class RedisDataCheckProfessor {
             Set<String> uids = map.keySet();
             for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
-                int num = 1;
-                for (int i = 0; i < redisInfoGroup.size() - 1; i++) {
-                    if (redisInfoGroup.get(i).getKeys() == redisInfoGroup.get(i + 1).getKeys()) {
-                        num++;
-                    }
+                Set<Long> set = new HashSet<Long>();
+                for (RedisInfo redisInfo : redisInfoGroup) {
+                    set.add(redisInfo.getKeys());
                 }
-                if (redisInfoGroup.size() != num) {
-                    strBuffer.append(uid).append(": ");
+                if (1 != set.size()) {
+                    strBuffer.append(uid).append(" : ");
                     for (RedisInfo redisInfo : redisInfoGroup) {
                         strBuffer.append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
-                                .append(": ").append(redisInfo.getKeys()).append(" | ");
+                                .append(" : ").append(redisInfo.getKeys()).append("  |  ");
                     }
                     strBuffer.append(CRLF);
                 }
@@ -280,7 +277,7 @@ public class RedisDataCheckProfessor {
         Set<String> redisInses = map.keySet();
         for (String redisIns : redisInses) {
             Long curKeys = map.get(redisIns);
-            if (lastRecordBucket.containsKey(redisInses)) {
+            if (lastRecordBucket.containsKey(redisIns)) {
                 Long lastKeys = lastRecordBucket.get(redisIns);
                 if (curKeys > lastKeys) {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();

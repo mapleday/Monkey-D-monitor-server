@@ -39,7 +39,7 @@ public class RedisDataCheckProfessor {
     private static boolean isChanged = false;
     private static String lastCheckTime = "";
     private static ZkUtils zk;
-    private static Map<String, Long> lastRecordBucket;
+    private static Map<String, Integer> lastRecordBucket;
 
     public void handle() throws InterruptedException, IOException, KeeperException {
 
@@ -54,7 +54,7 @@ public class RedisDataCheckProfessor {
 
         List<String> redisVisitFailedList = new ArrayList<String>();
         Map<String, List<RedisInfo>> redisClusterInfo = new HashMap<String, List<RedisInfo>>();
-        Map<String, Long> currentRecordBucket = new HashMap<String, Long>();
+        Map<String, Integer> currentRecordBucket = new HashMap<String, Integer>();
 
         for (String uid : uids) {
             List<RedisIns> redisInses;
@@ -158,12 +158,12 @@ public class RedisDataCheckProfessor {
      * @throws KeeperException
      * @throws InterruptedException
      */
-    private static void updateZkSwap(String time, Map<String, Long> map) throws KeeperException, InterruptedException {
+    private static void updateZkSwap(String time, Map<String, Integer> map) throws KeeperException, InterruptedException {
         if(null == time) {
             time = DateUtil.getCurrentMin();
         }
         if(null == map) {
-            map = new HashMap<String, Long>();
+            map = new HashMap<String, Integer>();
         }
         String swap = time + "|" + jsonMapper.toJson(map);
         zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swap).getBytes(), -1);
@@ -205,8 +205,8 @@ public class RedisDataCheckProfessor {
             redisInfo.setUsedCpu(null == usedCpu ? "" : usedCpu);
         }
         if (line.startsWith("db0:keys=")) {
-            Long keys = Long.parseLong(line.substring(line.indexOf("=") + 1, line.indexOf(",")));
-            redisInfo.setKeys(null == keys ? 0L : keys);
+            Integer keys = Integer.parseInt(line.substring(line.indexOf("=") + 1, line.indexOf(",")));
+            redisInfo.setKeys(null == keys ? 0 : keys);
         }
     }
 
@@ -248,7 +248,7 @@ public class RedisDataCheckProfessor {
             Set<String> uids = map.keySet();
             for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
-                Set<Long> set = new HashSet<Long>();
+                Set<Integer> set = new HashSet<Integer>();
                 for (RedisInfo redisInfo : redisInfoGroup) {
                     set.add(redisInfo.getKeys());
                 }
@@ -269,7 +269,7 @@ public class RedisDataCheckProfessor {
         return result;
     }
 
-    private void formatKeysChangeExceptionRedis(Map<String, Long> map, StringBuilder keysIncr, StringBuilder keysDecline) {
+    private void formatKeysChangeExceptionRedis(Map<String, Integer> map, StringBuilder keysIncr, StringBuilder keysDecline) {
         keysIncr.append(RedisEmailUtil.CRLF);
         keysDecline.append(RedisEmailUtil.CRLF);
 
@@ -281,9 +281,9 @@ public class RedisDataCheckProfessor {
         }
         Set<String> redisInses = map.keySet();
         for (String redisIns : redisInses) {
-            Long curKeys = map.get(redisIns);
+            Integer curKeys = map.get(redisIns);
             if (lastRecordBucket.containsKey(redisIns)) {
-                Long lastKeys = lastRecordBucket.get(redisIns);
+                Integer lastKeys = lastRecordBucket.get(redisIns);
                 if (curKeys > lastKeys) {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {

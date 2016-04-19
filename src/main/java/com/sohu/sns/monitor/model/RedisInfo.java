@@ -8,7 +8,7 @@ public class RedisInfo {
     private String ip = "";
     private String desc = "";
     private Integer isMaster = 0;
-    private Long keys = 0L;
+    private Integer keys = 0;
     private Long maxMemory = 0L;
     private Long usedMemory = 0L;
     private String usedCpu = "";
@@ -30,11 +30,11 @@ public class RedisInfo {
         this.isMaster = isMaster;
     }
 
-    public Long getKeys() {
+    public Integer getKeys() {
         return keys;
     }
 
-    public void setKeys(Long keys) {
+    public void setKeys(Integer keys) {
         this.keys = keys;
     }
 

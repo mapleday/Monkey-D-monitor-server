@@ -1,4 +1,3 @@
-import com.sohu.sns.monitor.service.SelectPersonService;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,10 +21,5 @@ public class DutyTest {
 
     @Test
     public void sendTest() throws Exception {
-        SelectPersonService bean = context.getBean(SelectPersonService.class);
-        for (int i = 0; i < 10; i++) {
-            bean.send();
-
-        }
     }
 }

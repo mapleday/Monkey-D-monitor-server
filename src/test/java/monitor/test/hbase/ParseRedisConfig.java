@@ -16,11 +16,14 @@ public class ParseRedisConfig {
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("D:/redis_result.txt"), "UTF-8"));
         String line = null;
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, Map<String, String>> map = new HashMap<String, Map<String, String>>();
         while((line = br.readLine()) != null) {
             line = line.trim();
             String[] array = line.split("\\t");
-            map.put(array[0], array[1]);
+            Map<String, String> temp = new HashMap<String, String>();
+            temp.put("passwd", array[1]);
+            temp.put("desc", array[2]);
+            map.put(array[0], temp);
         }
         System.out.println(jsonMapper.toJson(map));
     }

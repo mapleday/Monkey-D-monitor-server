@@ -6,6 +6,7 @@ package com.sohu.sns.monitor.model;
 public class RedisInfo {
 
     private String ip = "";
+    private String desc = "";
     private Integer isMaster = 0;
     private Long keys = 0L;
     private Long maxMemory = 0L;
@@ -67,5 +68,13 @@ public class RedisInfo {
 
     public void setConnectedClients(Long connectedClients) {
         this.connectedClients = connectedClients;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

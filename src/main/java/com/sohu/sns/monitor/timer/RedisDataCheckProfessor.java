@@ -38,6 +38,7 @@ public class RedisDataCheckProfessor {
     private static String simpleEmailInterface = "";
     private static String mailTo = "";
     private static boolean isChanged = false;
+    private static String lastCheckTime = "";
     private static Map<String, Long> lastRecordBucket;
 
     public void handle() throws InterruptedException, IOException, KeeperException {
@@ -45,7 +46,7 @@ public class RedisDataCheckProfessor {
         long begin = System.currentTimeMillis();
         String time = DateUtil.getCurrentMin();
 
-        Map<String, String> redisConfig = getRedisClusterConfig();
+        Map<String, Map<String, String>> redisConfig = getRedisClusterConfig();
         if (null == redisConfig || redisConfig.isEmpty()) return;
         if (REDIS_CHECK_URL.isEmpty()) return;
         System.out.println("redis check start : " + redisConfig.size() + ", time:" + DateUtil.getCurrentTime());
@@ -57,15 +58,17 @@ public class RedisDataCheckProfessor {
 
         for (String uid : uids) {
             List<RedisIns> redisInses;
+            String passwd = redisConfig.get(uid).get("passwd");
+            String desc = redisConfig.get(uid).get("desc");
             try {
                 String redisInsStr = HttpClientUtil.getStringByGet(String.format(REDIS_CHECK_URL, uid), null);
                 redisInses = jsonMapper.fromJson(redisInsStr, collectionType);
                 if (null == redisInses || redisInses.isEmpty()) {
-                    redisVisitFailedList.add(joiner.join(uid, redisConfig.get(uid)));
+                    redisVisitFailedList.add(joiner.join(uid, passwd, desc));
                     continue;
                 }
             } catch (Exception e) {
-                redisVisitFailedList.add(joiner.join(uid, redisConfig.get(uid)));
+                redisVisitFailedList.add(joiner.join(uid, passwd, desc));
                 LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.getStringByGet", null, null, e);
                 e.printStackTrace();
                 continue;
@@ -73,15 +76,14 @@ public class RedisDataCheckProfessor {
             if (null == redisInses) continue;
             for (RedisIns redisIns : redisInses) {
                 try {
-                    String password = redisConfig.get(uid);
                     Jedis jedis = new Jedis(redisIns.getIp(), redisIns.getPort());
-                    String result = jedis.auth(password);
+                    String result = jedis.auth(passwd);
                     if (!"OK".equals(result)) {
-                        redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), redisConfig.get(uid)));
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.auth", password, result, null);
+                        redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd, desc));
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.auth", passwd, result, null);
                         continue;
                     }
-                    RedisInfo redisInfo = infoExtraction(jedis.info(), redisIns.getMaster(), redisIns.getIp());
+                    RedisInfo redisInfo = infoExtraction(jedis.info(), redisIns.getMaster(), redisIns.getIp(), desc);
 
                     /**分析数据是否一致用**/
                     if (redisClusterInfo.containsKey(uid)) {
@@ -100,12 +102,12 @@ public class RedisDataCheckProfessor {
 
                     /**分析数据变化趋势***/
                     if (1 == redisIns.getMaster()) {
-                        currentRecordBucket.put(joiner.join(uid, redisIns.getIp()), redisInfo.getKeys());
+                        currentRecordBucket.put(joiner.join(uid, redisIns.getIp(), desc), redisInfo.getKeys());
                     }
-                    //writeJdbcTemplate.update(INSERT_RECORD, uid, redisInfo.getIp(), redisInfo.getIsMaster(), redisInfo.getKeys(), time);
+
                     jedis.close();
                 } catch (Exception e) {
-                    redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), redisConfig.get(uid)));
+                    redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd));
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.getInfo", null, null, e);
                     e.printStackTrace();
                 }
@@ -117,25 +119,31 @@ public class RedisDataCheckProfessor {
         StringBuilder keyDecline = new StringBuilder();
         formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
 
+        /**若为第一次检查则不预警**/
+        if(Strings.isNullOrEmpty(lastCheckTime)) {
+           lastCheckTime = time;
+            return;
+        }
+
         if (!isChanged || null == mailTo || mailTo.isEmpty()) return;
 
         String keysIncrException = String.format(RedisEmailUtil.GROW_EXCEPTION, keyIncr.toString().equals(CRLF) ?
-                "None" : keyIncr.toString());
+                NONE : keyIncr.toString());
         String KeysDeclineException = String.format(RedisEmailUtil.DECLINE_EXCEPTION, keyDecline.toString().
-                equals(CRLF) ? "None" : keyDecline.toString());
+                equals(CRLF) ? NONE : keyDecline.toString());
 
         StringBuilder emailContent = new StringBuilder();
-        emailContent.append(redisVisitFailedInfo).append(redisKeysNotSameInfo)
+        emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).append(redisKeysNotSameInfo)
                 .append(keysIncrException).append(KeysDeclineException);
 
         Map<String, String> map = new HashMap<String, String>();
-        map.put("subject", String.format(RedisEmailUtil.SUBJECT, time));
+        map.put("subject", RedisEmailUtil.SUBJECT);
         map.put("text", emailContent.toString());
-        map.put("to", mailTo);
+        map.put("to", "gordonchen@sohu-inc.com");
         isChanged = false;
         try {
             HttpClientUtil.getStringByPost(baseEmailUrl + simpleEmailInterface, map, null);
-            System.out.println("mail_to" + mailTo);
+            System.out.println("mail_to : " + mailTo);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.senEmail", null, null, e);
             e.printStackTrace();
@@ -152,7 +160,7 @@ public class RedisDataCheckProfessor {
      * @throws InterruptedException
      * @throws KeeperException
      */
-    private Map<String, String> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
+    private Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
         ZkUtils zk = new ZkUtils();
         zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
@@ -165,17 +173,18 @@ public class RedisDataCheckProfessor {
 
         System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
 
-        return (Map<String, String>) map.get("redis_config");
+        return (Map<String, Map<String, String>>) map.get("redis_config");
     }
 
-    private RedisInfo infoExtraction(String info, int isMater, String ip) {
+    private RedisInfo infoExtraction(String info, int isMater, String ip, String desc) {
         if (Strings.isNullOrEmpty(info)) {
             return null;
         }
-        String[] array = StringUtils.split(info, "\r\n");
+        String[] array = StringUtils.split(info, CRLF);
         RedisInfo redisInfo = new RedisInfo();
         redisInfo.setIp(null == ip ? "" : ip);
         redisInfo.setIsMaster(isMater);
+        redisInfo.setDesc(desc);
         for (String line : array) {
             fillObject(line.trim(), redisInfo);
         }
@@ -221,7 +230,7 @@ public class RedisDataCheckProfessor {
         } else {
             StringBuilder strBuffer = new StringBuilder(CRLF);
             for (String info : redisVisitErrorList) {
-                strBuffer.append(info).append(CRLF);
+                strBuffer.append("\t").append(info).append(CRLF);
             }
             result = String.format(RedisEmailUtil.VISIT_EXCEPTION, strBuffer.toString());
             isChanged = true;
@@ -249,9 +258,9 @@ public class RedisDataCheckProfessor {
                     set.add(redisInfo.getKeys());
                 }
                 if (1 != set.size()) {
-                    strBuffer.append(uid).append(" : ");
+                    strBuffer.append("  *").append(uid).append("(" + map.get(uid).get(0).getDesc() + ")").append(" : " + CRLF);
                     for (RedisInfo redisInfo : redisInfoGroup) {
-                        strBuffer.append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
+                        strBuffer.append("\t").append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
                                 .append(" : ").append(redisInfo.getKeys()).append("  |  ");
                     }
                     strBuffer.append(CRLF);
@@ -282,8 +291,8 @@ public class RedisDataCheckProfessor {
                 if (curKeys > lastKeys) {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
-                        keysIncr.append(redisIns).append(":").append(" lastKeys:").
-                                append(lastKeys).append(", currentKeys:").append(curKeys)
+                        keysIncr.append("  *").append(redisIns).append(" : ").append(CRLF);
+                        keysIncr.append("\t").append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", incr:").append((int) (val * 100)).append("%");
                         keysIncr.append(CRLF);
                         isChanged = true;
@@ -291,16 +300,16 @@ public class RedisDataCheckProfessor {
                 } else {
                     double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.1) {
-                        keysIncr.append(redisIns).append(":").append(" lastKeys:").
-                                append(lastKeys).append(", currentKeys:").append(curKeys)
+                        keysIncr.append("  *").append(redisIns).append(" : ").append(CRLF);
+                        keysIncr.append("\t").append(" lastKeys:").append(lastKeys).append(", currentKeys:").append(curKeys)
                                 .append(", decline:").append((int) (val * 100)).append("%");
                         keysIncr.append(CRLF);
                         isChanged = true;
                     }
                 }
             } else {
-                keysIncr.append(redisIns).append(":").append(" lastKeys:").
-                        append("UnKnown").append(", currentKeys:").append(curKeys);
+                keysIncr.append("  *").append(redisIns).append(" : ").append(CRLF);
+                keysIncr.append("\t").append(" lastKeys:").append("UnKnown").append(", currentKeys:").append(curKeys);
                 keysIncr.append(CRLF);
                 isChanged = true;
             }

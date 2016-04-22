@@ -5,6 +5,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.config.ZkPathConfig;
+import com.sohu.sns.monitor.model.DiffInfo;
+import com.sohu.sns.monitor.model.MemoryInfo;
 import com.sohu.sns.monitor.model.RedisInfo;
 import com.sohu.sns.monitor.model.RedisIns;
 import com.sohu.sns.monitor.util.DateUtil;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -32,6 +35,7 @@ public class RedisDataCheckProfessor {
     private static JavaType collectionType = jsonMapper.contructCollectionType(ArrayList.class, RedisIns.class);
     private static Joiner joiner = Joiner.on("_").skipNulls();
     private static final String NONE = "None";
+    private static final String SEP = "@@@";
     private static String REDIS_CHECK_URL = "";
     private static String baseEmailUrl = "";
     private static String emailInterface = "";
@@ -40,6 +44,8 @@ public class RedisDataCheckProfessor {
     private static String lastCheckTime = "";
     private static ZkUtils zk;
     private static Map<String, Integer> lastRecordBucket;
+    private static Map<String, Long> lastMemoryRecordBucket;
+    private static Map<String, Integer> lastKeyDiffBucket;
 
     public void handle() throws InterruptedException, IOException, KeeperException {
 
@@ -54,6 +60,7 @@ public class RedisDataCheckProfessor {
 
         List<String> redisVisitFailedList = new ArrayList<String>();
         Map<String, List<RedisInfo>> redisClusterInfo = new HashMap<String, List<RedisInfo>>();
+        Map<String, RedisInfo> masterInfo = new HashMap<String, RedisInfo>();
         Map<String, Integer> currentRecordBucket = new HashMap<String, Integer>();
 
         for (String uid : uids) {
@@ -85,6 +92,13 @@ public class RedisDataCheckProfessor {
                     }
                     RedisInfo redisInfo = infoExtraction(jedis.info(), redisIns.getMaster(), redisIns.getIp(), desc);
 
+                    /**
+                     * 添加master的信息
+                     */
+                    if(1 == redisInfo.getIsMaster()) {
+                        masterInfo.put(uid, redisInfo);
+                    }
+
                     /**分析数据是否一致用**/
                     if (redisClusterInfo.containsKey(uid)) {
                         if (null == redisClusterInfo.get(uid)) {
@@ -115,6 +129,7 @@ public class RedisDataCheckProfessor {
         }
         String redisVisitFailedInfo = formatVisitFailedReidis(redisVisitFailedList);
         String redisKeysNotSameInfo = formatKeysNotSameRedis(redisClusterInfo);
+        String memoryAnal = formatMemoryAnal(masterInfo);
         StringBuilder keyIncr = new StringBuilder();
         StringBuilder keyDecline = new StringBuilder();
         formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
@@ -131,15 +146,15 @@ public class RedisDataCheckProfessor {
                 equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
 
         StringBuilder emailContent = new StringBuilder();
-        emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).append(redisKeysNotSameInfo)
-                .append(keysIncrException).append(KeysDeclineException);
+        emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).
+                append(redisKeysNotSameInfo).append(memoryAnal).append(keysIncrException).append(KeysDeclineException);
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("subject", RedisEmailUtil.SUBJECT);
         map.put("text", emailContent.toString());
         map.put("to", mailTo);
         isChanged = false;
-        updateZkSwap(time, currentRecordBucket);
+        updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket);
         try {
             HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
             System.out.println("mail_to : " + mailTo);
@@ -158,14 +173,25 @@ public class RedisDataCheckProfessor {
      * @throws KeeperException
      * @throws InterruptedException
      */
-    private static void updateZkSwap(String time, Map<String, Integer> map) throws KeeperException, InterruptedException {
+    private static void updateZkSwap(String time, Map<String, Integer> map, Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap) throws KeeperException, InterruptedException {
         if(null == time) {
             time = DateUtil.getCurrentMin();
         }
         if(null == map) {
             map = new HashMap<String, Integer>();
         }
-        String swap = time + "|" + jsonMapper.toJson(map);
+        if(null == diffMap) {
+            diffMap = new HashMap<String, Integer>();
+        }
+        Map<String, String> lastMemoryInfo = new HashMap<String, String>();
+        if(null != masterInfo) {
+            Set<String> uids = masterInfo.keySet();
+            for(String uid : uids) {
+                lastMemoryInfo.put(uid, String.valueOf(masterInfo.get(uid).getUsedMemory()));
+            }
+        }
+
+        String swap = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(lastMemoryInfo) + SEP + jsonMapper.toJson(diffMap);
         zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swap).getBytes(), -1);
     }
 
@@ -246,6 +272,8 @@ public class RedisDataCheckProfessor {
         } else {
             StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
             Set<String> uids = map.keySet();
+            Map<String, Integer> diffMap = new HashMap<String, Integer>();
+            List<DiffInfo> list = new LinkedList<DiffInfo>();
             for (String uid : uids) {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
                 int minSlaveKeys = Integer.MAX_VALUE, maxSlaveKeys = Integer.MIN_VALUE, masterKeys = 0;
@@ -263,24 +291,99 @@ public class RedisDataCheckProfessor {
 
                 int diff1 = masterKeys - minSlaveKeys;
                 int diff2 = masterKeys - maxSlaveKeys;
-
+                int maxDiff = Math.abs(diff1) > Math.abs(diff2)?diff1:diff2;
+                diffMap.put(uid, maxDiff);
+                int lastMaxDiff = (null == lastKeyDiffBucket.get(uid)?0:lastKeyDiffBucket.get(uid));
                 if (0 != diff1 || 0 != diff2) {
                     StringBuilder temp = new StringBuilder();
                     temp.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
-                    strBuffer.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
-                    for (RedisInfo redisInfo : redisInfoGroup) {
-                        strBuffer.append(RedisEmailUtil.getSpace(10)).append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
-                                .append(" : ").append(redisInfo.getKeys()).append("  |  ");
-                    }
-                    strBuffer.append("&nbsp; &nbsp; Max Diff : ").append(Math.abs(diff1) > Math.abs(diff2)?diff1:diff2);
-                    strBuffer.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
+                    DiffInfo diffInfo = new DiffInfo();
+                    diffInfo.setUid(temp.toString());
+                    diffInfo.setList(redisInfoGroup);
+                    diffInfo.setMaxDiff(maxDiff);
+                    diffInfo.setDiffByLast(maxDiff - lastMaxDiff);
+                    list.add(diffInfo);
                 }
             }
+            Collections.sort(list);
+            for(DiffInfo diffInfo : list) {
+                strBuffer.append(RedisEmailUtil.colorLine(diffInfo.getUid(), "red")).append(RedisEmailUtil.CRLF);
+                List<RedisInfo> temp = diffInfo.getList();
+                strBuffer.append(RedisEmailUtil.getSpace(10));
+                for (RedisInfo redisInfo : temp) {
+                    strBuffer.append(redisInfo.getIp()).append(0 == redisInfo.getIsMaster() ? "(s)" : "(m)")
+                            .append(" : ").append(redisInfo.getKeys()).append("&nbsp; &nbsp;|&nbsp; &nbsp;");
+                }
+                strBuffer.append("Max Diff : ").append(diffInfo.getMaxDiff());
+                strBuffer.append("&nbsp; &nbsp;|&nbsp; &nbsp; Diff_By_Last : ").append(diffInfo.getDiffByLast());
+                strBuffer.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
+            }
+            lastKeyDiffBucket = diffMap;
             result = String.format(KEYS_EXCEPTION, strBuffer.toString());
             isChanged = true;
         }
         return result;
     }
+
+    /**
+     * 分析redis中master Memory使用情况
+     * @param masterInfos
+     * @return
+     */
+    private String formatMemoryAnal(Map<String, RedisInfo> masterInfos) {
+        String memoryAnal = RedisEmailUtil.boldLine(RedisEmailUtil.MEMORY_CHANGE_INFO);
+        String result;
+        if(null == masterInfos || masterInfos.isEmpty()) {
+            result = String.format(memoryAnal, NONE);
+        } else {
+            StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
+            Set<String> uids = masterInfos.keySet();
+            List<MemoryInfo> list = new LinkedList<MemoryInfo>();
+            for(String uid : uids) {
+                RedisInfo redisInfo = masterInfos.get(uid);
+                long lastMemoryInfo = 0;
+                if(lastMemoryRecordBucket.containsKey(uid)) {
+                    lastMemoryInfo = lastMemoryRecordBucket.get(uid);
+                }
+                long diff = redisInfo.getUsedMemory() - lastMemoryInfo;
+                MemoryInfo memoryInfo = new MemoryInfo();
+                StringBuilder temp = new StringBuilder();
+                temp.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(" (" + redisInfo.getDesc() + ")").append(" : ");
+                memoryInfo.setUid(temp.toString());
+                memoryInfo.setMaxMemory(parseGb(redisInfo.getMaxMemory()));
+                memoryInfo.setUsedMemory(parseGb(redisInfo.getUsedMemory()));
+                memoryInfo.setLastUsedMemory(parseGb(lastMemoryInfo));
+                memoryInfo.setIncr(parseMb(diff));
+                list.add(memoryInfo);
+
+            }
+            Collections.sort(list);
+            for(MemoryInfo memoryInfo : list) {
+                if(Math.abs(memoryInfo.getIncr()) <= 1.0) continue;
+                strBuffer.append(RedisEmailUtil.colorLine(memoryInfo.getUid(), "red")).append(RedisEmailUtil.CRLF);
+                strBuffer.append(RedisEmailUtil.getSpace(10)).append("Max_Memory : ").append(memoryInfo.getMaxMemory()).append(" GB")
+                        .append("&nbsp;&nbsp;|&nbsp;&nbsp;").append("Used_Memory : ").append(memoryInfo.getUsedMemory()).append(" GB")
+                        .append("&nbsp;&nbsp;|&nbsp;&nbsp;").append("Last_Used_Memory : ").append(memoryInfo.getLastUsedMemory()).append(" GB")
+                        .append("&nbsp;&nbsp;|&nbsp;&nbsp;").append("Incr : ").append(memoryInfo.getIncr()).append(" MB");
+                strBuffer.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
+            }
+            result = String.format(memoryAnal, strBuffer.toString());
+        }
+        return result;
+    }
+
+    private double parseMb(Long num) {
+        double result = num/1024.0/1024.0;
+        BigDecimal bigDecimal = new BigDecimal(result);
+        return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
+    private double parseGb(Long num) {
+        double result = num/1024.0/1024.0/1024.0;
+        BigDecimal bigDecimal = new BigDecimal(result);
+        return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
+
 
     private void formatKeysChangeExceptionRedis(Map<String, Integer> map, StringBuilder keysIncr, StringBuilder keysDecline) {
         keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
@@ -299,7 +402,7 @@ public class RedisDataCheckProfessor {
                 Integer lastKeys = lastRecordBucket.get(redisIns);
                 if (curKeys > lastKeys) {
                     double val = (curKeys - lastKeys) / lastKeys.doubleValue();
-                    if (val >= 0.1) {
+                    if (val >= 0.02) {
                         StringBuilder temp = new StringBuilder();
                         temp.append(RedisEmailUtil.getSpace(6)).append("*").append(redisIns).append(" : ");
                         keysIncr.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
@@ -310,7 +413,7 @@ public class RedisDataCheckProfessor {
                     }
                 } else if (curKeys < lastKeys){
                     double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
-                    if (val >= 0.1) {
+                    if (val >= 0.02) {
                         StringBuilder temp = new StringBuilder();
                         temp.append(RedisEmailUtil.getSpace(6)).append("*").append(redisIns).append(" : ");
                         keysDecline.append(RedisEmailUtil.colorLine(temp.toString(), "red")).append(RedisEmailUtil.CRLF);
@@ -345,12 +448,28 @@ public class RedisDataCheckProfessor {
         String redisConfig = new String(zk.getData(ZkPathConfig.REDIS_CHECK_CONFIG));
 
         swapData = ZipUtils.gunzip(swapData);
-        lastCheckTime = swapData.substring(0, swapData.indexOf("|"));
-        lastRecordBucket = jsonMapper.fromJson(swapData.substring(swapData.indexOf("|")+1, swapData.length()), HashMap.class);
+        String[] array = swapData.split(SEP);
+        if(4 != array.length) {
+            lastCheckTime = DateUtil.getCurrentMin();
+            lastRecordBucket = new HashMap<String, Integer>();
+            lastMemoryRecordBucket = new HashMap<String, Long>();
+            lastKeyDiffBucket = new HashMap<String, Integer>();
+        } else {
+        lastCheckTime = array[0];
+        lastRecordBucket = jsonMapper.fromJson(array[1], HashMap.class);
+        Map<String, String> temp = jsonMapper.fromJson(array[2], HashMap.class);
+        Set<String> uids = temp.keySet();
+        Map<String, Long> map = new HashMap<String, Long>();
+        for(String uid : uids) {
+            map.put(uid, Long.parseLong(temp.get(uid)));
+        }
+        lastMemoryRecordBucket = map;
+        lastKeyDiffBucket = jsonMapper.fromJson(array[3], HashMap.class);
+    }
 
-        Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
+    Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
 
-        REDIS_CHECK_URL = (String) map.get("check_url");
+    REDIS_CHECK_URL = (String) map.get("check_url");
 
         System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
 
@@ -364,7 +483,7 @@ public class RedisDataCheckProfessor {
         if(Strings.isNullOrEmpty(swap)) {
             String time = DateUtil.getCurrentMin();
             Map<String, Long> map  = new HashMap<String, Long>();
-            String swapData = time + "|" + jsonMapper.toJson(map);
+            String swapData = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map);
             zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swapData).getBytes(), -1);
         }
         Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);

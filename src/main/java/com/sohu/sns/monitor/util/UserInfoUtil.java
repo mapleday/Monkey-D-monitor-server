@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class UserInfoUtil {
     private static JsonMapper mapper = JsonMapper.nonDefaultMapper();
-    public static String userQueryUrl = "http://sns-api-msg.sce.sohuno.com/v5/users/query";
+    public static String userQueryUrl = "http://sns-api.apps.sohuno.com/v5/users/query";
     public static int split = 8;
     public static int timeout = 3000;
 

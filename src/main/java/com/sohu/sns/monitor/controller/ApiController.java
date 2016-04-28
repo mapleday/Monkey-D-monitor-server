@@ -27,8 +27,6 @@ public class ApiController {
     @Autowired
     private CountAppErrorService countAppErrorService;
     @Autowired
-    private DelErrorLogsService delErrorLogsService;
-    @Autowired
     private RedisCheckService redisCheckService;
 
     //收集statlog，分析访问次数是否异常
@@ -73,16 +71,9 @@ public class ApiController {
         return SUCCESS;
     }
 
-    //定时清理mysql错误日志
-    @RequestParams(path = "/monitor/del_error_logs",  method = {"get", "post"}, required = {"extra"})
-    public String deleteErrorLogs(Map<String, RequestValue> params) throws Exception {
-        delErrorLogsService.deleteRecord();
-        return SUCCESS;
-    }
-
     @RequestParams(path = "/monitor/redis",  method = {"get", "post"}, required = {"extra"})
     public String redisCheck(Map<String, RequestValue> params) throws Exception {
         redisCheckService.checkRedis();
-        return  SUCCESS;
+        return SUCCESS;
     }
 }

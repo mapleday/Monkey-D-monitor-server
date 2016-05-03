@@ -210,6 +210,13 @@
                 <env>product</env>
             </properties>
         </profile>
+
+        <profile>
+            <id>test_sce4</id>
+            <properties>
+                <env>test_sce4</env>
+            </properties>
+        </profile>
     </profiles>
     <build>
         <plugins>

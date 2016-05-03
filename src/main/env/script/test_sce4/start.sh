@@ -1,12 +1,12 @@
 #!/bin/sh
 
-ZK_CONF=/opt/src/config/zk.json
+ZK_CONF=$USER_DIR/app/config/zk.json
 PORT=8080
 
 APP_MAINCLASS=com.sohu.sns.monitor.SnsMonitorLogServer
 
 CLASSPATH='.'
-for i in /opt/src/lib/*.jar; do
+for i in /opt/src/app/lib/*.jar; do
    CLASSPATH="$CLASSPATH":"$i"
 done
   
@@ -23,6 +23,6 @@ JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
 -Dcom.sun.management.jmxremote
 -Dfile.encoding=UTF-8"
 
-JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=/opt/src/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $PORT"
+JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=$USER_DIR/app/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $PORT"
 echo $JAVA_CMD
 $JAVA_CMD

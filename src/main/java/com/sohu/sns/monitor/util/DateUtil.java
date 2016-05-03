@@ -206,4 +206,11 @@ public class DateUtil {
         String hour = new SimpleDateFormat("HH").format(now.getTime());
         return Integer.parseInt(hour);
     }
+
+    public static String getLastDay() {
+        Calendar now = Calendar.getInstance();
+        now.add(Calendar.DAY_OF_MONTH, -1);
+        return new SimpleDateFormat("yyyy-MM-dd").format(now.getTime());
+
+    }
 }

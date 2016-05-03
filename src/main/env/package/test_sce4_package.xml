@@ -9,7 +9,7 @@
     <fileSets>
         <fileSet>
         	<directory>src/main/env/script/test_sce4</directory>
-            <outputDirectory>/sce/bin</outputDirectory>
+            <outputDirectory>/bin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>src/main/resources</directory>
@@ -21,7 +21,7 @@
 	    </fileSet>
         <fileSet>
 	        <directory>src/main/env/yaml/test_sce4</directory>
-	        <outputDirectory>/sce</outputDirectory>
+	        <outputDirectory>/</outputDirectory>
 	    </fileSet>
     </fileSets>
     <dependencySets>

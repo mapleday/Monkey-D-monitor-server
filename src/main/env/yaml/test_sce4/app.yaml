@@ -5,7 +5,6 @@ tryRestart:
 webHealth: true
 webHealthConf:
     path: /
-    timeout: 3000ms
+    timeout: 2000ms
     success: [200,201,403,301,302]
-tcpHealth: true
-tcpPort: [8080]
+tcpHealth: false

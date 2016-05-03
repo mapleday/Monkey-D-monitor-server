@@ -8,20 +8,20 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-        	<directory>src/main/env/script/test</directory>
-            <outputDirectory>bin</outputDirectory>
+        	<directory>src/main/env/script/test_sce4</directory>
+            <outputDirectory>/sce/bin</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>src/main/resources</directory>
-            <outputDirectory>config</outputDirectory>
+            <outputDirectory>/config</outputDirectory>
         </fileSet>
 	    <fileSet>
-	        <directory>src/main/env/config/test</directory>
-	        <outputDirectory>config</outputDirectory>
+	        <directory>src/main/env/config/test_sce4</directory>
+	        <outputDirectory>/config</outputDirectory>
 	    </fileSet>
         <fileSet>
-	        <directory>src/main/env/yaml/test</directory>
-	        <outputDirectory>/</outputDirectory>
+	        <directory>src/main/env/yaml/test_sce4</directory>
+	        <outputDirectory>/sce</outputDirectory>
 	    </fileSet>
     </fileSets>
     <dependencySets>

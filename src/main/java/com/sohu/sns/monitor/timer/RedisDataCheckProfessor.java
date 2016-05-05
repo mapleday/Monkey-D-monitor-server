@@ -50,7 +50,7 @@ public class RedisDataCheckProfessor {
     private static Map<String, Integer> lastRecordBucket;
     private static Map<String, Long> lastMemoryRecordBucket;
     private static Map<String, Integer> lastKeyDiffBucket;
-    private static Map<String, Map<String, String>> lastRedisIpPortMap = new HashMap<String, Map<String, String>>();
+    private static Map<String, Map<String, String>> lastRedisIpPortMap;
     private static final String QUERY_IS_EXIST_DAY = "select count(1) from meta_redis_used_memory_day where log_day = ?";
     private static final String QUERY_LAST_DAY_USED_MEMORY = "select used_memory from meta_redis_used_memory_day where log_day = ?";
     private static final String INSERT_DAY_RECORD = "insert into meta_redis_used_memory_day (last_day_used_memory, used_memory, log_day, update_time) " +
@@ -190,7 +190,7 @@ public class RedisDataCheckProfessor {
         map.put("text", emailContent.toString());
         map.put("to", mailTo);
         isChanged = false;
-        updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket);
+        updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket, lastRedisIpPortMap);
         try {
             HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
             System.out.println("mail_to : " + mailTo);
@@ -239,7 +239,7 @@ public class RedisDataCheckProfessor {
             }
             strBuffer.append(RedisEmailUtil.CRLF);
         }
-        if(strBuffer.toString().equals("<br><br>")) {
+        if(strBuffer.toString().trim().equals("<br><br>")) {
             result = String.format(ipPortException, NONE);
         } else {
             result = String.format(ipPortException, strBuffer.toString());
@@ -255,7 +255,8 @@ public class RedisDataCheckProfessor {
      * @throws KeeperException
      * @throws InterruptedException
      */
-    private static void updateZkSwap(String time, Map<String, Integer> map, Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap) throws KeeperException, InterruptedException {
+    private static void updateZkSwap(String time, Map<String, Integer> map,
+                                     Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap, Map<String, Map<String,String>> ipPortMap) throws KeeperException, InterruptedException {
         if(null == time) {
             time = DateUtil.getCurrentMin();
         }
@@ -272,8 +273,13 @@ public class RedisDataCheckProfessor {
                 lastMemoryInfo.put(uid, String.valueOf(masterInfo.get(uid).getUsedMemory()));
             }
         }
+        if(null == ipPortMap) {
+            ipPortMap = new HashMap<String, Map<String, String>>();
+        }
 
-        String swap = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(lastMemoryInfo) + SEP + jsonMapper.toJson(diffMap);
+        String swap = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(lastMemoryInfo) + SEP +
+                jsonMapper.toJson(diffMap) + SEP + jsonMapper.toJson(ipPortMap);
+
         zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swap).getBytes(), -1);
     }
 
@@ -564,27 +570,35 @@ public class RedisDataCheckProfessor {
 
         swapData = ZipUtils.gunzip(swapData);
         String[] array = swapData.split(SEP);
-        if(4 != array.length) {
+        if(5 != array.length) {
             lastCheckTime = DateUtil.getCurrentMin();
             lastRecordBucket = new HashMap<String, Integer>();
             lastMemoryRecordBucket = new HashMap<String, Long>();
             lastKeyDiffBucket = new HashMap<String, Integer>();
+            lastRedisIpPortMap = new HashMap<String, Map<String, String>>();
         } else {
-        lastCheckTime = array[0];
-        lastRecordBucket = jsonMapper.fromJson(array[1], HashMap.class);
-        Map<String, String> temp = jsonMapper.fromJson(array[2], HashMap.class);
-        Set<String> uids = temp.keySet();
-        Map<String, Long> map = new HashMap<String, Long>();
-        for(String uid : uids) {
-            map.put(uid, Long.parseLong(temp.get(uid)));
+            lastCheckTime = array[0];
+            lastRecordBucket = jsonMapper.fromJson(array[1], HashMap.class);
+            Map<String, String> temp = jsonMapper.fromJson(array[2], HashMap.class);
+            Set<String> uids = temp.keySet();
+            Map<String, Long> map = new HashMap<String, Long>();
+            for(String uid : uids) {
+                map.put(uid, Long.parseLong(temp.get(uid)));
+            }
+            lastMemoryRecordBucket = map;
+            lastKeyDiffBucket = jsonMapper.fromJson(array[3], HashMap.class);
+            Map<String, Object> ipPortMap = jsonMapper.fromJson(array[4], HashMap.class);
+            Map<String, Map<String, String>> lastIpPortMap = new HashMap<String, Map<String, String>>();
+            Set<String> uidDescSet = ipPortMap.keySet();
+            for(String str : uidDescSet) {
+                lastIpPortMap.put(str, (Map<String, String>) ipPortMap.get(str));
+            }
+            lastRedisIpPortMap = lastIpPortMap;
         }
-        lastMemoryRecordBucket = map;
-        lastKeyDiffBucket = jsonMapper.fromJson(array[3], HashMap.class);
-    }
 
-    Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
+        Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
 
-    REDIS_CHECK_URL = (String) map.get("check_url");
+        REDIS_CHECK_URL = (String) map.get("check_url");
 
         System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
 
@@ -598,7 +612,7 @@ public class RedisDataCheckProfessor {
         if(Strings.isNullOrEmpty(swap)) {
             String time = DateUtil.getCurrentMin();
             Map<String, Long> map  = new HashMap<String, Long>();
-            String swapData = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map);
+            String swapData = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map);
             zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swapData).getBytes(), -1);
         }
         Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);

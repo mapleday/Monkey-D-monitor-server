@@ -12,6 +12,7 @@ public class RedisEmailUtil {
     public static final String MEMORY_CHANGE_INFO = "<br>3. Memory使用情况(内存变化超过1MB)：%s";
     public static final String GROW_EXCEPTION = "<br>4. KEYS较上次统计增幅超过2%%的Redis实例为: %s";
     public static final String DECLINE_EXCEPTION = "<br>5. KEYS较上次统计下降2%%的Redis实例为: %s";
+    public static final String IP_PORT_EXCEPTION = "<br>6. Ip或Port发生变化的Redis实例为: %s";
 
     private static final String BOLD_HTML = "<strong>%s</strong>";
     private static final String COLOR_HTML = "<font color=\"%s\">%s</font>";

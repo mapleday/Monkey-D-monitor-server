@@ -50,6 +50,7 @@ public class RedisDataCheckProfessor {
     private static Map<String, Integer> lastRecordBucket;
     private static Map<String, Long> lastMemoryRecordBucket;
     private static Map<String, Integer> lastKeyDiffBucket;
+    private static Map<String, Map<String, String>> lastRedisIpPortMap = new HashMap<String, Map<String, String>>();
     private static final String QUERY_IS_EXIST_DAY = "select count(1) from meta_redis_used_memory_day where log_day = ?";
     private static final String QUERY_LAST_DAY_USED_MEMORY = "select used_memory from meta_redis_used_memory_day where log_day = ?";
     private static final String INSERT_DAY_RECORD = "insert into meta_redis_used_memory_day (last_day_used_memory, used_memory, log_day, update_time) " +
@@ -74,6 +75,7 @@ public class RedisDataCheckProfessor {
         Map<String, List<RedisInfo>> redisClusterInfo = new HashMap<String, List<RedisInfo>>();
         Map<String, RedisInfo> masterInfo = new HashMap<String, RedisInfo>();
         Map<String, Integer> currentRecordBucket = new HashMap<String, Integer>();
+        Map<String, Map<String, String>> redisIpPortMap = new HashMap<String, Map<String, String>>();
 
         for (String uid : uids) {
             List<RedisIns> redisInses;
@@ -93,7 +95,17 @@ public class RedisDataCheckProfessor {
                 continue;
             }
             if (null == redisInses) continue;
+            StringBuilder masterBuffer = new StringBuilder();
+            StringBuilder slaveBuffer = new StringBuilder();
             for (RedisIns redisIns : redisInses) {
+                if(1 == redisIns.getMaster()) {
+                    masterBuffer.append(redisIns.getIp()).append(":").append(redisIns.getPort());
+                } else {
+                    if(0 != slaveBuffer.length()) {
+                        slaveBuffer.append(",");
+                    }
+                    slaveBuffer.append(redisIns.getIp()).append(":").append(redisIns.getPort());
+                }
                 try {
                     Jedis jedis = new Jedis(redisIns.getIp(), redisIns.getPort());
                     String result = jedis.auth(passwd);
@@ -138,6 +150,10 @@ public class RedisDataCheckProfessor {
                     e.printStackTrace();
                 }
             }
+            Map<String, String> masterSlaveInfo = new HashMap<String, String>();
+            masterSlaveInfo.put("master", masterBuffer.toString());
+            masterSlaveInfo.put("slave", slaveBuffer.toString());
+            redisIpPortMap.put(uid+"_"+desc, masterSlaveInfo);
         }
         try {
             metaDataChangeAnal(redisClusterInfo);
@@ -151,6 +167,7 @@ public class RedisDataCheckProfessor {
         StringBuilder keyIncr = new StringBuilder();
         StringBuilder keyDecline = new StringBuilder();
         formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
+        String ipPortException = checkIpPort(redisIpPortMap);
 
         if (!isChanged || null == mailTo || mailTo.isEmpty()) {
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
@@ -165,7 +182,8 @@ public class RedisDataCheckProfessor {
 
         StringBuilder emailContent = new StringBuilder();
         emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).
-                append(redisKeysNotSameInfo).append(memoryAnal).append(keysIncrException).append(KeysDeclineException);
+                append(redisKeysNotSameInfo).append(memoryAnal).append(keysIncrException).append(KeysDeclineException)
+                .append(ipPortException);
 
         Map<String, String> map = new HashMap<String, String>();
         map.put("subject", RedisEmailUtil.SUBJECT);
@@ -183,6 +201,48 @@ public class RedisDataCheckProfessor {
         System.out.println("execute time : " + (System.currentTimeMillis() - begin));
     }
 
+    /**
+     * 检查ip&端口变化
+     * @param map
+     * @return
+     */
+    private String checkIpPort(Map<String, Map<String, String>> map) {
+        String ipPortException = RedisEmailUtil.boldLine(RedisEmailUtil.IP_PORT_EXCEPTION);
+        String result;
+        if(null == map || map.isEmpty() ) {
+            result = String.format(ipPortException, NONE);
+            return result;
+        }
+        if(null == lastRedisIpPortMap || lastRedisIpPortMap.isEmpty()) {
+            result = String.format(ipPortException, NONE);
+            lastRedisIpPortMap = map;
+            return result;
+        }
+        Set<String> uids = map.keySet();
+        StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);;
+        for(String uid : uids) {
+            if(!lastRedisIpPortMap.containsKey(uid)) continue;
+            String masterInfo = map.get(uid).get("master");
+            String slaveInfo = map.get(uid).get("slave");
+            String lastMasterInfo = lastRedisIpPortMap.get(uid).get("master");
+            String lastSlaveInfo = lastRedisIpPortMap.get(uid).get("slave");
+            if(!masterInfo.equals(lastMasterInfo) || !slaveInfo.equals(lastSlaveInfo)) {
+                strBuffer.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(RedisEmailUtil.CRLF);
+            }
+            if(!masterInfo.equals(lastMasterInfo)) {
+                strBuffer.append(RedisEmailUtil.getSpace(10)).append("MASTER : last : ").append(lastMasterInfo)
+                        .append(" | current : ").append(masterInfo).append(RedisEmailUtil.CRLF);
+            }
+            if(!slaveInfo.equals(lastSlaveInfo)) {
+                strBuffer.append(RedisEmailUtil.getSpace(10)).append("SLAVE : last : ").append(lastSlaveInfo)
+                        .append(" | current : ").append(slaveInfo).append(RedisEmailUtil.CRLF);
+            }
+            strBuffer.append(RedisEmailUtil.CRLF);
+        }
+        result = String.format(ipPortException, strBuffer.toString());
+        lastRedisIpPortMap = map;
+        return result;
+    }
 
     /**
      * 更新zk暂存区

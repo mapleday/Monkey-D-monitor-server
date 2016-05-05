@@ -228,16 +228,18 @@ public class RedisDataCheckProfessor {
             String lastSlaveInfo = lastRedisIpPortMap.get(uid).get("slave");
             if(!masterInfo.equals(lastMasterInfo) || !slaveInfo.equals(lastSlaveInfo)) {
                 strBuffer.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(RedisEmailUtil.CRLF);
+
+                if(!masterInfo.equals(lastMasterInfo)) {
+                    strBuffer.append(RedisEmailUtil.getSpace(10)).append("MASTER : last : ").append(lastMasterInfo)
+                            .append(" | current : ").append(masterInfo).append(RedisEmailUtil.CRLF);
+                }
+                if(!slaveInfo.equals(lastSlaveInfo)) {
+                    strBuffer.append(RedisEmailUtil.getSpace(10)).append("SLAVE : last : ").append(lastSlaveInfo)
+                            .append(" | current : ").append(slaveInfo).append(RedisEmailUtil.CRLF);
+                }
+
+                strBuffer.append(RedisEmailUtil.CRLF);
             }
-            if(!masterInfo.equals(lastMasterInfo)) {
-                strBuffer.append(RedisEmailUtil.getSpace(10)).append("MASTER : last : ").append(lastMasterInfo)
-                        .append(" | current : ").append(masterInfo).append(RedisEmailUtil.CRLF);
-            }
-            if(!slaveInfo.equals(lastSlaveInfo)) {
-                strBuffer.append(RedisEmailUtil.getSpace(10)).append("SLAVE : last : ").append(lastSlaveInfo)
-                        .append(" | current : ").append(slaveInfo).append(RedisEmailUtil.CRLF);
-            }
-            strBuffer.append(RedisEmailUtil.CRLF);
         }
         if(strBuffer.toString().trim().equals("<br><br>")) {
             result = String.format(ipPortException, NONE);

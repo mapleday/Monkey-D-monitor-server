@@ -219,7 +219,7 @@ public class RedisDataCheckProfessor {
             return result;
         }
         Set<String> uids = map.keySet();
-        StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);;
+        StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
         for(String uid : uids) {
             if(!lastRedisIpPortMap.containsKey(uid)) continue;
             String masterInfo = map.get(uid).get("master");
@@ -239,7 +239,11 @@ public class RedisDataCheckProfessor {
             }
             strBuffer.append(RedisEmailUtil.CRLF);
         }
-        result = String.format(ipPortException, strBuffer.toString());
+        if(strBuffer.toString().equals("<br><br>")) {
+            result = String.format(ipPortException, NONE);
+        } else {
+            result = String.format(ipPortException, strBuffer.toString());
+        }
         lastRedisIpPortMap = map;
         return result;
     }

@@ -15,6 +15,7 @@ import com.sohu.sns.monitor.util.ZipUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
 import com.sohu.snscommon.utils.zk.ZkUtils;
@@ -46,7 +47,6 @@ public class RedisDataCheckProfessor {
     private static String mailTo = "";
     private static boolean isChanged = false;
     private static String lastCheckTime = "";
-    private static ZkUtils zk;
     private static Map<String, Integer> lastRecordBucket;
     private static Map<String, Long> lastMemoryRecordBucket;
     private static Map<String, Integer> lastKeyDiffBucket;
@@ -258,7 +258,7 @@ public class RedisDataCheckProfessor {
      * @throws InterruptedException
      */
     private static void updateZkSwap(String time, Map<String, Integer> map,
-                                     Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap, Map<String, Map<String,String>> ipPortMap) throws KeeperException, InterruptedException {
+                                     Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap, Map<String, Map<String,String>> ipPortMap) throws KeeperException, InterruptedException, IOException {
         if(null == time) {
             time = DateUtil.getCurrentMin();
         }
@@ -281,8 +281,11 @@ public class RedisDataCheckProfessor {
 
         String swap = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(lastMemoryInfo) + SEP +
                 jsonMapper.toJson(diffMap) + SEP + jsonMapper.toJson(ipPortMap);
-
+        ZkUtils zk = new ZkUtils();
+        zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
+                ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
         zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swap).getBytes(), -1);
+        zk.close();
     }
 
     private RedisInfo infoExtraction(String info, int isMater, String ip, String desc) {
@@ -567,9 +570,12 @@ public class RedisDataCheckProfessor {
      */
     private Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
 
+        ZkUtils zk = new ZkUtils();
+        zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
+                ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
         String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
         String redisConfig = new String(zk.getData(ZkPathConfig.REDIS_CHECK_CONFIG));
-
+        zk.close();
         swapData = ZipUtils.gunzip(swapData);
         String[] array = swapData.split(SEP);
         if(5 != array.length) {
@@ -608,15 +614,13 @@ public class RedisDataCheckProfessor {
     }
 
     public static void initEnv(String monitorUrls, String errorLogConfig, String swap, ZkUtils zkUtils) throws KeeperException, InterruptedException {
-        if(null == zk) {
-            zk = zkUtils;
-        }
         if(Strings.isNullOrEmpty(swap)) {
             String time = DateUtil.getCurrentMin();
             Map<String, Long> map  = new HashMap<String, Long>();
             String swapData = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map);
-            zk.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swapData).getBytes(), -1);
+            zkUtils.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swapData).getBytes(), -1);
         }
+        zkUtils.close();
         Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
         Map<String, Object> errorLogConfigMap = jsonMapper.fromJson(errorLogConfig, HashMap.class);
         baseEmailUrl = urls.get("base_url");

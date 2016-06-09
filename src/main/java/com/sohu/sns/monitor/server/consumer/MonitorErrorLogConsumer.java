@@ -79,7 +79,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         errorLog.setStackTrace(msgMap.get(ErrorLogFields.STACK_TRACE.getName()));
         errorLog.setTime(new Date());
 
-        ErrorLogBucket.insertData(errorLog);
+        //ErrorLogBucket.insertData(errorLog);
 
         /**超时统计*/
         if(timeoutTypes.contains(errorLog.getExceptionName())) {
@@ -92,7 +92,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
             TimeoutBucket.insertData(method);
         }
 
-        saveToDB(errorLog);
+        //saveToDB(errorLog);
     }
 
     /**

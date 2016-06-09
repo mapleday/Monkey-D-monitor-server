@@ -76,7 +76,7 @@ public class ErrorLogProcessor implements Runnable {
                         Map<String, String> errorMap = new HashMap<String, String>();
                         errorMap.put("errorLogs", errorLogs);
                         try {
-                            HttpClientUtil.getStringByPost(baseUrl+emailErrorlogInterface, errorMap, null);
+                            //HttpClientUtil.getStringByPost(baseUrl+emailErrorlogInterface, errorMap, null);
                         } catch (Exception e) {
                             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_email", errorMap.size()+"", null, e);
                             e.printStackTrace();

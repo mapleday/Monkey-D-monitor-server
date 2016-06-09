@@ -3,6 +3,7 @@ package com.sohu.sns.monitor;
 import com.sohu.sns.monitor.config.MySqlDBConfig;
 import com.sohu.sns.monitor.config.ZkPathConfig;
 import com.sohu.sns.monitor.server.LogMessageProcessor;
+import com.sohu.sns.monitor.server.MessageProcessor;
 import com.sohu.sns.monitor.server.config.UniqNameDBClusterService;
 import com.sohu.sns.monitor.thread.ErrorLogProcessor;
 import com.sohu.sns.monitor.timer.RedisDataCheckProfessor;
@@ -65,7 +66,7 @@ public class SnsMonitorLogServer {
             new LogMessageProcessor(kafkaTopics, kafkaConfig, timeoutConfig).start();
 
             /**启动url_log的监控**/
-            //new MessageProcessor().start();
+//            new MessageProcessor().start();
 
             /**启动定时将日志信息发送到汇总服务器类**/
             new Thread(new ErrorLogProcessor(bean, monitorUrls)).start();

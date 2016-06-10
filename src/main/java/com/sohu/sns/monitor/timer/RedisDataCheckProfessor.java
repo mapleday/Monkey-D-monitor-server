@@ -13,7 +13,6 @@ import com.sohu.sns.monitor.util.DateUtil;
 import com.sohu.sns.monitor.util.RedisEmailUtil;
 import com.sohu.sns.monitor.util.ZipUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
-import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;

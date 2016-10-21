@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sohu.sns.monitor.httpmonitor.dao.httpResource.HttpResourceDAO">
+
+
+    <select id="getResources" resultType="com.sohu.sns.monitor.httpmonitor.model.HttpResource">
+        SELECT id as id,
+            resource_name as resourceName,
+            resource_address as resourceAddress,
+            monitor_time_out as monitorTimeOut,
+            monitor_time_interval as monitorInterval,
+            monitor_times as monitorTimes,
+            alarm_threshold_times as alarmThresholdTimes
+        FROM
+          t_monitor_http_resource t
+        WHERE
+          t.status=1
+    </select>
+</mapper>

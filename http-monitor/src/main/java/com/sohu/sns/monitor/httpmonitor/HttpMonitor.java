@@ -6,7 +6,6 @@ import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class HttpMonitor {
         monitorResult.setMonitorTimes(monitorTimes);
         for (int i = 0; i < monitorTimes.intValue(); i++) {
             try {
-                HttpClientUtil.HttpResult post = httpClientUtil.get(resouceAddress, Collections.EMPTY_MAP, header);
+                HttpClientUtil.HttpResult post = httpClientUtil.get(resouceAddress, Collections.<String, String>emptyMap(), header);
                 int statusCode = post.getStatusCode();
                 if (statusCode != 200) {
                     monitorResult.setFailed(true);
@@ -64,12 +63,6 @@ public class HttpMonitor {
                 , monitorResult.getMonitorTimes()
                 , monitorResult.getFailedTimes()
                 , monitorResult.getFailedReason());
-        System.out.println(msg);
         NotifyUtils.sendWeixin(phones, msg);
-    }
-
-    public static void main(String[] args) throws IOException {
-        String stringByGet = HttpClientUtil.getStringByGet("http://changyan.sohu.com/api/2/topic/count?topic_source_id=435709908&client_id=cyqemw6s1", null);
-        System.out.println(stringByGet);
     }
 }

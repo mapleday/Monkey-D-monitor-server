@@ -174,45 +174,6 @@
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>test_log</id>
-            <properties>
-                <env>test_log</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>product_log</id>
-            <properties>
-                <env>product_log</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <env>test</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>develop</id>
-            <properties>
-                <env>develop</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>product</id>
-            <properties>
-                <env>product</env>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>test_sce4</id>
-            <properties>
-                <env>test_sce4</env>
-            </properties>
-        </profile>
-    </profiles>
     <build>
         <plugins>
             <plugin>
@@ -220,13 +181,12 @@
                 <configuration>
                     <appendAssemblyId>true</appendAssemblyId>
                     <descriptors>
-                        <descriptor>src/main/env/package/${env}_package.xml</descriptor>
+                        <descriptor>src/env/${env}/assembly/package.xml</descriptor>
                     </descriptors>
-                    <encoding>UTF-8</encoding>
-                    <finalName>sns-monitor</finalName>
+                    <finalName>SnsMonitorLogServer</finalName>
                     <archive>
                         <manifest>
-                            <mainClass>com.sohu.sns.com.sohu.sns.monitor.SnsMonitorServer</mainClass>
+                            <mainClass>com.sohu.sns.monitor.SnsMonitorLogServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -240,72 +200,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.1</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>sns-local</id>
-            <name>Nexus Public Repository</name>
-            <url>http://sns.mtpc.sohu.com/nexus/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>nexus</id>
-            <name>local private nexus</name>
-            <url>http://mtpc.sohu.com/maven/content/groups/public</url>
-        </repository>
-        <repository>
-            <id>pv_repo</id>
-            <name>pv repo</name>
-            <url>http://mtpc.sohu.com/maven/content/repositories/pvinsight</url>
-        </repository>
-        <repository>
-            <id>sce</id>
-            <name>sce</name>
-            <url>http://mtpc.sohu.com/maven/content/repositories/sce</url>
-        </repository>
-        <repository>
-            <id>nexus snapshots</id>
-            <name>mtpc snapshots</name>
-            <url>http://mtpc.sohu.com/maven/content/repositories/passport_snapshots/</url>
-        </repository>
-        <repository>
-            <id>nexus_snapshots</id>
-            <name>mtpc_snapshots</name>
-            <url>http://mtpc.sohu.com/maven/content/repositories/passport</url>
-        </repository>
-    </repositories>
 </project>

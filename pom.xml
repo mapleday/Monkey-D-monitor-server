@@ -25,94 +25,14 @@
 
     <profiles>
         <profile>
-            <id>test_log</id>
-            <properties>
-                <env>test_log</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>product_log</id>
-            <properties>
-                <env>product_log</env>
-            </properties>
-        </profile>
-        <profile>
             <id>test</id>
             <properties>
                 <env>test</env>
             </properties>
         </profile>
-        <profile>
-            <id>develop</id>
-            <properties>
-                <env>develop</env>
-            </properties>
-        </profile>
-        <profile>
-            <id>product</id>
-            <properties>
-                <env>product</env>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>test_sce4</id>
-            <properties>
-                <env>test_sce4</env>
-            </properties>
-        </profile>
     </profiles>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <appendAssemblyId>true</appendAssemblyId>
-                    <descriptors>
-                        <descriptor>src/main/env/package/${env}_package.xml</descriptor>
-                    </descriptors>
-                    <encoding>UTF-8</encoding>
-                    <finalName>sns-monitor</finalName>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.sohu.sns.monitor.SnsMonitorServer</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-install-plugin</artifactId>
-                <version>2.5.1</version>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -121,6 +41,24 @@
                     <source>1.6</source>
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <!-- <classpathPrefix>lib/</classpathPrefix> -->
+                            <mainClass>com.sohu.sns.cc.conn.ServerApp</mainClass>
+
+                        </manifest>
+                        <manifestEntries>
+
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
         </plugins>

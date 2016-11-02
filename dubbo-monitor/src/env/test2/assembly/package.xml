@@ -39,20 +39,12 @@
 			</includes>
 		</fileSet>
 		<fileSet>
-			<directory>src/main/env/${profile.active}/yaml</directory>
+			<directory>${project.basedir}/src/env/test2/yaml</directory>
 			<outputDirectory>/sce</outputDirectory>
 		</fileSet>
 		<fileSet>
-			<directory>src/main/env/${profile.active}/zk</directory>
+			<directory>${project.basedir}/src/env/test2/zk</directory>
 			<outputDirectory>/WEB-INF/classes</outputDirectory>
 		</fileSet>
-		<fileSet>
-			<directory>src/main/env/${profile.active}/db</directory>
-			<outputDirectory>/WEB-INF/classes</outputDirectory>
-		</fileSet>
-        <fileSet>
-            <directory>src/main/env/${profile.active}/hosts</directory>
-            <outputDirectory>/sce/conf</outputDirectory>
-        </fileSet>
 	</fileSets>
 </assembly>

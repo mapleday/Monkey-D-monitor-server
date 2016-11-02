@@ -6,7 +6,7 @@ tryRestart:
     fail: 3
 webHealth: false
 webHealthConf: 
-    path: /status
+    path: /health
     timeout: 2000ms
     success: [200,201,403,301,302]
 tcpHealth: false

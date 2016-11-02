@@ -19,15 +19,6 @@
         </dependency>
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>test</id>
-            <properties>
-                <env>test</env>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>

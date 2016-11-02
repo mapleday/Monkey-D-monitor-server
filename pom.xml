@@ -13,6 +13,7 @@
         <module>redis-monitor</module>
         <module>monitor-app</module>
         <module>log-monitor</module>
+        <module>dubbo-monitor</module>
     </modules>
 
     <properties>
@@ -28,6 +29,12 @@
             <id>test</id>
             <properties>
                 <env>test</env>
+            </properties>
+        </profile>
+        <profile>
+            <id>test2</id>
+            <properties>
+                <env>test2</env>
             </properties>
         </profile>
     </profiles>

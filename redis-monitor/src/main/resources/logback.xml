@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="app_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FILE}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FILE}-%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="BUSI_LOG" level="info" additivity="false">
+        <appender-ref ref="app_log"/>
+    </logger>
+    <logger name="STAT_LOG" level="info" additivity="false">
+        <appender-ref ref="app_log"/>
+    </logger>
+    <logger name="ERRO_LOG" level="error" additivity="true">
+        <appender-ref ref="app_log"/>
+    </logger>
+    <logger name="ANAL_LOG" level="info" additivity="false">
+        <appender-ref ref="app_log"/>
+    </logger>
+
+    <logger name="MESSAGE_LOG" level="info" additivity="true">
+        <appender-ref ref="messageFile"/>
+    </logger>
+    <logger name="MESSAGE_RETRY_LOG" level="info" additivity="true">
+        <appender-ref ref="messageRetryFile"/>
+    </logger>
+    <logger name="ERROR_MESSAGE_LOG" level="info" additivity="true">
+        <appender-ref ref="errorMessageFile"/>
+    </logger>
+
+</configuration>

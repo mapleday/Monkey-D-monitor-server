@@ -19,7 +19,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protostuff.version>1.0.9</protostuff.version>
-        <snscommon.version>1.8.0-SNAPSHOT</snscommon.version>
+        <snscommon.version>1.8.0</snscommon.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.1.2</logback.version>
     </properties>

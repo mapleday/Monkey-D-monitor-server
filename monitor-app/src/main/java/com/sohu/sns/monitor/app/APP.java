@@ -13,10 +13,21 @@ public class APP {
     private APP() {
     }
 
+//    public static void main(String[] args) throws IOException {
+//        ClassPathXmlApplicationContext context = null;
+//        try {
+//            context = new ClassPathXmlApplicationContext("/httpMonitorContext.xml");
+//            System.in.read();
+//        } finally {
+//            if (context != null) {
+//                context.close();
+//            }
+//        }
+//    }
     public static void main(String[] args) throws IOException {
         ClassPathXmlApplicationContext context = null;
         try {
-            context = new ClassPathXmlApplicationContext("/httpMonitorContext.xml");
+            context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml");
             System.in.read();
         } finally {
             if (context != null) {

@@ -1,6 +1,6 @@
 {
-"sce.zk.root" : "/sns_test",
-"sce.zk.url" : ["10.16.0.164:2181","10.16.0.174:2181","10.16.0.217:2181"],
-"sce.zk.timeout" : 180000,
-"sce.zk.auth" : [{"user":"sce3-keeper", "password":"swe@s08973"}]
+  "sce.zk.root" : "/sns_test",
+  "sce.zk.url" : ["10.16.0.164:2181","10.16.0.174:2181","10.16.0.217:2181"],
+  "sce.zk.timeout" : 180000,
+  "sce.zk.auth" : [{"user":"sce3-keeper", "password":"swe@s08973"}]
 }

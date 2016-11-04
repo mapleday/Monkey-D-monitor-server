@@ -16,42 +16,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class RedisMonitorSchedule {
-    private static String param = "F:\\IdeaProjects\\sns-monitor-server\\redis-monitor\\src\\env\\test\\zk\\zk.json";
     private static boolean  isInited = false;
-    private void init(){
-        System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++");
-        try {
-            ZkUtils.setZkConfigFilePath(param);
-            ZkUtils.initZkConfig(param);
-            ZkUtils zk = new ZkUtils();
 
-            zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
-                    ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
-            SnsDiamonds.setDiamondsEnvBySystem();
-
-            /**监控各种urls**/
-            String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
-
-            /**获取发送错误信息的配置**/
-            String errorLogConfig = new String(zk.getData(ZkPathConfig.ERROR_LOG_CONFIG));
-
-            /**获取redis检查的缓存信息**/
-            String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
-            RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig, swapData, zk);
-            zk.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Scheduled(fixedRate = 10000l)
     public void checkRedis(){
         try {
-            if(!isInited) {
-                init();
-                isInited=true;
-            }
+//            if(!isInited) {
+//                init();
+//                isInited=true;
+//            }
             new RedisDataCheckProfessor().handle();
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);

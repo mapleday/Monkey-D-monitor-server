@@ -1,5 +1,7 @@
 package com.sohu.sns.monitor.app;
 
+import com.sohu.sns.monitor.redis.InitRedisConfig;
+import com.sohu.sns.monitor.redis.schedule.RedisMonitorSchedule;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
@@ -25,15 +27,8 @@ public class APP {
 //        }
 //    }
     public static void main(String[] args) throws IOException {
-        ClassPathXmlApplicationContext context = null;
-        try {
-            context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml");
-            System.in.read();
-        } finally {
-            if (context != null) {
-                context.close();
-            }
-        }
+
+        InitRedisConfig.start();
     }
 
 

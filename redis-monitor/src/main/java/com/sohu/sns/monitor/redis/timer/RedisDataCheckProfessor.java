@@ -65,7 +65,12 @@ public class RedisDataCheckProfessor {
     private static final String UPDATE_DAY_RECORD = "update meta_redis_used_memory_day set used_memory = ?, update_time = now() where log_day = ?";
 
     //@Autowired(required = false)
-    private MysqlClusterService mysqlClusterService;
+    private static MysqlClusterService mysqlClusterService;
+
+    public static void init() {
+
+
+    }
 
 
     public void handle() throws InterruptedException, IOException, KeeperException {
@@ -88,9 +93,7 @@ public class RedisDataCheckProfessor {
                 currentRecordBucket, redisIpPortMap);
         try {
 
-            MysqlClusterConfig config = new MySqlDBConfig();
-            mysqlClusterService =new MysqlClusterServiceImpl(config,ClusterChangedPostProcessor.NOTHING_PROCESSOR);
-            mysqlClusterService.init(config);
+
             //mysqlClusterService = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
             metaDataChangeAnal(redisClusterInfo);
         } catch (Exception e) {

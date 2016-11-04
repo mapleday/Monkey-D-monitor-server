@@ -6,7 +6,7 @@ import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.ZkUtils;
-
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 /**
@@ -17,8 +17,20 @@ public class RedisMonitorServer {
     public static void main(String[] args) {
 
         try {
-            ZkUtils.setZkConfigFilePath(args[0]);
-            ZkUtils.initZkConfig(args[0]);
+
+            start(args[0]);
+            new RedisDataCheckProfessor().handle();
+            System.in.read();
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);
+            e.printStackTrace();
+        }
+    }
+
+    public static void  start(String arg) {
+        try {
+            ZkUtils.setZkConfigFilePath(arg);
+            ZkUtils.initZkConfig(arg);
 
             ZkUtils zk = new ZkUtils();
             zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
@@ -33,12 +45,7 @@ public class RedisMonitorServer {
             /**获取redis检查的缓存信息**/
             String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
             RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig, swapData, zk);
-
-            new RedisDataCheckProfessor().handle();
-
-            System.in.read();
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);
             e.printStackTrace();
         }
     }

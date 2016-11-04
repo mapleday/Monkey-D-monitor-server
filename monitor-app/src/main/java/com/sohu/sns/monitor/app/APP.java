@@ -12,7 +12,7 @@ import java.io.IOException;
 public class APP {
     private APP() {
     }
-
+//
 //    public static void main(String[] args) throws IOException {
 //        ClassPathXmlApplicationContext context = null;
 //        try {

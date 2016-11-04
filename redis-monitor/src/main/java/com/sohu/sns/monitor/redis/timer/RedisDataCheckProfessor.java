@@ -5,6 +5,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.redis.config.MonitorDBConfig;
+import com.sohu.sns.monitor.redis.config.MySqlDBConfig;
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.model.DiffInfo;
 import com.sohu.sns.monitor.redis.model.MemoryInfo;
@@ -15,12 +16,15 @@ import com.sohu.sns.monitor.redis.util.RedisEmailUtil;
 import com.sohu.sns.monitor.redis.util.ZipUtils;
 
 import com.sohu.snscommon.dbcluster.config.ClusterChangedPostProcessor;
+import com.sohu.snscommon.dbcluster.config.MysqlClusterConfig;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
+import com.sohu.snscommon.utils.spring.SpringContextUtil;
+import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.KeeperException;
@@ -60,11 +64,11 @@ public class RedisDataCheckProfessor {
             "values (?, ?, ?, now())";
     private static final String UPDATE_DAY_RECORD = "update meta_redis_used_memory_day set used_memory = ?, update_time = now() where log_day = ?";
 
-    @Autowired(required = false)
+    //@Autowired(required = false)
     private MysqlClusterService mysqlClusterService;
 
-    public void handle() throws InterruptedException, IOException, KeeperException {
 
+    public void handle() throws InterruptedException, IOException, KeeperException {
         long begin = System.currentTimeMillis();
         String time = DateUtil.getCurrentMin();
 
@@ -73,14 +77,74 @@ public class RedisDataCheckProfessor {
         if (REDIS_CHECK_URL.isEmpty()) return;
 
         System.out.println("redis check start : " + redisConfig.size() + ", time:" + DateUtil.getCurrentTime());
-        Set<String> uids = redisConfig.keySet();
+
 
         List<String> redisVisitFailedList = new ArrayList<String>();
         Map<String, List<RedisInfo>> redisClusterInfo = new HashMap<String, List<RedisInfo>>();
         Map<String, RedisInfo> masterInfo = new HashMap<String, RedisInfo>();
         Map<String, Integer> currentRecordBucket = new HashMap<String, Integer>();
         Map<String, Map<String, String>> redisIpPortMap = new HashMap<String, Map<String, String>>();
+        checkRedisConfig(redisConfig, redisVisitFailedList, redisClusterInfo, masterInfo,
+                currentRecordBucket, redisIpPortMap);
+        try {
 
+            MysqlClusterConfig config = new MySqlDBConfig();
+            mysqlClusterService =new MysqlClusterServiceImpl(config,ClusterChangedPostProcessor.NOTHING_PROCESSOR);
+            mysqlClusterService.init(config);
+            //mysqlClusterService = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
+            metaDataChangeAnal(redisClusterInfo);
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.metaDataChangeAnal", null, null, e);
+            e.printStackTrace();
+        }
+        String redisVisitFailedInfo = formatVisitFailedReidis(redisVisitFailedList);
+        String redisKeysNotSameInfo = formatKeysNotSameRedis(redisClusterInfo);
+        String memoryAnal = formatMemoryAnal(masterInfo);
+        StringBuilder keyIncr = new StringBuilder();
+        StringBuilder keyDecline = new StringBuilder();
+        formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
+        String ipPortException = checkIpPort(redisIpPortMap);
+        if (!isChanged || null == mailTo || mailTo.isEmpty()) {
+            System.out.println("execute time : " + (System.currentTimeMillis() - begin));
+            return;
+        }
+        String growException = RedisEmailUtil.boldLine(RedisEmailUtil.GROW_EXCEPTION);
+        String declineException = RedisEmailUtil.boldLine(RedisEmailUtil.DECLINE_EXCEPTION);
+        String keysIncrException = String.format(growException, keyIncr.toString().
+                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
+        String KeysDeclineException = String.format(declineException, keyDecline.toString().
+                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
+
+        StringBuilder emailContent = new StringBuilder();
+        emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).
+                append(redisKeysNotSameInfo).append(memoryAnal).append(keysIncrException).append(KeysDeclineException)
+                .append(ipPortException);
+        System.out.println(String.format(RedisEmailUtil.TIME, time, lastCheckTime)+"=="
+        +redisVisitFailedInfo+"=="+redisKeysNotSameInfo+"=="+memoryAnal+"=="+keysIncrException+"=="+KeysDeclineException
+                +"=="+ipPortException);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("subject", RedisEmailUtil.SUBJECT);
+        map.put("text", emailContent.toString());
+        map.put("to", mailTo);
+        isChanged = false;
+        updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket, lastRedisIpPortMap);
+        try {
+            HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
+            System.out.println("mail_to : " + mailTo);
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.senEmail", null, null, e);
+            e.printStackTrace();
+        }
+        System.out.println("execute time : " + (System.currentTimeMillis() - begin));
+    }
+
+    private void checkRedisConfig(Map<String, Map<String, String>> redisConfig,
+                                  List<String> redisVisitFailedList,
+                                  Map<String, List<RedisInfo>> redisClusterInfo,
+                                  Map<String, RedisInfo> masterInfo,
+                                  Map<String, Integer> currentRecordBucket,
+                                  Map<String, Map<String, String>> redisIpPortMap) {
+        Set<String> uids = redisConfig.keySet();
         for (String uid : uids) {
             List<RedisIns> redisInses;
             String passwd = redisConfig.get(uid).get("passwd");
@@ -94,7 +158,8 @@ public class RedisDataCheckProfessor {
                 }
             } catch (Exception e) {
                 redisVisitFailedList.add(joiner.join(uid, passwd, desc));
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.getStringByGet", null, null, e);
+                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.getStringByGet",
+                        null, null, e);
                 e.printStackTrace();
                 continue;
             }
@@ -115,7 +180,8 @@ public class RedisDataCheckProfessor {
                     String result = jedis.auth(passwd);
                     if (!"OK".equals(result)) {
                         redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd, desc));
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.auth", passwd, result, null);
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.auth", passwd,
+                                result, null);
                         continue;
                     }
                     RedisInfo redisInfo = infoExtraction(jedis.info(), redisIns.getMaster(), redisIns.getIp(), desc);
@@ -159,50 +225,6 @@ public class RedisDataCheckProfessor {
             masterSlaveInfo.put("slave", slaveBuffer.toString());
             redisIpPortMap.put(uid+"_"+desc, masterSlaveInfo);
         }
-        try {
-            //metaDataChangeAnal(redisClusterInfo);
-        } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.metaDataChangeAnal", null, null, e);
-            e.printStackTrace();
-        }
-        String redisVisitFailedInfo = formatVisitFailedReidis(redisVisitFailedList);
-        String redisKeysNotSameInfo = formatKeysNotSameRedis(redisClusterInfo);
-        String memoryAnal = formatMemoryAnal(masterInfo);
-        StringBuilder keyIncr = new StringBuilder();
-        StringBuilder keyDecline = new StringBuilder();
-        formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
-        String ipPortException = checkIpPort(redisIpPortMap);
-
-        if (!isChanged || null == mailTo || mailTo.isEmpty()) {
-            System.out.println("execute time : " + (System.currentTimeMillis() - begin));
-            return;
-        }
-        String growException = RedisEmailUtil.boldLine(RedisEmailUtil.GROW_EXCEPTION);
-        String declineException = RedisEmailUtil.boldLine(RedisEmailUtil.DECLINE_EXCEPTION);
-        String keysIncrException = String.format(growException, keyIncr.toString().
-                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
-        String KeysDeclineException = String.format(declineException, keyDecline.toString().
-                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
-
-        StringBuilder emailContent = new StringBuilder();
-        emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).
-                append(redisKeysNotSameInfo).append(memoryAnal).append(keysIncrException).append(KeysDeclineException)
-                .append(ipPortException);
-
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("subject", RedisEmailUtil.SUBJECT);
-        map.put("text", emailContent.toString());
-        map.put("to", mailTo);
-        isChanged = false;
-        updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket, lastRedisIpPortMap);
-        try {
-            HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
-            System.out.println("mail_to : " + mailTo);
-        } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.senEmail", null, null, e);
-            e.printStackTrace();
-        }
-        System.out.println("execute time : " + (System.currentTimeMillis() - begin));
     }
 
     /**
@@ -262,7 +284,9 @@ public class RedisDataCheckProfessor {
      * @throws InterruptedException
      */
     private static void updateZkSwap(String time, Map<String, Integer> map,
-                                     Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap, Map<String, Map<String,String>> ipPortMap) throws KeeperException, InterruptedException, IOException {
+                                     Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap,
+                                     Map<String, Map<String,String>> ipPortMap)
+            throws KeeperException, InterruptedException, IOException {
         if(null == time) {
             time = DateUtil.getCurrentMin();
         }

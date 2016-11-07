@@ -159,6 +159,15 @@ public class DateUtil {
     }
 
     /**
+     * 得到当前所在的分钟
+     * @return
+     */
+    public static String getDateMin(Date date) {
+        String min = new SimpleDateFormat("yyyy-MM-dd HH:mm").format(date);
+        return min + ":00";
+    }
+
+    /**
      * 获取当前时间的上一个小时的开始时间和结束时间
      * @param flag 0：上个小时的开始时间， 1：上个小时的结束时间
      * @return

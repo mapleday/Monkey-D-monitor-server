@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.app;
 
+import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
@@ -27,9 +28,14 @@ public class APP {
     public static void main(String[] args) throws IOException {
         ClassPathXmlApplicationContext context = null;
         try {
+            ZkUtils.setZkConfigFilePath(args[0]);
+            ZkUtils.initZkConfig(args[0]);
             context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml");
             System.in.read();
-        } finally {
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finally {
             if (context != null) {
                 context.close();
             }

@@ -9,22 +9,37 @@ import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.exception.SnsConfigException;
 import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * Created by yzh on 2016/11/3.
  */
 @Component
 public class RedisMonitorSchedule {
+    private  static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
 
-    @Scheduled(fixedRate = 10000l)
-    public void checkRedis(){
+    @Scheduled(fixedRate = 360000l)
+    public void checkRedisAndSendMail(){
         try {
-            new RedisDataCheckProfessor().handle();
+            professor.handle(0);
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", null, null, e);
             e.printStackTrace();
         }
     }
+
+    @Scheduled(fixedRate = 60000l)
+    public void checkRedisAndSendWeixin(){
+        try {
+            professor.handle(1);
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", null, null, e);
+            e.printStackTrace();
+        }
+    }
+
 }

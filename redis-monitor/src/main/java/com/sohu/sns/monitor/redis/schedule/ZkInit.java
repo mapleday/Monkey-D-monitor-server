@@ -2,7 +2,10 @@ package com.sohu.sns.monitor.redis.schedule;
 
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
+import com.sohu.sns.monitor.redis.util.MysqlClusterServiceUtils;
+import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 
@@ -11,13 +14,9 @@ import com.sohu.snscommon.utils.zk.ZkUtils;
  */
 
 public class ZkInit {
-    private static String param = "F:\\IdeaProjects\\sns-monitor-server\\redis-monitor\\src\\env\\test\\zk\\zk.json";
-
-    private static void init(){
+    private void init(){
 
         try {
-            ZkUtils.setZkConfigFilePath(param);
-            ZkUtils.initZkConfig(param);
             ZkUtils zk = new ZkUtils();
 
             zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
@@ -34,16 +33,15 @@ public class ZkInit {
             String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
             RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig, swapData, zk);
 
-            //MysqlClusterServiceUtils.init();
+            MysqlClusterServiceUtils.init();
 
             zk.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "MsgUtil.sendWeiXin", null, null, e);
         }
     }
 
     public ZkInit(){
         init();
     }
-
 }

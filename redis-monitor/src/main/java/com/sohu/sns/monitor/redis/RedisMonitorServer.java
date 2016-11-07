@@ -20,6 +20,7 @@ public class RedisMonitorServer {
 
         try {
             initZkConfig(args[0]);
+
             new ClassPathXmlApplicationContext("RedisMonitorContext.xml");
             MysqlClusterServiceUtils.init();
 //            new RedisDataCheckProfessor().handle();

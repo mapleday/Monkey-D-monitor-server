@@ -11,6 +11,7 @@ import com.sohu.sns.monitor.redis.model.MemoryInfo;
 import com.sohu.sns.monitor.redis.model.RedisInfo;
 import com.sohu.sns.monitor.redis.model.RedisIns;
 import com.sohu.sns.monitor.redis.util.DateUtil;
+import com.sohu.sns.monitor.redis.util.MysqlClusterServiceUtils;
 import com.sohu.sns.monitor.redis.util.RedisEmailUtil;
 import com.sohu.sns.monitor.redis.util.ZipUtils;
 
@@ -60,9 +61,9 @@ public class RedisDataCheckProfessor {
     private static final String INSERT_DAY_RECORD = "insert into meta_redis_used_memory_day (last_day_used_memory, used_memory, log_day, update_time) " +
             "values (?, ?, ?, now())";
     private static final String UPDATE_DAY_RECORD = "update meta_redis_used_memory_day set used_memory = ?, update_time = now() where log_day = ?";
-
-    @Autowired
-    private MysqlClusterService mysqlClusterService;
+//
+//    @Autowired
+//    private MysqlClusterService mysqlClusterService;
 
     public void handle() throws InterruptedException, IOException, KeeperException {
         long begin = System.currentTimeMillis();
@@ -86,7 +87,7 @@ public class RedisDataCheckProfessor {
 //            MysqlClusterConfig config = new MySqlDBConfig();
 //            mysqlClusterService =new MysqlClusterServiceImpl(config, ClusterChangedPostProcessor.NOTHING_PROCESSOR);
 //            mysqlClusterService.init(config);
-            System.out.println(mysqlClusterService);
+//            System.out.println(mysqlClusterService);
             metaDataChangeAnal(redisClusterInfo);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.metaDataChangeAnal", null, null, e);
@@ -559,8 +560,8 @@ public class RedisDataCheckProfessor {
         long usedMemory = 0L;
         String currentDay = DateUtil.getCurrentDate();
         String lastDay = DateUtil.getLastDay();
-        JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
-        JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
+        JdbcTemplate readJdbcTemplate = MysqlClusterServiceUtils.getReadJdbcTemplate();
+        JdbcTemplate writeJdbcTemplate = MysqlClusterServiceUtils.getWriteJdbcTemplate();
         Set<String> uids = map.keySet();
         for(String uid : uids) {
             List<RedisInfo> redisInfos = map.get(uid);

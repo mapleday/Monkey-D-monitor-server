@@ -20,7 +20,7 @@ public class MysqlClusterServiceUtils {
         try {
             MysqlClusterConfig config = new MySqlDBConfig();
             mysqlClusterService =new MysqlClusterServiceImpl(config, ClusterChangedPostProcessor.NOTHING_PROCESSOR);
-            mysqlClusterService.init(config);
+//            mysqlClusterService.init(config);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,7 +39,6 @@ public class MysqlClusterServiceUtils {
 
     public static void main(String args[]) {
 
-        //zk
         MysqlClusterServiceUtils.init();
 
 

@@ -2,6 +2,7 @@ package com.sohu.sns.monitor.redis;
 
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
+import com.sohu.sns.monitor.redis.util.MysqlClusterServiceUtils;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -18,16 +19,18 @@ public class RedisMonitorServer {
     public static void main(String[] args) {
 
         try {
-            start(args[0]);
-            new RedisDataCheckProfessor().handle();
-            System.in.read();
+            initZkConfig(args[0]);
+            new ClassPathXmlApplicationContext("RedisMonitorContext.xml");
+            MysqlClusterServiceUtils.init();
+//            new RedisDataCheckProfessor().handle();
+//            System.in.read();
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);
             e.printStackTrace();
         }
     }
 
-    public static void  start(String arg) {
+    public static void  initZkConfig(String arg) {
         try {
             ZkUtils.setZkConfigFilePath(arg);
             ZkUtils.initZkConfig(arg);

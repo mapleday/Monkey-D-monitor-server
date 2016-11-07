@@ -5,6 +5,7 @@ import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -17,7 +18,6 @@ public class RedisMonitorServer {
     public static void main(String[] args) {
 
         try {
-
             start(args[0]);
             new RedisDataCheckProfessor().handle();
             System.in.read();
@@ -35,7 +35,7 @@ public class RedisMonitorServer {
             ZkUtils zk = new ZkUtils();
             zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                     ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
-
+            SnsDiamonds.setDiamondsEnvBySystem();
             /**监控各种urls**/
             String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
 

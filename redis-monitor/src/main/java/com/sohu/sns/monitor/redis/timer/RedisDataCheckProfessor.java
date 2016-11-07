@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
-import com.sohu.sns.monitor.redis.config.MonitorDBConfig;
 import com.sohu.sns.monitor.redis.config.MySqlDBConfig;
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.model.DiffInfo;
@@ -23,8 +22,6 @@ import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
-import com.sohu.snscommon.utils.spring.SpringContextUtil;
-import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.KeeperException;
@@ -64,14 +61,8 @@ public class RedisDataCheckProfessor {
             "values (?, ?, ?, now())";
     private static final String UPDATE_DAY_RECORD = "update meta_redis_used_memory_day set used_memory = ?, update_time = now() where log_day = ?";
 
-    //@Autowired(required = false)
-    private static MysqlClusterService mysqlClusterService;
-
-    public static void init() {
-
-
-    }
-
+    @Autowired
+    private MysqlClusterService mysqlClusterService;
 
     public void handle() throws InterruptedException, IOException, KeeperException {
         long begin = System.currentTimeMillis();
@@ -92,9 +83,10 @@ public class RedisDataCheckProfessor {
         checkRedisConfig(redisConfig, redisVisitFailedList, redisClusterInfo, masterInfo,
                 currentRecordBucket, redisIpPortMap);
         try {
-
-
-            //mysqlClusterService = SpringContextUtil.getBean(MysqlClusterServiceImpl.class);
+//            MysqlClusterConfig config = new MySqlDBConfig();
+//            mysqlClusterService =new MysqlClusterServiceImpl(config, ClusterChangedPostProcessor.NOTHING_PROCESSOR);
+//            mysqlClusterService.init(config);
+            System.out.println(mysqlClusterService);
             metaDataChangeAnal(redisClusterInfo);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.metaDataChangeAnal", null, null, e);
@@ -567,7 +559,6 @@ public class RedisDataCheckProfessor {
         long usedMemory = 0L;
         String currentDay = DateUtil.getCurrentDate();
         String lastDay = DateUtil.getLastDay();
-
         JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate(null);
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
         Set<String> uids = map.keySet();

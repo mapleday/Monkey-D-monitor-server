@@ -67,8 +67,12 @@ public class RedisDataCheckProfessor {
         long begin = System.currentTimeMillis();
 
         Map<String, Map<String, String>> redisConfig = getRedisClusterConfig();
-        if (null == redisConfig || redisConfig.isEmpty()) return;
-        if (REDIS_CHECK_URL.isEmpty()) return;
+        if (null == redisConfig || redisConfig.isEmpty()){
+            return;
+        }
+        if (REDIS_CHECK_URL.isEmpty()){
+            return;
+        }
 
         System.out.println("redis check start : " + redisConfig.size() + ", time:" + DateUtil.getCurrentTime());
 
@@ -97,7 +101,7 @@ public class RedisDataCheckProfessor {
                                  Map<String, Map<String, String>> redisIpPortMap)
             throws KeeperException, InterruptedException, IOException {
         String ipPortException = checkIpPort(redisIpPortMap);
-        if(ipPortException==null||ipPortException.indexOf(NONE)>=0){
+        if(ipPortException==null||ipPortException.contains(NONE)){
             System.out.println("IP或Port无异常");
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
             return;
@@ -192,7 +196,9 @@ public class RedisDataCheckProfessor {
                 e.printStackTrace();
                 continue;
             }
-            if (null == redisInses) continue;
+            if (null == redisInses){
+                continue;
+            }
             StringBuilder masterBuffer = new StringBuilder();
             StringBuilder slaveBuffer = new StringBuilder();
             for (RedisIns redisIns : redisInses) {
@@ -204,13 +210,15 @@ public class RedisDataCheckProfessor {
                     }
                     slaveBuffer.append(redisIns.getIp()).append(":").append(redisIns.getPort());
                 }
+                Jedis jedis = null;
                 try {
-                    Jedis jedis = new Jedis(redisIns.getIp(), redisIns.getPort());
+                    jedis = new Jedis(redisIns.getIp(), redisIns.getPort());
                     String result = jedis.auth(passwd);
                     if (!"OK".equals(result)) {
                         redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd, desc));
                         LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.auth", passwd,
                                 result, null);
+                        jedis.close();
                         continue;
                     }
                     RedisInfo redisInfo = infoExtraction(jedis.info(), redisIns.getMaster(), redisIns.getIp(), desc);
@@ -241,12 +249,14 @@ public class RedisDataCheckProfessor {
                     if (1 == redisIns.getMaster()) {
                         currentRecordBucket.put(joiner.join(uid, redisIns.getIp(), desc), redisInfo.getKeys());
                     }
-
-                    jedis.close();
                 } catch (Exception e) {
                     redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd));
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.getInfo", null, null, e);
                     e.printStackTrace();
+                }finally {
+                    if(jedis != null) {
+                        jedis.close();
+                    }
                 }
             }
             Map<String, String> masterSlaveInfo = new HashMap<String, String>();
@@ -261,7 +271,7 @@ public class RedisDataCheckProfessor {
      * @param map
      * @return
      */
-    private String checkIpPort(Map<String, Map<String, String>> map) {
+    private static String checkIpPort(Map<String, Map<String, String>> map) {
         String ipPortException = RedisEmailUtil.boldLine(RedisEmailUtil.IP_PORT_EXCEPTION);
         String result;
         if(null == map || map.isEmpty() ) {
@@ -276,7 +286,9 @@ public class RedisDataCheckProfessor {
         Set<String> uids = map.keySet();
         StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
         for(String uid : uids) {
-            if(!lastRedisIpPortMap.containsKey(uid)) continue;
+            if(!lastRedisIpPortMap.containsKey(uid)){
+                continue;
+            }
             String masterInfo = map.get(uid).get("master");
             String slaveInfo = map.get(uid).get("slave");
             String lastMasterInfo = lastRedisIpPortMap.get(uid).get("master");
@@ -392,7 +404,7 @@ public class RedisDataCheckProfessor {
      * @param redisVisitErrorList all visit failed info list
      * @return formatted visit failed info
      */
-    private String formatVisitFailedReidis(List<String> redisVisitErrorList) {
+    private static String formatVisitFailedReidis(List<String> redisVisitErrorList) {
         String VISIT_EXCEPTION = RedisEmailUtil.boldLine(RedisEmailUtil.VISIT_EXCEPTION);
         String result;
         if (null == redisVisitErrorList || redisVisitErrorList.isEmpty()) {
@@ -414,7 +426,7 @@ public class RedisDataCheckProfessor {
      * @param map
      * @return
      */
-    private String formatKeysNotSameRedis(Map<String, List<RedisInfo>> map) {
+    private static String formatKeysNotSameRedis(Map<String, List<RedisInfo>> map) {
         String KEYS_EXCEPTION = RedisEmailUtil.boldLine(RedisEmailUtil.KEYS_EXCEPTION);
         String result;
         if (null == map || map.isEmpty()) {
@@ -535,7 +547,7 @@ public class RedisDataCheckProfessor {
     }
 
 
-    private void formatKeysChangeExceptionRedis(Map<String, Integer> map, StringBuilder keysIncr, StringBuilder keysDecline) {
+    private static void formatKeysChangeExceptionRedis(Map<String, Integer> map, StringBuilder keysIncr, StringBuilder keysDecline) {
         keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
         keysDecline.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
 
@@ -623,7 +635,7 @@ public class RedisDataCheckProfessor {
      *
      * @return Map<String, Map<String, String>>
      */
-    public Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
+    public static Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
         ZkUtils zk = new ZkUtils();
         zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);

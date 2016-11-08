@@ -2,7 +2,7 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
-    <id>test2</id>
+    <id>product</id>
     <formats>
         <format>zip</format>
     </formats>
@@ -40,11 +40,11 @@
             </includes>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/env/test2/yaml</directory>
+            <directory>${project.basedir}/src/env/product/yaml</directory>
             <outputDirectory>/sce</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${project.basedir}/src/env/test2/zk</directory>
+            <directory>${project.basedir}/src/env/product/zk</directory>
             <outputDirectory>/WEB-INF/classes</outputDirectory>
         </fileSet>
     </fileSets>

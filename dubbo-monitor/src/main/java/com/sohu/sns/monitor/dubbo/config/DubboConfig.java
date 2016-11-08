@@ -33,6 +33,7 @@ import org.springframework.core.env.Environment;
 public class DubboConfig {
 
     private static final String REGISTRY_ADDRESS = "dubbo.registry.address";
+    private static final String REGISTRY_GROUP = "dubbo.registry.group";
     private static final String APPLICATION_NAME = "dubbo.application.name";
     private static final String APPLICATION_OWNER = "dubbo.application.owner";
     private static final String PROTOCOL_PORT = "dubbo.protocol.port";
@@ -59,8 +60,7 @@ public class DubboConfig {
     public RegistryConfig registryConfig() {
         RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setAddress(env.getProperty(REGISTRY_ADDRESS));
-        registryConfig.setGroup("/dubbo/TEST2");
-        registryConfig.setProtocol("dubbo");
+        registryConfig.setGroup(env.getProperty(REGISTRY_GROUP));
         return registryConfig;
     }
 

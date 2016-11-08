@@ -34,6 +34,8 @@ public class WebConfig extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
     }
 
+
+
     @Bean
     public JetTemplateViewResolver viewResolver() {
         JetTemplateViewResolver jetTemplateViewResolver = new JetTemplateViewResolver();

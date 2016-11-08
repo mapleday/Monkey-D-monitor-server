@@ -20,14 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.AbstractEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 
 import javax.annotation.PostConstruct;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -52,7 +50,6 @@ public class MonitorConfig {
         MutablePropertySources propertySources = ((AbstractEnvironment) env).getPropertySources();
 
         String envConfig = System.getProperty("env", "TEST2");
-        System.out.println(envConfig + "===========================");
         if ("PRODUCT".equals(envConfig)) {
             try {
                 Properties properties = parseProperties("/product/application.properties");
@@ -69,6 +66,8 @@ public class MonitorConfig {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }else {
+            throw new RuntimeException("env is error");
         }
     }
 

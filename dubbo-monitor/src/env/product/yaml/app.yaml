@@ -1,6 +1,6 @@
 appid: 127278840
 start: $JETTY_START
-setenv: {'JVM_ARGS':'-Xms1500m -Xmx1500m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/logs/ -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Dmonitor_agent_app_id="$APPID"_"$INSTANCEID" -Denv=TEST2'}
+setenv: {'JVM_ARGS':'-Xms1500m -Xmx1500m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/logs/ -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Dmonitor_agent_app_id="$APPID"_"$INSTANCEID" -Denv=PRODUCT'}
 tryRestart: 
     enable: true
     fail: 3

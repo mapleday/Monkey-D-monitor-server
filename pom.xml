@@ -59,6 +59,13 @@
                 <env>test2</env>
             </properties>
         </profile>
+        <profile>
+            <id>product</id>
+            <properties>
+                <env>product</env>
+            </properties>
+        </profile>
+
     </profiles>
     <build>
         <plugins>

@@ -6,12 +6,18 @@ import com.sohu.snscommon.dbcluster.config.MysqlClusterConfig;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * Created by wangzhenya on 16-11-4.
  */
 public class MysqlClusterServiceUtils {
+
+    private  MysqlClusterServiceUtils(){
+
+    }
 
     private static MysqlClusterService mysqlClusterService;
 
@@ -20,8 +26,9 @@ public class MysqlClusterServiceUtils {
         try {
             MysqlClusterConfig config = new MySqlDBConfig();
             mysqlClusterService =new MysqlClusterServiceImpl(config, ClusterChangedPostProcessor.NOTHING_PROCESSOR);
-//            mysqlClusterService.init(config);
         } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.UTIL, "MysqlClusterServiceUtils.init", null, null, e);
+
             e.printStackTrace();
         }
     }

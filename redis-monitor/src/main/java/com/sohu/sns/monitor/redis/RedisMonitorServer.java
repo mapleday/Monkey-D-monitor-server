@@ -1,5 +1,7 @@
 package com.sohu.sns.monitor.redis;
 
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -9,6 +11,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class RedisMonitorServer {
 
+    private  RedisMonitorServer(){}
+
     public static void main(String[] args) {
         ClassPathXmlApplicationContext context = null;
         try {
@@ -17,6 +21,7 @@ public class RedisMonitorServer {
             context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml");
             System.in.read();
         }catch (Exception e){
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);
             e.printStackTrace();
         }
         finally {

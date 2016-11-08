@@ -41,7 +41,7 @@ public class RedisDataCheckProfessor {
     private static String baseEmailUrl = "";
     private static String emailInterface = "";
     private static String mailTo = "";
-    private static String sendMsgTo = "";
+    private static String sendMsgTo = "15201017693";
     private static String weixinInterface = "";
     private static boolean isChanged = false;
     private static String lastCheckTime = "";
@@ -63,7 +63,7 @@ public class RedisDataCheckProfessor {
      * @throws IOException
      * @throws KeeperException
      */
-    public void handle(int type) throws InterruptedException, IOException, KeeperException {
+    public synchronized void handle(int type) throws InterruptedException, IOException, KeeperException {
         long begin = System.currentTimeMillis();
 
         Map<String, Map<String, String>> redisConfig = getRedisClusterConfig();
@@ -98,7 +98,7 @@ public class RedisDataCheckProfessor {
             throws KeeperException, InterruptedException, IOException {
         String ipPortException = checkIpPort(redisIpPortMap);
         if(ipPortException==null||ipPortException.indexOf(NONE)>=0){
-            System.out.println("无异常");
+            System.out.println("IP或Port无异常");
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
             return;
         }
@@ -160,7 +160,7 @@ public class RedisDataCheckProfessor {
             HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
             System.out.println("mail_to : " + mailTo);
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.senEmail", null, null, e);
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkAndSendMail", null, null, e);
             e.printStackTrace();
         }
         System.out.println("execute time : " + (System.currentTimeMillis() - begin));
@@ -187,7 +187,7 @@ public class RedisDataCheckProfessor {
                 }
             } catch (Exception e) {
                 redisVisitFailedList.add(joiner.join(uid, passwd, desc));
-                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.getStringByGet",
+                LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.getStringByGet",
                         null, null, e);
                 e.printStackTrace();
                 continue;
@@ -209,7 +209,7 @@ public class RedisDataCheckProfessor {
                     String result = jedis.auth(passwd);
                     if (!"OK".equals(result)) {
                         redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd, desc));
-                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.auth", passwd,
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.auth", passwd,
                                 result, null);
                         continue;
                     }
@@ -245,7 +245,7 @@ public class RedisDataCheckProfessor {
                     jedis.close();
                 } catch (Exception e) {
                     redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd));
-                    LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.handle.getInfo", null, null, e);
+                    LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.getInfo", null, null, e);
                     e.printStackTrace();
                 }
             }
@@ -678,15 +678,13 @@ public class RedisDataCheckProfessor {
         weixinInterface = urls.get("send_sms_interface");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
-//        for (String email : emails) {
-//            if (sb.length() != 0) {
-//                sb.append("|");
-//            }
-//            sb.append(email);
-//        }
-        sb.append("zhenhaoyu@sohu-inc.com");
+        for (String email : emails) {
+            if (sb.length() != 0) {
+                sb.append("|");
+            }
+            sb.append(email);
+        }
+        sb.append("|zhenhaoyu@sohu-inc.com");
         mailTo = sb.toString();
-
-        sendMsgTo = "15201017693";
     }
 }

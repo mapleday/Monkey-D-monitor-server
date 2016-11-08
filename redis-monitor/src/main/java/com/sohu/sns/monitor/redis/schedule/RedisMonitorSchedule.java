@@ -22,7 +22,7 @@ import java.io.IOException;
 public class RedisMonitorSchedule {
     private  static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
 
-    @Scheduled(fixedRate = 360000l)
+    @Scheduled(fixedRate = 360000L)
     public void checkRedisAndSendMail(){
         try {
             professor.handle(0);
@@ -32,7 +32,7 @@ public class RedisMonitorSchedule {
         }
     }
 
-    @Scheduled(fixedRate = 60000l)
+    @Scheduled(fixedRate = 60000L)
     public void checkRedisAndSendWeixin(){
         try {
             professor.handle(1);

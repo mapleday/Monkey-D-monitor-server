@@ -38,6 +38,7 @@ public class ZkInit {
             zk.close();
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "MsgUtil.sendWeiXin", null, null, e);
+            e.printStackTrace();
         }
     }
 

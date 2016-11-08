@@ -28,7 +28,7 @@ import java.util.Date;
  */
 public class DubboInvoke implements Serializable {
 
-    private String id;
+    private Integer id;
 
     private Date invokeDate;
 
@@ -117,11 +117,11 @@ public class DubboInvoke implements Serializable {
         this.type = type;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

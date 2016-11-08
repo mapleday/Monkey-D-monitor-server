@@ -111,7 +111,6 @@ public class DubboMonitorService implements MonitorService {
         }
         DubboInvoke dubboInvoke = new DubboInvoke();
 
-        dubboInvoke.setId(UuidUtil.createUUID());
         try {
             if (statistics.hasParameter(PROVIDER)) {
                 dubboInvoke.setType(CONSUMER);

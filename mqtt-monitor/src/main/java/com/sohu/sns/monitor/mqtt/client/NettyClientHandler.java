@@ -27,16 +27,14 @@ import io.netty.handler.codec.mqtt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Handler implementation for server.
+ * 出路服务端返回
  */
 @Sharable
 public class NettyClientHandler extends SimpleChannelInboundHandler<MqttMessage> {
     private static final JsonMapper mapper = JsonMapper.nonDefaultMapper();
-    private static final AtomicInteger userIndex = new AtomicInteger();
     private static final Random userRandom = new Random();
 
     @Override
@@ -50,40 +48,47 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<MqttMessage>
 
         MqttMessageType mqttMessageType = msg.fixedHeader().messageType();
         switch (mqttMessageType) {
-            case PUBLISH: {
-                MqttPublishMessage publishMessage = (MqttPublishMessage) msg;
-                int messageId = publishMessage.variableHeader().messageId();
-
-                System.out.println(publishMessage.payload().toString(Charsets.UTF_8));
-                MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBACK, false, MqttQoS.AT_LEAST_ONCE, false, 0);
-                MqttMessageIdVariableHeader variableHeader = MqttMessageIdVariableHeader.from(messageId);
-                MqttPubAckMessage pubAckMessage = new MqttPubAckMessage(fixedHeader, variableHeader);
-                ctx.writeAndFlush(pubAckMessage);
-
-                //test
-                MqttPublishVariableHeader publishVariableHeader = new MqttPublishVariableHeader("test", messageId);
-                Map<String, Object> replyMessageConent = new HashMap<String, Object>();
-                replyMessageConent.put("type", 1);
-                replyMessageConent.put("replyId", messageId);
-                replyMessageConent.put("data", "{\"deal\":1}");
-                String replyMessageStr = mapper.toJson(replyMessageConent);
-                ByteBuf replyPayload = Unpooled.copiedBuffer(replyMessageStr, Charsets.UTF_8);
-                MqttFixedHeader publishFixedHeader = new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_LEAST_ONCE, false, 0);
-                MqttPublishMessage replyPublishMessage = new MqttPublishMessage(publishFixedHeader, publishVariableHeader, replyPayload);
-                ctx.writeAndFlush(replyPublishMessage);
-            }
-            break;
-            case SUBACK: {
-                MqttSubAckMessage subAckMessage = (MqttSubAckMessage) msg;
-                MqttSubAckPayload payload1 = subAckMessage.payload();
-                MqttMessageIdVariableHeader mqttMessageIdVariableHeader = subAckMessage.variableHeader();
-
-                System.out.println(payload1.grantedQoSLevels());
-                System.out.println(mqttMessageIdVariableHeader.messageId());
-            }
+            case PUBLISH:
+                handlePulish(ctx, (MqttPublishMessage) msg);
+                break;
+            case SUBACK:
+                handleSuback((MqttSubAckMessage) msg);
+                break;
             default:
                 System.out.printf("default " + msg);
         }
+    }
+
+    private void handleSuback(MqttSubAckMessage msg) {
+        MqttSubAckMessage subAckMessage = msg;
+        MqttSubAckPayload payload1 = subAckMessage.payload();
+        MqttMessageIdVariableHeader mqttMessageIdVariableHeader = subAckMessage.variableHeader();
+
+        System.out.println(payload1.grantedQoSLevels());
+        System.out.println(mqttMessageIdVariableHeader.messageId());
+    }
+
+    private void handlePulish(ChannelHandlerContext ctx, MqttPublishMessage msg) {
+        MqttPublishMessage publishMessage = msg;
+        int messageId = publishMessage.variableHeader().messageId();
+
+        System.out.println(publishMessage.payload().toString(Charsets.UTF_8));
+        MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBACK, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+        MqttMessageIdVariableHeader variableHeader = MqttMessageIdVariableHeader.from(messageId);
+        MqttPubAckMessage pubAckMessage = new MqttPubAckMessage(fixedHeader, variableHeader);
+        ctx.writeAndFlush(pubAckMessage);
+
+        //test
+        MqttPublishVariableHeader publishVariableHeader = new MqttPublishVariableHeader("test", messageId);
+        Map<String, Object> replyMessageConent = new HashMap<String, Object>();
+        replyMessageConent.put("type", 1);
+        replyMessageConent.put("replyId", messageId);
+        replyMessageConent.put("data", "{\"deal\":1}");
+        String replyMessageStr = mapper.toJson(replyMessageConent);
+        ByteBuf replyPayload = Unpooled.copiedBuffer(replyMessageStr, Charsets.UTF_8);
+        MqttFixedHeader publishFixedHeader = new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+        MqttPublishMessage replyPublishMessage = new MqttPublishMessage(publishFixedHeader, publishVariableHeader, replyPayload);
+        ctx.writeAndFlush(replyPublishMessage);
     }
 
     @Override

@@ -12,14 +12,19 @@
     <artifactId>monitor-app</artifactId>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>com.sohu.sns.monitor</groupId>-->
-            <!--<artifactId>http-monitor</artifactId>-->
-            <!--<version>1.0-SNAPSHOT</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>com.sohu.sns.monitor</groupId>
+            <artifactId>http-monitor</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>com.sohu.sns.monitor</groupId>
             <artifactId>redis-monitor</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sohu.sns.monitor</groupId>
+            <artifactId>mqtt-monitor</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

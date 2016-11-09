@@ -9,29 +9,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>mqtt-monitor</artifactId>
-
+    <artifactId>monitor-common</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>${netty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.sohu.snscommon</groupId>
             <artifactId>util-common</artifactId>
-            <version>${snscommon.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sohu.sns.monitor</groupId>
-            <artifactId>monitor-common</artifactId>
-            <version>${monitor.version}</version>
+            <version>RELEASE</version>
         </dependency>
     </dependencies>
+
+    <dependency>
+        <groupId>com.sohu.snscommon</groupId>
+        <artifactId>util-common</artifactId>
+        <version>${snscommon.version}</version>
+    </dependency>
 
 </project>

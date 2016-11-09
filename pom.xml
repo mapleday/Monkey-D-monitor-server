@@ -14,6 +14,7 @@
         <module>monitor-app</module>
         <module>log-monitor</module>
         <module>dubbo-monitor</module>
+        <module>mqtt-monitor</module>
     </modules>
 
     <properties>
@@ -22,6 +23,8 @@
         <snscommon.version>1.8.0</snscommon.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.1.2</logback.version>
+        <netty.version>4.1.0.CR7</netty.version>
+        <guava.version>18.0</guava.version>
     </properties>
 
     <dependencyManagement>

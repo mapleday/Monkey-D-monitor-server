@@ -14,14 +14,16 @@
         <dependency>
             <groupId>com.sohu.snscommon</groupId>
             <artifactId>util-common</artifactId>
-            <version>RELEASE</version>
+            <version>${snscommon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sohu.snscommon</groupId>
+            <artifactId>util-common</artifactId>
+            <version>${snscommon.version}</version>
         </dependency>
     </dependencies>
 
-    <dependency>
-        <groupId>com.sohu.snscommon</groupId>
-        <artifactId>util-common</artifactId>
-        <version>${snscommon.version}</version>
-    </dependency>
+
 
 </project>

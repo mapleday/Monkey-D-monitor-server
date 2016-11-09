@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.mqtt.tasks;
 
+import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.mqtt.client.NettyClient;
 import com.sohu.sns.monitor.mqtt.client.SimpleMqttMessage;
 import com.sohu.snscommon.utils.LOGGER;
@@ -81,7 +82,8 @@ public class ScheduleConn {
             }
 
             if (!isConnAvalable) {
-                System.out.println("mqtt 连接建立异常报警：" + errorMessages.toString());
+                String message = "mqtt 连接建立异常报警：" + errorMessages.toString();
+                NotifyUtils.sendWeixin("18910556026",message);
             }
 
         }

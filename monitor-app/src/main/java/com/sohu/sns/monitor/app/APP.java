@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.app;
 
+import com.sohu.sns.monitor.mqtt.MqttMonitorApp;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,29 +14,18 @@ import java.io.IOException;
 public class APP {
     private APP() {
     }
-//
-//    public static void main(String[] args) throws IOException {
-//        ClassPathXmlApplicationContext context = null;
-//        try {
-//            context = new ClassPathXmlApplicationContext("/httpMonitorContext.xml");
-//            System.in.read();
-//        } finally {
-//            if (context != null) {
-//                context.close();
-//            }
-//        }
-//    }
+
     public static void main(String[] args) throws IOException {
         ClassPathXmlApplicationContext context = null;
         try {
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
-            context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml");
+            context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml", "/httpMonitorContext.xml");
+            MqttMonitorApp.start("cc.sns.sohusce.com:80");
             System.in.read();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (context != null) {
                 context.close();
             }

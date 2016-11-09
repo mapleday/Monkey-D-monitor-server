@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.mqtt.tasks;
 
+import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.mqtt.client.NettyClient;
 import com.sohu.sns.monitor.mqtt.client.SimpleMqttMessage;
 import com.sohu.snscommon.utils.LOGGER;
@@ -58,7 +59,8 @@ public class PersistentConn {
                     }
                 }
                 if (errorTimes > 0) {
-                    System.out.println("mqtt 长连接异常断开.次数：" + errorTimes);
+                    String message = "mqtt 长连接异常断开.次数：" + errorTimes;
+                    NotifyUtils.sendWeixin("18910556026", message);
                 }
             }
         }
@@ -96,8 +98,6 @@ public class PersistentConn {
             }
         }
     }
-
-
 
 
 }

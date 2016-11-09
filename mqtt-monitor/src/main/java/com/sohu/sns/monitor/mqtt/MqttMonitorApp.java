@@ -7,8 +7,8 @@ import com.sohu.sns.monitor.mqtt.tasks.ScheduleConn;
  * Created by jy on 16-9-2.
  * mqtt监控入口类
  */
-public class App {
-    private App() {
+public class MqttMonitorApp {
+    private MqttMonitorApp() {
     }
 
     public static void main(String[] args) throws Exception {
@@ -17,6 +17,16 @@ public class App {
         ScheduleConn.start(connNum, server);
         PersistentConn.start(2, server);
         System.in.read();
+    }
+
+    /**
+     * 启动监控
+     *
+     * @param server 服务器地址
+     */
+    public static void start(String server) {
+        ScheduleConn.start(4, server);
+        PersistentConn.start(2, server);
     }
 
 

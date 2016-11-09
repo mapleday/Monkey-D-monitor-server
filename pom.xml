@@ -15,6 +15,7 @@
         <module>log-monitor</module>
         <module>dubbo-monitor</module>
         <module>mqtt-monitor</module>
+        <module>monitor-common</module>
     </modules>
 
     <properties>
@@ -25,6 +26,7 @@
         <logback.version>1.1.2</logback.version>
         <netty.version>4.1.0.CR7</netty.version>
         <guava.version>18.0</guava.version>
+        <monitor.version>1.0-SNAPSHOT</monitor.version>
     </properties>
 
     <dependencyManagement>

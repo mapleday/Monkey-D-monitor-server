@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.mqtt;
 
+import com.sohu.sns.monitor.mqtt.tasks.PersistentConn;
 import com.sohu.sns.monitor.mqtt.tasks.ScheduleConn;
 
 /**
@@ -11,7 +12,10 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
-        ScheduleConn.start(Integer.parseInt(args[0]), args[1]);
+        int connNum = Integer.parseInt(args[0]);
+        String server = args[1];
+        ScheduleConn.start(connNum, server);
+        PersistentConn.start(2, server);
         System.in.read();
     }
 

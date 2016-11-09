@@ -9,12 +9,12 @@ CLASSPATH='.'
 for i in /opt/src/app/lib/*.jar; do
    CLASSPATH="$CLASSPATH":"$i"
 done
-  
-JAVA_OPTS=" -server -Xms1024m -Xmx1024m -Xmn1024m -Xss256k
+
+JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:HeapDumpPath=/opt/logs/
 -Djava.awt.headless=true
--XX:MaxPermSize=128m
+-XX:MaxPermSize=512m
 
 -Dcom.sun.management.jmxremote.port=11099
 -Dcom.sun.management.jmxremote.authenticate=false

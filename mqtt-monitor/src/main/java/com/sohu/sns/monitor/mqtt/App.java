@@ -10,7 +10,6 @@ public class App {
     private App() {
     }
 
-    
     public static void main(String[] args) throws Exception {
         ScheduleConn.start(Integer.parseInt(args[0]), args[1]);
         System.in.read();

@@ -92,17 +92,28 @@ public class RedisDataCheckProfessor {
                     redisIpPortMap);
         }
         if(1==type){
-            checkAndSendMsg(begin,masterInfo,currentRecordBucket,redisIpPortMap);
+            checkAndSendMsg(begin,redisVisitFailedList,masterInfo,currentRecordBucket,redisIpPortMap);
         }
     }
     private void checkAndSendMsg(long begin,
+                                 List<String> redisVisitFailedList,
                                  Map<String, RedisInfo> masterInfo,
                                  Map<String, Integer> currentRecordBucket,
                                  Map<String, Map<String, String>> redisIpPortMap)
             throws KeeperException, InterruptedException, IOException {
+        StringBuilder msg = new StringBuilder("");
         String ipPortException = checkIpPort(redisIpPortMap);
-        if(ipPortException==null||ipPortException.contains(NONE)){
-            System.out.println("IP或Port无异常");
+
+        if (!(null == redisVisitFailedList || redisVisitFailedList.isEmpty())) {
+            msg.append("未能成功访问的Redis实例或uid为：");
+            for(String s:redisVisitFailedList){
+                msg.append(" "+s+" ");
+            }
+        }
+        if(!(ipPortException==null||ipPortException.contains(NONE))){
+            msg.append(ipPortException);
+        }
+        if(msg.toString().equals("")){
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
             return;
         }
@@ -110,7 +121,7 @@ public class RedisDataCheckProfessor {
 
         updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket, lastRedisIpPortMap);
         //发送微信
-        MsgUtil.sendWeixin(baseEmailUrl+weixinInterface,sendMsgTo,ipPortException);
+        MsgUtil.sendWeixin(baseEmailUrl+weixinInterface,sendMsgTo,msg.toString());
         System.out.println("sendWeixin_to : "+sendMsgTo);
         System.out.println("execute time : " + (System.currentTimeMillis() - begin));
     }
@@ -253,7 +264,8 @@ public class RedisDataCheckProfessor {
                     redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd));
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.getInfo", null, null, e);
                     e.printStackTrace();
-                }finally {
+                }
+                finally {
                     if(jedis != null) {
                         jedis.close();
                     }
@@ -696,7 +708,6 @@ public class RedisDataCheckProfessor {
             }
             sb.append(email);
         }
-        sb.append("|zhenhaoyu@sohu-inc.com");
         mailTo = sb.toString();
     }
 }

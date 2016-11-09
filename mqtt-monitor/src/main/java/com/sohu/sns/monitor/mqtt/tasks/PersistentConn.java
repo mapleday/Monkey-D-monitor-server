@@ -2,6 +2,8 @@ package com.sohu.sns.monitor.mqtt.tasks;
 
 import com.sohu.sns.monitor.mqtt.client.NettyClient;
 import com.sohu.sns.monitor.mqtt.client.SimpleMqttMessage;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.MqttSubscribeMessage;
 
@@ -26,64 +28,76 @@ public class PersistentConn {
 
     }
 
-    public static void start(final int connNum, final String server) {
-        executorService.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (PersistentConn.class) {
-                    createConns(connNum, server);
+    public static void start(int connNum, String server) {
+        executorService.scheduleAtFixedRate(new ConnMonitor(connNum, server), 1, 30, TimeUnit.SECONDS);
+    }
 
-                    int errorTimes = 0;
-                    for (Iterator<Channel> iterator = conns.iterator(); iterator.hasNext(); ) {
-                        Channel conn = iterator.next();
-                        if (conn.isActive()) {
-                            conn.writeAndFlush(SimpleMqttMessage.createPing());
-                            System.out.println("mqtt 长连接继续可用");
-                        } else {
-                            iterator.remove();
-                            errorTimes++;
-                        }
-                    }
-                    if (errorTimes >0) {
-                        System.out.println("mqtt 长连接异常断开.次数：" + errorTimes);
+    private static class ConnMonitor implements Runnable {
+        private int connNum;
+        private String server;
+
+        public ConnMonitor(int connNum, String server) {
+            this.connNum = connNum;
+            this.server = server;
+        }
+
+        @Override
+        public void run() {
+            synchronized (PersistentConn.class) {
+
+                createConns(connNum, server);
+
+                int errorTimes = 0;
+                for (Iterator<Channel> iterator = conns.iterator(); iterator.hasNext(); ) {
+                    Channel conn = iterator.next();
+                    if (conn.isActive()) {
+                        conn.writeAndFlush(SimpleMqttMessage.createPing());
+                    } else {
+                        iterator.remove();
+                        errorTimes++;
                     }
                 }
+                if (errorTimes > 0) {
+                    System.out.println("mqtt 长连接异常断开.次数：" + errorTimes);
+                }
             }
-        }, 1, 30, TimeUnit.SECONDS);
-    }
+        }
 
-    /**
-     * 创建一个连接
-     *
-     * @param server
-     * @return
-     * @throws InterruptedException
-     */
-    private static Channel createConn(String server) throws InterruptedException {
-        Channel conn = NettyClient.conn(server, MQTT_HEART_INTERVAL);
-        MqttSubscribeMessage subscribe = SimpleMqttMessage.createSubscribe("direct_message", "sns_log_echo", "sns_notification", "sns_task");
-        conn.writeAndFlush(subscribe);
-        conns.add(conn);
-        return conn;
-    }
+        /**
+         * 创建一个连接
+         *
+         * @param server
+         * @return
+         * @throws InterruptedException
+         */
+        private static Channel createConn(String server) throws InterruptedException {
+            Channel conn = NettyClient.conn(server, MQTT_HEART_INTERVAL);
+            MqttSubscribeMessage subscribe = SimpleMqttMessage.createSubscribe("direct_message", "sns_log_echo", "sns_notification", "sns_task");
+            conn.writeAndFlush(subscribe);
+            conns.add(conn);
+            return conn;
+        }
 
-    /**
-     * 创建一组连接
-     *
-     * @param connNum
-     * @param server
-     */
-    private static void createConns(int connNum, String server) {
-        if (conns.size() < connNum) {
-            for (int i = 0; i < connNum - conns.size(); i++) {
-                try {
-                    createConn(server);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        /**
+         * 创建一组连接
+         *
+         * @param connNum
+         * @param server
+         */
+        private static void createConns(int connNum, String server) {
+            if (conns.size() < connNum) {
+                for (int i = 0; i < connNum - conns.size(); i++) {
+                    try {
+                        createConn(server);
+                    } catch (Exception e) {
+                        LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "PersistentConn.createConns", server, "", e);
+                    }
                 }
             }
         }
     }
+
+
 
 
 }

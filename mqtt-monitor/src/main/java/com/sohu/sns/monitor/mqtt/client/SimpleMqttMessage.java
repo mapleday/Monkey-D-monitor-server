@@ -1,6 +1,5 @@
 package com.sohu.sns.monitor.mqtt.client;
 
-import io.netty.channel.Channel;
 import io.netty.handler.codec.mqtt.*;
 
 import java.util.ArrayList;
@@ -12,6 +11,9 @@ import java.util.List;
  */
 public class SimpleMqttMessage {
     private static volatile MqttMessage ping;
+
+    private SimpleMqttMessage() {
+    }
 
     /**
      * 创建ping消息

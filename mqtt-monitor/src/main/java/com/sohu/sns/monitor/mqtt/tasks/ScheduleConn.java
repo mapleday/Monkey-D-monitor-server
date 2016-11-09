@@ -2,11 +2,11 @@ package com.sohu.sns.monitor.mqtt.tasks;
 
 import com.sohu.sns.monitor.mqtt.client.NettyClient;
 import com.sohu.sns.monitor.mqtt.client.SimpleMqttMessage;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.mqtt.*;
+import io.netty.handler.codec.mqtt.MqttSubscribeMessage;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -69,9 +69,11 @@ public class ScheduleConn {
                     if (errorMessages.containsKey(errorMessage)) {
                         Integer integer = errorMessages.get(errorMessage);
                         errorMessages.put(errorMessage, integer + 1);
-                    }else {
-                        errorMessages.put(errorMessage, new Integer(1));
+                    } else {
+                        errorMessages.put(errorMessage, Integer.valueOf(1));
                     }
+
+                    LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "ScheduleConn.MqttMonitor.run", server, "", e);
                 }
                 if (conn != null) {
                     conn.close();

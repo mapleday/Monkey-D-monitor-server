@@ -41,7 +41,7 @@ public class RedisDataCheckProfessor {
     private static String baseEmailUrl = "";
     private static String emailInterface = "";
     private static String mailTo = "";
-    private static String sendMsgTo = "15201017693";
+    private static String sendMsgTo = "15201017693,18910556026";
     private static String weixinInterface = "";
     private static boolean isChanged = false;
     private static String lastCheckTime = "";

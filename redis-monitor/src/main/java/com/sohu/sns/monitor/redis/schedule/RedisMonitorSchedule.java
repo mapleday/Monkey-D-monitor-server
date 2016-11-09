@@ -20,10 +20,18 @@ import java.io.IOException;
  */
 @Component
 public class RedisMonitorSchedule {
-    private  static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
+    private static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
 
-    @Scheduled(fixedRate = 360000L)
+    private static boolean firstMail = true;
+    private static boolean firstMsg = true;
+
+    @Scheduled(fixedRate = 60000L)
     public void checkRedisAndSendMail(){
+        if(firstMail){
+            firstMail = false;
+            System.out.println("监控启动---");
+            return;
+        }
         try {
             professor.handle(0);
         } catch (Exception e) {
@@ -34,6 +42,10 @@ public class RedisMonitorSchedule {
 
     @Scheduled(fixedRate = 60000L)
     public void checkRedisAndSendWeixin(){
+        if(firstMsg){
+            firstMsg = false;
+            return;
+        }
         try {
             professor.handle(1);
         } catch (Exception e) {

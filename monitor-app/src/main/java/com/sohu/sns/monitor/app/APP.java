@@ -22,6 +22,7 @@ public class APP {
             ZkUtils.initZkConfig(args[0]);
             context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml", "/httpMonitorContext.xml");
             MqttMonitorApp.start("cc.sns.sohusce.com:80");
+            MqttMonitorApp.start("61.135.133.153:80");
             System.in.read();
         } catch (Exception e) {
             e.printStackTrace();

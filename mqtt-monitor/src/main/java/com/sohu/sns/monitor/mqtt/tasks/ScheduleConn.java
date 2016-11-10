@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * author:jy
@@ -20,6 +21,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class ScheduleConn {
     private static final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(2);
+    private static AtomicLong monitorTimes = new AtomicLong();
+    private static AtomicLong errorTimes = new AtomicLong();
 
     private ScheduleConn() {
 
@@ -61,10 +64,12 @@ public class ScheduleConn {
             for (int i = 0; i < connNums; i++) {
                 Channel conn = null;
                 try {
+                    monitorTimes.incrementAndGet();
                     conn = NettyClient.conn(server, 180);
                     MqttSubscribeMessage subscribe = SimpleMqttMessage.createSubscribe("direct_message", "sns_log_echo", "sns_notification", "sns_task");
                     conn.writeAndFlush(subscribe);
                 } catch (Exception e) {
+                    errorTimes.incrementAndGet();
                     isConnAvalable = false;
                     String errorMessage = e.getMessage();
                     if (errorMessages.containsKey(errorMessage)) {
@@ -82,8 +87,9 @@ public class ScheduleConn {
             }
 
             if (!isConnAvalable) {
-                String message = "mqtt 连接建立异常报警：" + errorMessages.toString();
-                NotifyUtils.sendWeixin("18910556026",message);
+                String message = "mqtt 连接建立异常报警，次数：" + errorTimes.get() + "/" + monitorTimes.get()
+                        + " 原因：" + errorMessages.toString();
+                NotifyUtils.sendWeixin("18910556026", message);
             }
 
         }

@@ -3,6 +3,7 @@ package com.sohu.sns.monitor.redis.schedule;
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
 import com.sohu.sns.monitor.redis.util.MysqlClusterServiceUtils;
+import com.sohu.sns.monitor.redis.util.ZkLockUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by yzh on 2016/11/3.
@@ -25,14 +27,17 @@ public class RedisMonitorSchedule {
     private static boolean firstMail = true;
     private static boolean firstMsg = true;
 
-    @Scheduled(fixedRate = 360000L)
-    public void checkRedisAndSendMail(){
+    //@Scheduled(fixedRate = 3600000L)
+    @Scheduled(fixedRate = 60000L)
+    public void checkRedisAndSendMail() {
         if(firstMail){
             firstMail = false;
-            System.out.println("监控启动---");
+            System.out.println("redis监控启动---");
             return;
         }
         try {
+            System.out.println();
+            System.out.println("准备发邮件...");
             professor.handle(0);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", null, null, e);

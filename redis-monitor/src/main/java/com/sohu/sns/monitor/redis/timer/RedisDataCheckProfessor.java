@@ -654,7 +654,7 @@ public class RedisDataCheckProfessor {
         String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
         String redisConfig = new String(zk.getData(ZkPathConfig.REDIS_CHECK_CONFIG));
         zk.close();
-
+        System.out.println("Get redis cluster config");
         swapData = ZipUtils.gunzip(swapData);
         String[] array = swapData.split(SEP);
         if(5 != array.length) {
@@ -684,7 +684,7 @@ public class RedisDataCheckProfessor {
         }
         Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
         REDIS_CHECK_URL = (String) map.get("check_url");
-        //System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
+        System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
         return (Map<String, Map<String, String>>) map.get("redis_config");
     }
     public static void initEnv(String monitorUrls, String errorLogConfig, String swap, ZkUtils zkUtils) throws KeeperException, InterruptedException {
@@ -702,12 +702,13 @@ public class RedisDataCheckProfessor {
         weixinInterface = urls.get("send_sms_interface");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
-        for (String email : emails) {
-            if (sb.length() != 0) {
-                sb.append("|");
-            }
-            sb.append(email);
-        }
+//        for (String email : emails) {
+//            if (sb.length() != 0) {
+//                sb.append("|");
+//            }
+//            sb.append(email);
+//        }
+        sb.append("zhenhaoyu@sohu-inc.com");
         mailTo = sb.toString();
     }
 }

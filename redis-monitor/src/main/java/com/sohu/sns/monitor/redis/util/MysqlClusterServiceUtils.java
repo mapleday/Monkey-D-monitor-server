@@ -27,7 +27,7 @@ public class MysqlClusterServiceUtils {
             System.out.println("MysqlClusterServiceUtils 初始化");
             MysqlClusterConfig config = new MySqlDBConfig();
             mysqlClusterService =new MysqlClusterServiceImpl(config, ClusterChangedPostProcessor.NOTHING_PROCESSOR);
-            System.out.println("MysqlClusterServiceUtils 初始化");
+            System.out.println("MysqlClusterServiceUtils 初始化完成");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.UTIL, "MysqlClusterServiceUtils.init", null, null, e);
 

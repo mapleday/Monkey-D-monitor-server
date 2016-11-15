@@ -648,6 +648,7 @@ public class RedisDataCheckProfessor {
      * @return Map<String, Map<String, String>>
      */
     public static Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
+        System.out.println("getRedisClusterConfig---get zk");
         ZkUtils zk = new ZkUtils();
         zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);

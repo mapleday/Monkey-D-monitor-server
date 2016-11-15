@@ -17,6 +17,7 @@ public class ZkInit {
     private void init(){
 
         try {
+            System.out.println("ZkInit 初始化");
             ZkUtils zk = new ZkUtils();
 
             zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
@@ -35,6 +36,7 @@ public class ZkInit {
             MysqlClusterServiceUtils.init();
 
             zk.close();
+            System.out.println("ZkInit 初始化完成");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "ZkInit.init", null, null, e);
         }

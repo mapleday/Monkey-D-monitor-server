@@ -1,6 +1,7 @@
 package com.sohu.sns.monitor.app;
 
 import com.sohu.sns.monitor.mqtt.MqttMonitorApp;
+import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -20,6 +21,7 @@ public class APP {
         try {
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
+            SnsDiamonds.setDiamondsEnvBySystem();
             context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml", "/httpMonitorContext.xml");
             MqttMonitorApp.start("192.168.93.11:80");
             MqttMonitorApp.start("cc.sns.sohusce.com:80");

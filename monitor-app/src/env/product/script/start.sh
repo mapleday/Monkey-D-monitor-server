@@ -21,7 +21,8 @@ JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
 -Dcom.sun.management.jmxremote.ssl=false
 -Dcom.sun.management.jmxremote.password=false
 -Dcom.sun.management.jmxremote
--Dfile.encoding=UTF-8"
+-Dfile.encoding=UTF-8
+-Denv=TEST"
 
 JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=$USER_DIR/app/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $PORT"
 echo $JAVA_CMD

@@ -27,6 +27,6 @@ JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
 -Dmonitor_agent_app_id=$AGENT_APP_ID
 -Denv=TEST"
 
-JAVA_CMD="$JAVA_HOME/bin/java $MONITOR_OPTS $JAVA_OPTS -Dlogback.configurationFile=$USER_DIR/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $APPID"
+JAVA_CMD="$JAVA_HOME/bin/java $MONITOR_OPTS $JAVA_OPTS -Dlogback.configurationFile=$USER_DIR/app/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $APPID"
 echo $JAVA_CMD
 $JAVA_CMD

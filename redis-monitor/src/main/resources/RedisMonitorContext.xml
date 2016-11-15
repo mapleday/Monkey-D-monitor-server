@@ -21,4 +21,5 @@
     <bean id="readDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"/>
     <bean id="writeDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"/>
     <bean class="com.sohu.sns.monitor.redis.schedule.ZkInit"/>
+    <bean class="com.sohu.sns.monitor.redis.schedule.RedisMonitorSchedule"/>
 </beans>

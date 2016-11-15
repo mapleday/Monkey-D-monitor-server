@@ -22,6 +22,7 @@ public class APP {
     }
 
     public static void main(String[] args) throws IOException {
+        ClassPathXmlApplicationContext context = null;
         try {
             if (args.length >= 2) {
                 sysout(args[1]);
@@ -29,16 +30,24 @@ public class APP {
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
             SnsDiamonds.setDiamondsEnvBySystem();
-            new ClassPathXmlApplicationContext("applicationContext.xml");
+            context = new ClassPathXmlApplicationContext("applicationContext.xml");
             MqttMonitorApp.start("192.168.93.11:80");
             MqttMonitorApp.start("cc.sns.sohusce.com:80");
+            System.out.println("start ok !!!!!!");
+            System.in.read();
+            System.out.println("in !!!!!!");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "Monitor-app.app.main", null, null, e);
+        } finally {
+            System.out.println("finally !!!!!!");
+            if (context != null) {
+                context.close();
+            }
         }
     }
 
     private static void sysout(String appId) throws IOException {
-        String logDir = System.getProperty("logdir", "/opt/logs");
+        String logDir = System.getProperty("logdir", "/opt/logs/");
         String out = logDir + "/stdout_" + appId + ".log";
         String err = logDir + "/stderr_" + appId + ".log";
         System.setOut(new PrintStream(new CustomRolloverFileOutputStream(out, true, 31, TimeZone.getDefault(), "yyyy-MM-dd", null), false, "utf-8"));

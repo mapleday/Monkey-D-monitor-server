@@ -31,7 +31,7 @@ public class RedisMonitorSchedule {
     public void checkRedisAndSendMail() {
         if(firstMail){
             firstMail = false;
-            System.out.println("redis监控启动---");
+            System.out.println("checkRedisAndSendMail---");
             return;
         }
         try {
@@ -45,10 +45,12 @@ public class RedisMonitorSchedule {
     @Scheduled(fixedRate = 60000L)
     public void checkRedisAndSendWeixin(){
         if(firstMsg){
+            System.out.println("checkRedisAndSendWeixin---");
             firstMsg = false;
             return;
         }
         try {
+            System.out.println("\n 准备发微信...");
             professor.handle(1);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", null, null, e);

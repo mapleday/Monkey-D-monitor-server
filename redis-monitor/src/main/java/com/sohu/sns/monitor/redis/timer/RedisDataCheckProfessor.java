@@ -123,7 +123,7 @@ public class RedisDataCheckProfessor {
         //发送微信
         MsgUtil.sendWeixin(baseEmailUrl+weixinInterface,sendMsgTo,msg.toString());
         System.out.println("sendWeixin_to : "+sendMsgTo);
-        System.out.println("execute time : " + (System.currentTimeMillis() - begin));
+        System.out.println("checkAndSendMsg execute time : " + (System.currentTimeMillis() - begin));
     }
     private void checkAndSendMail(long begin,
                                   List<String> redisVisitFailedList,
@@ -178,7 +178,7 @@ public class RedisDataCheckProfessor {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkAndSendMail", null, null, e);
             e.printStackTrace();
         }
-        System.out.println("execute time : " + (System.currentTimeMillis() - begin));
+        System.out.println("checkAndSendMail execute time : " + (System.currentTimeMillis() - begin));
     }
 
 

@@ -24,9 +24,7 @@ public class ZkInit {
 
             /**监控各种urls**/
             String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
-            System.out.println(monitorUrls);
-            System.out.println(monitorUrls);
-            System.out.println(monitorUrls);
+
             /**获取发送错误信息的配置**/
             String errorLogConfig = new String(zk.getData(ZkPathConfig.ERROR_LOG_CONFIG));
 

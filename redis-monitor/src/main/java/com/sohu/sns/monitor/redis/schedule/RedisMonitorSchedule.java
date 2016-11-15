@@ -24,7 +24,7 @@ import java.util.List;
 public class RedisMonitorSchedule {
     private static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
 
-    @Scheduled(fixedRate = 3600000L, fixedDelay = 3600000L)
+    @Scheduled(fixedRate = 3600000L, initialDelay = 3600000L)
     public void checkRedisAndSendMail() {
         try {
             System.out.println("\n 准备发邮件...");
@@ -35,7 +35,7 @@ public class RedisMonitorSchedule {
         }
     }
 
-    @Scheduled(fixedRate = 60000L, fixedDelay = 60000L)
+    @Scheduled(fixedRate = 60000L, initialDelay = 60000L)
     public void checkRedisAndSendWeixin() {
         try {
             System.out.println("\n 准备发微信...");

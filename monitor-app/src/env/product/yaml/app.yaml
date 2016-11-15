@@ -1,10 +1,5 @@
 appid: 187034800
 start: sh /opt/src/bin/start.sh
-tryRestart: 
+tryRestart:
     enable: false
-webHealth: true
-webHealthConf: 
-    path: /health
-    timeout: 2000ms
-    success: [200,201,403,301,302]
 tcpHealth: false

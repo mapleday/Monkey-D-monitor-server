@@ -24,6 +24,6 @@ JAVA_OPTS=" -server -Xms6114m -Xmx6114m -Xmn2200m -Xss256k
 -Dfile.encoding=UTF-8
 -Denv=TEST"
 
-JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=$USER_DIR/app/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $PORT"
+JAVA_CMD="$JAVA_HOME/bin/java $JAVA_OPTS -Dlogback.configurationFile=$USER_DIR/app/config/logback.xml -classpath $CLASSPATH $APP_MAINCLASS $ZK_CONF $APPID"
 echo $JAVA_CMD
 $JAVA_CMD

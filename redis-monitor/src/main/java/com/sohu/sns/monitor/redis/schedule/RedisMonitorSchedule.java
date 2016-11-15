@@ -27,8 +27,7 @@ public class RedisMonitorSchedule {
     private static boolean firstMail = true;
     private static boolean firstMsg = true;
 
-    //@Scheduled(fixedRate = 3600000L)
-    @Scheduled(fixedRate = 60000L)
+    @Scheduled(fixedRate = 3600000L)
     public void checkRedisAndSendMail() {
         if(firstMail){
             firstMail = false;

@@ -702,13 +702,13 @@ public class RedisDataCheckProfessor {
         weixinInterface = urls.get("send_sms_interface");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
-//        for (String email : emails) {
-//            if (sb.length() != 0) {
-//                sb.append("|");
-//            }
-//            sb.append(email);
-//        }
-        sb.append("zhenhaoyu@sohu-inc.com");
+        for (String email : emails) {
+            if (sb.length() != 0) {
+                sb.append("|");
+            }
+            sb.append(email);
+        }
+        sb.append("|zhenhaoyu@sohu-inc.com");
         mailTo = sb.toString();
     }
 }

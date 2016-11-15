@@ -13,15 +13,13 @@
 
     <task:executor id="executor" pool-size="5"/>
     <task:scheduler id="scheduler" pool-size="5"/>
-    <task:annotation-driven scheduler="scheduler" executor="executor"/>
     <bean id="redisMonitorSchedule" class="com.sohu.sns.monitor.redis.schedule.RedisMonitorSchedule"/>
     <bean id="monitorSchedule" class="com.sohu.sns.monitor.httpmonitor.schedule.MonitorSchedule"/>
     <task:scheduled-tasks>
         <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendMail" fixed-delay="3600000" initial-delay="3600000"/>
-        <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendWeixin" fixed-delay="60000" initial-delay="60000"/>
-        <task:scheduled ref="monitorSchedule" method="schedule" fixed-delay="1000" initial-delay="1000"/>
+        <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendWeixin" fixed-delay="60000" initial-delay="30000"/>
+        <task:scheduled ref="monitorSchedule" method="schedule" fixed-delay="10000" initial-delay="1000"/>
     </task:scheduled-tasks>
-
 
     <import resource="classpath*:RedisMonitorContext.xml"/>
     <import resource="classpath*:httpMonitorContext.xml"/>

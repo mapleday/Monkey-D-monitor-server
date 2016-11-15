@@ -3,15 +3,17 @@ package com.sohu.sns.monitor.redis.schedule;
 import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
  * Created by yzh on 2016/11/3.
  */
-@Component("redisMonitorSchedule")
+@Component
 public class RedisMonitorSchedule {
-    private static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
+    @Autowired
+    private RedisDataCheckProfessor professor;
 
     @Scheduled(fixedRate = 3600000L, initialDelay = 3600000L)
     public void checkRedisAndSendMail() {

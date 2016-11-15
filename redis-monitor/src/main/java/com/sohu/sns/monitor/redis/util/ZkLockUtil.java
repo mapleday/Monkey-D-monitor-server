@@ -17,7 +17,7 @@ import java.util.List;
  * Created by yzh on 2016/11/10.
  */
 public class ZkLockUtil {
-   /* private String selfPath;
+    private String selfPath;
     private String waitPath;
 
     //private final static long DELAY_TIME = 3540000L;
@@ -70,6 +70,4 @@ public class ZkLockUtil {
         }
 
     }
-
-*/
 }

@@ -105,13 +105,13 @@ public class RedisDataCheckProfessor {
         String ipPortException = checkIpPort(redisIpPortMap);
 
         if (!(null == redisVisitFailedList || redisVisitFailedList.isEmpty())) {
-            msg.append("未能成功访问的Redis实例或uid为：");
+            msg.append(DateUtil.getDateHMS()+" 未能成功访问的Redis实例或uid为：");
             for(String s:redisVisitFailedList){
                 msg.append(" "+s+" ");
             }
         }
         if(!(ipPortException==null||ipPortException.contains(NONE))){
-            msg.append(ipPortException);
+            msg.append(DateUtil.getDateHMS()+" "+ipPortException);
         }
         if(msg.toString().equals("")){
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
@@ -173,7 +173,7 @@ public class RedisDataCheckProfessor {
         updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket, lastRedisIpPortMap);
         try {
             HttpClientUtil.getStringByPost(baseEmailUrl + emailInterface, map, null);
-            System.out.println("mail_to : " + mailTo);
+            System.out.println("\n mail_to : " + mailTo);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkAndSendMail", null, null, e);
             e.printStackTrace();
@@ -684,7 +684,7 @@ public class RedisDataCheckProfessor {
         }
         Map<String, Object> map = jsonMapper.fromJson(redisConfig, HashMap.class);
         REDIS_CHECK_URL = (String) map.get("check_url");
-        System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed : " + redisConfig);
+        System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed. ");
         return (Map<String, Map<String, String>>) map.get("redis_config");
     }
     public static void initEnv(String monitorUrls, String errorLogConfig, String swap, ZkUtils zkUtils) throws KeeperException, InterruptedException {

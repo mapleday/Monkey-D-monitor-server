@@ -168,6 +168,14 @@ public class DateUtil {
     }
 
     /**
+     * 得到当前时分秒
+     * @return
+     */
+    public static String getDateHMS() {
+        return new SimpleDateFormat("HH:mm:ss").format(new Date());
+    }
+
+    /**
      * 获取当前时间的上一个小时的开始时间和结束时间
      * @param flag 0：上个小时的开始时间， 1：上个小时的结束时间
      * @return

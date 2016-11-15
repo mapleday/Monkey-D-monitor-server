@@ -26,4 +26,8 @@ public class ZkPathConfig {
     public static String ERROR_LOG_CONFIG = ZK_ROOT + "/sns_monitor/errorlog_email_config";
 
     public static String REDIS_CHECK_SWAP = ZK_ROOT + "/sns_monitor/redis_check_swap";
+
+    public static String LAST_TIME = ZK_ROOT + "/sns_monitor/last_time";
+
+    public static String LAST_TIME_SUB = ZK_ROOT + "/sns_monitor/last_time/sub";
 }

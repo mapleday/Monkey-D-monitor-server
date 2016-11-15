@@ -22,7 +22,6 @@ public class RedisMonitorServer {
             System.in.read();
         }catch (Exception e){
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);
-            e.printStackTrace();
         }
         finally {
             if (context != null) {

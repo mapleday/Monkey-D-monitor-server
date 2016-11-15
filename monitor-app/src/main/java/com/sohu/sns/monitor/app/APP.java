@@ -1,6 +1,8 @@
 package com.sohu.sns.monitor.app;
 
 import com.sohu.sns.monitor.mqtt.MqttMonitorApp;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,7 +29,7 @@ public class APP {
             MqttMonitorApp.start("cc.sns.sohusce.com:80");
             System.in.read();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "Monitor-app.app.main", null, null, e);
         } finally {
             if (context != null) {
                 context.close();

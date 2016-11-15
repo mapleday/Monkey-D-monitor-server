@@ -36,12 +36,10 @@ public class RedisMonitorSchedule {
             return;
         }
         try {
-            System.out.println();
-            System.out.println("准备发邮件...");
+            System.out.println("\n 准备发邮件...");
             professor.handle(0);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", null, null, e);
-            e.printStackTrace();
         }
     }
 
@@ -55,7 +53,6 @@ public class RedisMonitorSchedule {
             professor.handle(1);
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", null, null, e);
-            e.printStackTrace();
         }
     }
 

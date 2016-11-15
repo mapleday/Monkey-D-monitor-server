@@ -21,11 +21,12 @@ public class ZkInit {
 
             zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                     ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
-            SnsDiamonds.setDiamondsEnvBySystem();
 
             /**监控各种urls**/
             String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
-
+            System.out.println(monitorUrls);
+            System.out.println(monitorUrls);
+            System.out.println(monitorUrls);
             /**获取发送错误信息的配置**/
             String errorLogConfig = new String(zk.getData(ZkPathConfig.ERROR_LOG_CONFIG));
 
@@ -37,8 +38,7 @@ public class ZkInit {
 
             zk.close();
         } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "MsgUtil.sendWeiXin", null, null, e);
-            e.printStackTrace();
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "ZkInit.init", null, null, e);
         }
     }
 

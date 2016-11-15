@@ -34,22 +34,15 @@ public class MysqlClusterServiceUtils {
     }
 
     public static JdbcTemplate getWriteJdbcTemplate() throws MysqlClusterException {
-
         return mysqlClusterService.getWriteJdbcTemplate("");
     }
 
 
     public static JdbcTemplate getReadJdbcTemplate() throws MysqlClusterException {
-
         return mysqlClusterService.getReadJdbcTemplate("");
     }
 
     public static void main(String args[]) {
-
         MysqlClusterServiceUtils.init();
-
-
     }
-
-
 }

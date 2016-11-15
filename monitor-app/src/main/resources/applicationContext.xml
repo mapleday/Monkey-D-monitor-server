@@ -11,13 +11,14 @@
     <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"/>
     <context:component-scan base-package="com.sohu.sns.monitor"/>
 
-    <task:executor id="executor" pool-size="5"/>
-    <task:scheduler id="scheduler" pool-size="5"/>
+    <task:scheduler id="scheduler" pool-size="16"/>
     <bean id="redisMonitorSchedule" class="com.sohu.sns.monitor.redis.schedule.RedisMonitorSchedule"/>
     <bean id="monitorSchedule" class="com.sohu.sns.monitor.httpmonitor.schedule.MonitorSchedule"/>
-    <task:scheduled-tasks>
-        <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendMail" fixed-delay="3600000" initial-delay="3600000"/>
-        <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendWeixin" fixed-delay="60000" initial-delay="30000"/>
+    <task:scheduled-tasks scheduler="scheduler">
+        <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendMail" fixed-delay="3600000"
+                        initial-delay="3600000"/>
+        <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendWeixin" fixed-delay="60000"
+                        initial-delay="30000"/>
         <task:scheduled ref="monitorSchedule" method="schedule" fixed-delay="10000" initial-delay="1000"/>
     </task:scheduled-tasks>
 

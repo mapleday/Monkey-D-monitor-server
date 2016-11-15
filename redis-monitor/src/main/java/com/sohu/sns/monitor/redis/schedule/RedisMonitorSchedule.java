@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created by yzh on 2016/11/3.
  */
-@Component
+@Component("redisMonitorSchedule")
 public class RedisMonitorSchedule {
     private static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
 

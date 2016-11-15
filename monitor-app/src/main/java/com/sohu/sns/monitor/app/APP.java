@@ -24,13 +24,13 @@ public class APP {
     public static void main(String[] args) throws IOException {
         ClassPathXmlApplicationContext context = null;
         try {
-            if (args.length >= 2){
+            if (args.length >= 2) {
                 sysout(args[1]);
             }
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
             SnsDiamonds.setDiamondsEnvBySystem();
-            context = new ClassPathXmlApplicationContext("classpath*:RedisMonitorContext.xml", "classpath*:httpMonitorContext.xml");
+            context = new ClassPathXmlApplicationContext("applicationContext.xml");
             MqttMonitorApp.start("192.168.93.11:80");
             MqttMonitorApp.start("cc.sns.sohusce.com:80");
             System.in.read();

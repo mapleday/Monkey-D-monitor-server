@@ -24,34 +24,23 @@ import java.util.List;
 public class RedisMonitorSchedule {
     private static RedisDataCheckProfessor professor = new RedisDataCheckProfessor();
 
-    private static boolean firstMail = true;
-    private static boolean firstMsg = true;
-
-    @Scheduled(fixedRate = 3600000L)
+    @Scheduled(fixedRate = 3600000L, fixedDelay = 3600000L)
     public void checkRedisAndSendMail() {
-        if(firstMail){
-            firstMail = false;
-            System.out.println("checkRedisAndSendMail---");
-            return;
-        }
         try {
             System.out.println("\n 准备发邮件...");
             professor.handle(0);
+            System.out.println("\n 发邮件完成...");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", null, null, e);
         }
     }
 
-    @Scheduled(fixedRate = 60000L)
-    public void checkRedisAndSendWeixin(){
-        if(firstMsg){
-            System.out.println("checkRedisAndSendWeixin---");
-            firstMsg = false;
-            return;
-        }
+    @Scheduled(fixedRate = 60000L, fixedDelay = 60000L)
+    public void checkRedisAndSendWeixin() {
         try {
             System.out.println("\n 准备发微信...");
             professor.handle(1);
+            System.out.println("\n 发微信完成...");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", null, null, e);
         }

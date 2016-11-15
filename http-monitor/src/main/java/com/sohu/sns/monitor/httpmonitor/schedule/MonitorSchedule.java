@@ -39,7 +39,7 @@ public class MonitorSchedule {
      *
      * @throws IOException
      */
-    @Scheduled(fixedRate = 1000l)
+    @Scheduled(fixedDelay = 1000l)
     public void schedule() throws IOException {
         final List<HttpResource> resources = httpResourceDAO.getResources();
         if (resources == null || resources.isEmpty()) {

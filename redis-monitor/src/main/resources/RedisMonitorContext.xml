@@ -11,7 +11,6 @@
        http://www.springframework.org/schema/task/spring-task.xsd">
 
     <context:component-scan base-package="com.sohu.sns.monitor.redis"/>
-    <task:annotation-driven/>
 
     <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"/>
     <bean id="transactionManager_0" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

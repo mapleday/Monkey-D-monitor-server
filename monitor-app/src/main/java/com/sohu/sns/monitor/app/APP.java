@@ -11,6 +11,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.TimeZone;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * author:jy
@@ -36,6 +37,9 @@ public class APP {
             System.out.println("start ok !!!!!!");
             System.in.read();
             System.out.println("in !!!!!!");
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+            countDownLatch.await();
+            System.out.println("countDownLatch !!!!!!");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "Monitor-app.app.main", null, null, e);
         } finally {

@@ -30,7 +30,7 @@ public class APP {
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
             SnsDiamonds.setDiamondsEnvBySystem();
-            context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml", "/httpMonitorContext.xml");
+            context = new ClassPathXmlApplicationContext("classpath*:RedisMonitorContext.xml", "classpath*:httpMonitorContext.xml");
             MqttMonitorApp.start("192.168.93.11:80");
             MqttMonitorApp.start("cc.sns.sohusce.com:80");
             System.in.read();

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Created by yzh on 2016/11/3.
+ * redis监控
  */
 @Component
 public class RedisMonitorSchedule {
@@ -18,9 +19,9 @@ public class RedisMonitorSchedule {
     @Scheduled(fixedRate = 3600000L, initialDelay = 3600000L)
     public void checkRedisAndSendMail() {
         try {
-            System.out.println("\n 准备发邮件...");
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "准备发邮件...", "");
             professor.handle(0);
-            System.out.println("\n 发邮件完成...");
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "发邮件完成...", "");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", null, null, e);
         }
@@ -29,9 +30,9 @@ public class RedisMonitorSchedule {
     @Scheduled(fixedRate = 60000L, initialDelay = 60000L)
     public void checkRedisAndSendWeixin() {
         try {
-            System.out.println("\n 准备发微信...");
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", "准备发微信...", "");
             professor.handle(1);
-            System.out.println("\n 发微信完成...");
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", "发微信完成...", "");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", null, null, e);
         }

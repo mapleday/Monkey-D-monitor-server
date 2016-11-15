@@ -4,6 +4,8 @@ import com.sohu.sns.monitor.httpmonitor.HttpMonitor;
 import com.sohu.sns.monitor.httpmonitor.MonitorResult;
 import com.sohu.sns.monitor.httpmonitor.dao.httpResource.HttpResourceDAO;
 import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
+import com.sohu.snscommon.utils.LOGGER;
+import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -29,8 +31,8 @@ public class MonitorSchedule {
     @Autowired
     HttpMonitor monitor;
 
-    public static ConcurrentHashMap<Integer, Long> taskSchedules = new ConcurrentHashMap();//任务调度
-    public static ConcurrentHashMap<Integer, HttpResource> tasks = new ConcurrentHashMap();//所有任务
+    private static ConcurrentHashMap<Integer, Long> taskSchedules = new ConcurrentHashMap();//任务调度
+    private static ConcurrentHashMap<Integer, HttpResource> tasks = new ConcurrentHashMap();//所有任务
 
     private static final ExecutorService monitorExecutorService = Executors.newFixedThreadPool(16);//监控执行线程池
 
@@ -41,6 +43,7 @@ public class MonitorSchedule {
      */
     @Scheduled(fixedDelay = 1000l)
     public void schedule() throws IOException {
+        LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "MonitorSchedule.schedule", "monitor", "");
         final List<HttpResource> resources = httpResourceDAO.getResources();
         if (resources == null || resources.isEmpty()) {
             return;

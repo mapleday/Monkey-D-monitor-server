@@ -2,11 +2,9 @@ package com.sohu.sns.monitor.redis.schedule;
 
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
-import com.sohu.sns.monitor.redis.util.MysqlClusterServiceUtils;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
-import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 
 /**

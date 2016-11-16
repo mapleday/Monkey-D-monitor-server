@@ -9,6 +9,7 @@
 
 
     <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"/>
+    <import resource="classpath*:mysqlConfig.xml"/>
     <context:component-scan base-package="com.sohu.sns.monitor"/>
 
     <task:scheduler id="schedulerRedis" pool-size="8"/>

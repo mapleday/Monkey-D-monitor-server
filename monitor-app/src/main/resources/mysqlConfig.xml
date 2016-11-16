@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="transactionManager_0" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="writeDataSource_0" />
+        <qualifier value="write" />
+    </bean>
+    <bean id="readDataSource_0" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"/>
+    <bean id="writeDataSource_0"  class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close"/>
+
+    <bean id="mySqlDBConfig" class="com.sohu.sns.monitor.httpmonitor.config.MySqlDBConfig"/>
+    <bean id="mysqlClusterServiceImpl" class="com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl">
+        <constructor-arg ref="mySqlDBConfig"/>
+        <constructor-arg>
+            <null/>
+        </constructor-arg>
+    </bean>
+</beans>

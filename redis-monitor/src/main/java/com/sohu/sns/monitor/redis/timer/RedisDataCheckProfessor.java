@@ -11,6 +11,7 @@ import com.sohu.sns.monitor.redis.model.RedisInfo;
 import com.sohu.sns.monitor.redis.model.RedisIns;
 import com.sohu.sns.monitor.redis.util.*;
 
+import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -18,6 +19,7 @@ import com.sohu.snscommon.utils.http.HttpClientUtil;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.KeeperException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
@@ -55,6 +57,8 @@ public class RedisDataCheckProfessor {
             "values (?, ?, ?, now())";
     private static final String UPDATE_DAY_RECORD = "update meta_redis_used_memory_day set used_memory = ?, update_time = now() where log_day = ?";
 
+    @Autowired
+    private MysqlClusterService mysqlClusterService;
     /**
      * 检测异常
      * type==0 发送邮件 检测间隔一小时
@@ -617,8 +621,8 @@ public class RedisDataCheckProfessor {
         long usedMemory = 0L;
         String currentDay = DateUtil.getCurrentDate();
         String lastDay = DateUtil.getLastDay();
-        JdbcTemplate readJdbcTemplate = MysqlClusterServiceUtils.getReadJdbcTemplate();
-        JdbcTemplate writeJdbcTemplate = MysqlClusterServiceUtils.getWriteJdbcTemplate();
+        JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate("");
+        JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate("");
 
         Set<String> uids = map.keySet();
         for(String uid : uids) {

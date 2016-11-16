@@ -24,6 +24,9 @@ public class MysqlClusterServiceUtils {
 
     public static void init() {
         try {
+            if(mysqlClusterService!=null){
+                return;
+            }
             System.out.println("MysqlClusterServiceUtils 初始化");
             MysqlClusterConfig config = new MySqlDBConfig();
             mysqlClusterService =new MysqlClusterServiceImpl(config, ClusterChangedPostProcessor.NOTHING_PROCESSOR);

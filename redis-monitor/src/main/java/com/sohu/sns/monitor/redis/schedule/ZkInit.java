@@ -33,8 +33,6 @@ public class ZkInit {
             String swapData = new String(zk.getData(ZkPathConfig.REDIS_CHECK_SWAP));
             RedisDataCheckProfessor.initEnv(monitorUrls, errorLogConfig, swapData, zk);
 
-            MysqlClusterServiceUtils.init();
-
             zk.close();
             System.out.println("ZkInit 初始化完成");
         } catch (Exception e) {

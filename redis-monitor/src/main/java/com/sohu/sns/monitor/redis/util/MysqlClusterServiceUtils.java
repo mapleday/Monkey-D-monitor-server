@@ -30,8 +30,6 @@ public class MysqlClusterServiceUtils {
             System.out.println("MysqlClusterServiceUtils 初始化完成");
         } catch (Exception e) {
             LOGGER.errorLog(ModuleEnum.UTIL, "MysqlClusterServiceUtils.init", null, null, e);
-
-            e.printStackTrace();
         }
     }
 

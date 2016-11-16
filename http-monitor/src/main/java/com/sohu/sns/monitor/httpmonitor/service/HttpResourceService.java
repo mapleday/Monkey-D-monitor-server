@@ -1,10 +1,11 @@
 package com.sohu.sns.monitor.httpmonitor.service;
 
 import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
-import com.sohu.sns.monitor.httpmonitor.util.MysqlClusterServiceUtils;
+import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedBeanPropertyRowMapper;
@@ -28,11 +29,13 @@ public class HttpResourceService {
             "          t_monitor_http_resource t" +
             "        WHERE" +
             "          t.status=1";
+    @Autowired
+    private MysqlClusterService mysqlClusterService;
 
     public List<HttpResource> getResources(){
         List<HttpResource> list = null;
         try {
-            JdbcTemplate readTemplate= MysqlClusterServiceUtils.getReadJdbcTemplate();
+            JdbcTemplate readTemplate= mysqlClusterService.getReadJdbcTemplate("");
             RowMapper<HttpResource> rm = ParameterizedBeanPropertyRowMapper.newInstance(HttpResource.class);
             list = readTemplate.query(QUERY_RESOURCES,rm);
             System.out.println(list);

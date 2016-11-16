@@ -1,14 +1,8 @@
 package com.sohu.sns.monitor.httpmonitor;
 
-import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
-import com.sohu.sns.monitor.httpmonitor.service.HttpResourceService;
-import com.sohu.sns.monitor.httpmonitor.util.MysqlClusterServiceUtils;
-import com.sohu.snscommon.utils.exception.SnsConfigException;
 import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.util.List;
 
 /**
  * Created by yzh on 2016/11/15.

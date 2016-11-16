@@ -38,7 +38,7 @@ public class HttpResourceService {
             JdbcTemplate readTemplate= mysqlClusterService.getReadJdbcTemplate("");
             RowMapper<HttpResource> rm = ParameterizedBeanPropertyRowMapper.newInstance(HttpResource.class);
             list = readTemplate.query(QUERY_RESOURCES,rm);
-            System.out.println(list);
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE,"HttpResourceService.getResources","Got HttpResource...", "");
         } catch (MysqlClusterException e) {
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "HttpResourceService.getResources", null, null, e);
         }

@@ -4,6 +4,7 @@ import com.sohu.sns.monitor.httpmonitor.HttpMonitor;
 import com.sohu.sns.monitor.httpmonitor.MonitorResult;
 import com.sohu.sns.monitor.httpmonitor.dao.httpResource.HttpResourceDAO;
 import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
+import com.sohu.sns.monitor.httpmonitor.service.HttpResourceService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ import java.util.concurrent.Executors;
 @Component
 public class MonitorSchedule {
     @Autowired
-    HttpResourceDAO httpResourceDAO;
+    HttpResourceService httpResourceService;
     @Autowired
     HttpMonitor monitor;
 
@@ -44,7 +45,7 @@ public class MonitorSchedule {
     @Scheduled(fixedDelay = 1000l)
     public void schedule() throws IOException {
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "MonitorSchedule.schedule", "monitor", "");
-        final List<HttpResource> resources = httpResourceDAO.getResources();
+        final List<HttpResource> resources = httpResourceService.getResources();
         if (resources == null || resources.isEmpty()) {
             return;
         }

@@ -60,7 +60,7 @@ public class PersistentConn {
                 }
                 if (errorTimes > 0) {
                     String message = "mqtt 长连接异常断开.次数：" + errorTimes;
-                    NotifyUtils.sendWeixin("18910556026", message);
+                    NotifyUtils.sendAlert("18910556026", message);
                 }
             }
         }

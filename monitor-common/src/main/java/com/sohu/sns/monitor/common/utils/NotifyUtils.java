@@ -4,6 +4,8 @@ import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,5 +40,19 @@ public class NotifyUtils {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 发送报警微信
+     *
+     * @param phones
+     * @param message
+     * @return
+     */
+    public static boolean sendAlert(String phones, String message) {
+        String messageTemplate = "【SNS报警 %s】%s";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:dd");
+        String date = simpleDateFormat.format(new Date());
+        return sendWeixin(phones, String.format(messageTemplate, date, message));
     }
 }

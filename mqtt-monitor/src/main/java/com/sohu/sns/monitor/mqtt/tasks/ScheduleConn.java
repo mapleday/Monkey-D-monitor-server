@@ -89,7 +89,7 @@ public class ScheduleConn {
             if (!isConnAvalable) {
                 String message = "mqtt 连接建立异常报警，次数：" + errorTimes.get() + "/" + monitorTimes.get()
                         + " 原因：" + errorMessages.toString();
-                NotifyUtils.sendWeixin("18910556026", message);
+                NotifyUtils.sendAlert("18910556026", message);
             }
 
         }

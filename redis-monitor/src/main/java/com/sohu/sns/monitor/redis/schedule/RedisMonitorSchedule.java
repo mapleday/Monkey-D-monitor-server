@@ -1,11 +1,16 @@
 package com.sohu.sns.monitor.redis.schedule;
 
+import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.timer.RedisDataCheckProfessor;
+import com.sohu.sns.monitor.redis.util.ZkLockUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * Created by yzh on 2016/11/3.
@@ -18,6 +23,13 @@ public class RedisMonitorSchedule {
 
     @Scheduled(fixedRate = 3600000L, initialDelay = 3600000L)
     public void checkRedisAndSendMail() {
+        try {
+            if(!new ZkLockUtil().getLock(3600000L, ZkPathConfig.LAST_EMAIL_TIME,ZkPathConfig.LAST_EMAIL_TIME_SUB)){
+                return ;
+            }
+        } catch (Exception e) {
+            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "get lock exception", null, e);
+        }
         try {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "准备发邮件...", "");
             professor.handle(0);

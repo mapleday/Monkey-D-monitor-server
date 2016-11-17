@@ -27,7 +27,7 @@ public class ZkPathConfig {
 
     public static String REDIS_CHECK_SWAP = ZK_ROOT + "/sns_monitor/redis_check_swap";
 
-    public static String LAST_TIME = ZK_ROOT + "/sns_monitor/last_time";
+    public static String LAST_EMAIL_TIME = ZK_ROOT + "/sns_monitor/last_email_time";
 
-    public static String LAST_TIME_SUB = ZK_ROOT + "/sns_monitor/last_time/sub";
+    public static String LAST_EMAIL_TIME_SUB = ZK_ROOT + "/sns_monitor/last_email_time/sub";
 }

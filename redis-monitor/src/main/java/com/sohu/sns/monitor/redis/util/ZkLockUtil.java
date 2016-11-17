@@ -5,9 +5,7 @@ import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.ZkUtils;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.*;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -20,21 +18,29 @@ public class ZkLockUtil {
     private String selfPath;
     private String waitPath;
 
-    //private final static long DELAY_TIME = 3540000L;
-    private final static long DELAY_TIME = 60000L;
-
-    public boolean getLock() throws KeeperException, InterruptedException, IOException{
+    /**
+     *
+     * @param delayTime
+     * @param node
+     * @param subNode
+     * @return
+     * @throws KeeperException
+     * @throws InterruptedException
+     * @throws IOException
+     */
+    public boolean getLock(long delayTime,String node,String subNode) throws KeeperException, InterruptedException, IOException{
         ZkUtils zk = new ZkUtils();
 
         zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
                 ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
-        selfPath = zk.create(ZkPathConfig.LAST_TIME_SUB, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
-        if (checkMinPath(zk)) {
-            Long lastTime = Long.parseLong(new String(zk.getData(ZkPathConfig.LAST_TIME)));
+        selfPath = zk.create(subNode, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL_SEQUENTIAL);
+        LOGGER.buziLog(ModuleEnum.UTIL,"ZkLockUtil.getLock","ephemeral_sequential_node"+selfPath,null);
+        if (checkMinPath(zk,node)) {
+            Long lastTime = Long.parseLong(new String(zk.getData(node)));
             Long curTime = System.currentTimeMillis();
-            System.out.println(curTime-lastTime);
-            if(curTime-lastTime>=DELAY_TIME) {
-                zk.setData(ZkPathConfig.LAST_TIME, curTime.toString().getBytes(), -1);
+            LOGGER.buziLog(ModuleEnum.UTIL,"ZkLockUtil.getLock","curTime-lastTime ="+(curTime-lastTime),null);
+            if(curTime-lastTime>=delayTime) {
+                zk.setData(node, curTime.toString().getBytes(), -1);
                 zk.delete(selfPath);
                 zk.close();
                 return true;
@@ -47,27 +53,22 @@ public class ZkLockUtil {
         zk.close();
         return false;
     }
-    private boolean checkMinPath(ZkUtils zk) throws KeeperException, InterruptedException{
-        List<String> subNodes = zk.getZooKeeper().getChildren(ZkPathConfig.LAST_TIME,false);
-
+    private boolean checkMinPath(ZkUtils zk,String node) throws KeeperException, InterruptedException{
+        List<String> subNodes = zk.getZooKeeper().getChildren(node,false);
         Collections.sort(subNodes);
-        System.out.println(selfPath);
-        System.out.println(subNodes);
-        int index = subNodes.indexOf(selfPath.substring(ZkPathConfig.LAST_TIME.length()+1));
+        int index = subNodes.indexOf(selfPath.substring(node.length()+1));
         switch (index){
             case -1:
                 return false;
             case 0:
                 return true;
             default:
-                waitPath = ZkPathConfig.LAST_TIME+"/"+subNodes.get(index-1);
+                waitPath = node+"/"+subNodes.get(index-1);
                 if(!zk.exists(waitPath)){
-                    return checkMinPath(zk);
+                    return checkMinPath(zk,node);
                 }else {
                     return false;
                 }
-
         }
-
     }
 }

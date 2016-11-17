@@ -51,6 +51,9 @@ public class PersistentConn {
                 int errorTimes = 0;
                 for (Iterator<Channel> iterator = conns.iterator(); iterator.hasNext(); ) {
                     Channel conn = iterator.next();
+                    if (conn.isOpen()){
+                        conn.writeAndFlush(SimpleMqttMessage.createPing());
+                    }
                     if (conn.isActive()) {
                         conn.writeAndFlush(SimpleMqttMessage.createPing());
                     } else {

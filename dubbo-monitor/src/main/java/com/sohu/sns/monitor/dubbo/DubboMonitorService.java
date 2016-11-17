@@ -25,7 +25,6 @@ import com.alibaba.dubbo.monitor.MonitorService;
 import com.google.common.collect.Maps;
 import com.sohu.sns.monitor.dubbo.domain.DubboInvoke;
 import com.sohu.sns.monitor.dubbo.support.Dao;
-import com.sohu.sns.monitor.dubbo.support.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -34,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -66,6 +66,8 @@ public class DubboMonitorService implements MonitorService {
 
     @Autowired
     private Dao dao;
+
+    private Random random = new Random();
 
     @PostConstruct
     private void init() {
@@ -129,6 +131,18 @@ public class DubboMonitorService implements MonitorService {
                 }
                 dubboInvoke.setProvider(statistics.getHost());
             }
+
+            if ("com.sohu.sns.user.msg.dubbo.api.IUserMsgDubboService".equals(statistics.getServiceInterface())) {
+                if (random.nextInt(100) != 1) {
+                    return;
+                }
+            } else {
+                if (random.nextInt(10) != 1) {
+                    return;
+                }
+            }
+
+
             dubboInvoke.setInvokeDate(now);
             dubboInvoke.setService(statistics.getServiceInterface());
             dubboInvoke.setMethod(statistics.getParameter(METHOD));

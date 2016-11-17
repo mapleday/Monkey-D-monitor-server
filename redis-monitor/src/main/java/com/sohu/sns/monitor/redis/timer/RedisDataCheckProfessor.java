@@ -43,7 +43,7 @@ public class RedisDataCheckProfessor {
     private static String baseEmailUrl = "";
     private static String emailInterface = "";
     private static String mailTo = "";
-    private static String sendMsgTo = "15201017693,18910556026";
+    private static String sendMsgTo = "";
     private static String weixinInterface = "";
     private static boolean isChanged = false;
     private static String lastCheckTime = "";
@@ -705,6 +705,7 @@ public class RedisDataCheckProfessor {
         baseEmailUrl = urls.get("base_url");
         emailInterface = urls.get("html_email_interface");
         weixinInterface = urls.get("send_sms_interface");
+        sendMsgTo = (String)errorLogConfigMap.get("phone_to");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
         for (String email : emails) {
@@ -713,7 +714,6 @@ public class RedisDataCheckProfessor {
             }
             sb.append(email);
         }
-        sb.append("|zhenhaoyu@sohu-inc.com");
         mailTo = sb.toString();
     }
 }

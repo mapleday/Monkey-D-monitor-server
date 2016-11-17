@@ -133,7 +133,7 @@ public class DubboMonitorService implements MonitorService {
             }
 
             if ("com.sohu.sns.user.msg.dubbo.api.IUserMsgDubboService".equals(statistics.getServiceInterface())) {
-                if (random.nextInt(100) != 1) {
+                if (random.nextInt(10000) != 1) {
                     return;
                 }
             } else {

@@ -27,6 +27,7 @@
         <netty.version>4.1.0.CR7</netty.version>
         <guava.version>18.0</guava.version>
         <monitor.version>1.0-SNAPSHOT</monitor.version>
+        <dubbo.version>2.5.3</dubbo.version>
     </properties>
 
     <dependencyManagement>

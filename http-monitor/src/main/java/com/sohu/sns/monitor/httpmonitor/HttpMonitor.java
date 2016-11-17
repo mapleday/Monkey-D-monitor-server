@@ -1,5 +1,6 @@
 package com.sohu.sns.monitor.httpmonitor;
 
+import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -63,6 +64,6 @@ public class HttpMonitor {
                 , monitorResult.getMonitorTimes()
                 , monitorResult.getFailedTimes()
                 , monitorResult.getFailedReason());
-        NotifyUtils.sendWeixin(phones, msg);
+        NotifyUtils.sendAlert(phones, msg);
     }
 }

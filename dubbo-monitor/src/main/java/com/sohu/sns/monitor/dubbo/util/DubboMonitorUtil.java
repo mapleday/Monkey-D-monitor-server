@@ -37,6 +37,7 @@ public class DubboMonitorUtil {
     private static String formatMsg(DubboInvoke invoke){
         StringBuilder sb = new StringBuilder("");
         sb.append(new SimpleDateFormat("HH:mm:ss").format(new Date())+"\n");
+        sb.append("dubbo 接口方法请求失败: \n");
         sb.append("service: "+invoke.getService()+"\n");
         sb.append("method: "+invoke.getMethod()+"\n");
         sb.append("provider: "+invoke.getProvider()+"\n");

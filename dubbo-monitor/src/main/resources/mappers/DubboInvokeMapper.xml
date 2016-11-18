@@ -253,4 +253,26 @@
         GROUP BY dubbo_invoke.service, dubbo_invoke.method
         ORDER BY SUM(dubbo_invoke.failure) DESC LIMIT 20
     </select>
+    <update id="creatNewTable" parameterType="String">
+        DROP table IF EXISTS ${tableName};
+        CREATE TABLE ${tableName} (
+            id int(11) NOT NULL AUTO_INCREMENT,
+            invoke_date date NOT NULL,
+            service varchar(255) DEFAULT NULL,
+            method varchar(255) DEFAULT NULL,
+            consumer varchar(255) DEFAULT NULL,
+            provider varchar(255) DEFAULT NULL,
+            type varchar(255) DEFAULT '',
+            invoke_time bigint(20) DEFAULT NULL,
+            success int(11) DEFAULT NULL,
+            failure int(11) DEFAULT NULL,
+            elapsed int(11) DEFAULT NULL,
+            concurrent int(11) DEFAULT NULL,
+            max_elapsed int(11) DEFAULT NULL,
+            max_concurrent int(11) DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY index_service (service) USING BTREE,
+            KEY index_method (method) USING BTREE
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT
+    </update>
 </mapper>

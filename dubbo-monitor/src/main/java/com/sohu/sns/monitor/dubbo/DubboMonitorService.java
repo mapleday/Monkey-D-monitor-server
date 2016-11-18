@@ -25,6 +25,7 @@ import com.alibaba.dubbo.monitor.MonitorService;
 import com.google.common.collect.Maps;
 import com.sohu.sns.monitor.dubbo.domain.DubboInvoke;
 import com.sohu.sns.monitor.dubbo.support.Dao;
+import com.sohu.sns.monitor.dubbo.util.DubboMonitorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -158,7 +159,7 @@ public class DubboMonitorService implements MonitorService {
                 return;
             }
             dao.insert(CLASSNAME, "addDubboInvoke", dubboInvoke);
-
+            DubboMonitorUtil.checkDubboInvoke(dubboInvoke);
         } catch (Throwable t) {
             logger.error(t.getMessage(), t);
         }

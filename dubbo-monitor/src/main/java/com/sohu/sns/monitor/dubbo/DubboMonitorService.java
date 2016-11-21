@@ -132,18 +132,6 @@ public class DubboMonitorService implements MonitorService {
                 }
                 dubboInvoke.setProvider(statistics.getHost());
             }
-
-            if ("com.sohu.sns.user.msg.dubbo.api.IUserMsgDubboService".equals(statistics.getServiceInterface())) {
-                if (random.nextInt(10000) != 1) {
-                    return;
-                }
-            } else {
-                if (random.nextInt(10) != 1) {
-                    return;
-                }
-            }
-
-
             dubboInvoke.setInvokeDate(now);
             dubboInvoke.setService(statistics.getServiceInterface());
             dubboInvoke.setMethod(statistics.getParameter(METHOD));
@@ -154,12 +142,22 @@ public class DubboMonitorService implements MonitorService {
             dubboInvoke.setConcurrent(statistics.getParameter(CONCURRENT, 0));
             dubboInvoke.setMaxElapsed(statistics.getParameter(MAX_ELAPSED, 0));
             dubboInvoke.setMaxConcurrent(statistics.getParameter(MAX_CONCURRENT, 0));
+            DubboMonitorUtil.checkDubboInvoke(dubboInvoke);
+            if ("com.sohu.sns.user.msg.dubbo.api.IUserMsgDubboService".equals(statistics.getServiceInterface())) {
+                if (random.nextInt(10000) != 1) {
+                    return;
+                }
+            } else {
+                if (random.nextInt(10) != 1) {
+                    return;
+                }
+            }
             if (dubboInvoke.getSuccess() == 0 && dubboInvoke.getFailure() == 0 && dubboInvoke.getElapsed() == 0
                     && dubboInvoke.getConcurrent() == 0 && dubboInvoke.getMaxElapsed() == 0 && dubboInvoke.getMaxConcurrent() == 0) {
                 return;
             }
             dao.insert(CLASSNAME, "addDubboInvoke", dubboInvoke);
-            DubboMonitorUtil.checkDubboInvoke(dubboInvoke);
+
         } catch (Throwable t) {
             logger.error(t.getMessage(), t);
         }

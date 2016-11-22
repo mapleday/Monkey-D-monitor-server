@@ -77,7 +77,7 @@ public class RedisDataCheckProfessor {
         if (REDIS_CHECK_URL.isEmpty()){
             return;
         }
-
+        Map<String, List<String>> redisConfig2 = getRedisClusterConfig2();
         System.out.println("redis check start : " + redisConfig.size() + ", time:" + DateUtil.getCurrentTime());
 
         List<String> redisVisitFailedList = new ArrayList<String>();
@@ -86,6 +86,8 @@ public class RedisDataCheckProfessor {
         Map<String, Integer> currentRecordBucket = new HashMap<String, Integer>();
         Map<String, Map<String, String>> redisIpPortMap = new HashMap<String, Map<String, String>>();
         checkRedisConfig(redisConfig, redisVisitFailedList, redisClusterInfo, masterInfo,
+                currentRecordBucket, redisIpPortMap);
+        checkRedisConfig2(redisConfig2, redisVisitFailedList, redisClusterInfo, masterInfo,
                 currentRecordBucket, redisIpPortMap);
         if(0==type) {
             checkAndSendMail(begin,
@@ -283,6 +285,74 @@ public class RedisDataCheckProfessor {
     }
 
     /**
+     *
+     * @param redisConfig2
+     * @param redisVisitFailedList
+     * @param redisClusterInfo
+     * @param masterInfo
+     * @param currentRecordBucket
+     * @param redisIpPortMap
+     */
+    private void checkRedisConfig2(Map<String, List<String>> redisConfig2,
+                                   List<String> redisVisitFailedList,
+                                   Map<String, List<RedisInfo>> redisClusterInfo,
+                                   Map<String, RedisInfo> masterInfo,
+                                   Map<String, Integer> currentRecordBucket,
+                                   Map<String, Map<String, String>> redisIpPortMap
+                                   ){
+        if(null == redisConfig2){
+            return;
+        }
+        for(Map.Entry<String, List<String>> config : redisConfig2.entrySet()){
+            List<String> ipPortList = config.getValue();
+            for(String ipt : ipPortList){
+                String[] pair = ipt.split(":");
+                Jedis jedis = null;
+                try {
+                    jedis = new Jedis(pair[0], Integer.parseInt(pair[1]));
+                    RedisInfo redisInfo = infoExtraction(jedis.info(), 1, pair[0], config.getKey());
+
+                    /**
+                     * 添加master的信息
+                     */
+                    masterInfo.put(ipt, redisInfo);
+
+                    /**分析数据是否一致用**/
+                    if (redisClusterInfo.containsKey(ipt)) {
+                        if (null == redisClusterInfo.get(ipt)) {
+                            List<RedisInfo> temp = new ArrayList<RedisInfo>();
+                            temp.add(redisInfo);
+                            redisClusterInfo.put(ipt, temp);
+                        } else {
+                            redisClusterInfo.get(ipt).add(redisInfo);
+                        }
+                    } else {
+                        List<RedisInfo> temp = new ArrayList<RedisInfo>();
+                        temp.add(redisInfo);
+                        redisClusterInfo.put(ipt, temp);
+                    }
+
+                    /**分析数据变化趋势***/
+                    currentRecordBucket.put(joiner.join(ipt, pair[0], config.getKey()), redisInfo.getKeys());
+                } catch (Exception e) {
+                    redisVisitFailedList.add(joiner.join(ipt, pair[0], null));
+                    LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig2.getInfo", null, null, e);
+                    e.printStackTrace();
+                }
+                finally {
+                    if(jedis != null) {
+                        jedis.close();
+                    }
+                }
+
+                Map<String, String> masterSlaveInfo = new HashMap<String, String>();
+                masterSlaveInfo.put("master", ipt);
+                masterSlaveInfo.put("slave", "");
+                redisIpPortMap.put(ipt+"_"+config.getKey(), masterSlaveInfo);
+            }
+        }
+    }
+    /**
      * 检查ip&端口变化
      * @param map
      * @return
@@ -456,17 +526,19 @@ public class RedisDataCheckProfessor {
                 List<RedisInfo> redisInfoGroup = map.get(uid);
                 int minSlaveKeys = Integer.MAX_VALUE, maxSlaveKeys = Integer.MIN_VALUE, masterKeys = 0;
                 for (RedisInfo redisInfo : redisInfoGroup) {
-                    if(redisInfo.getKeys() < minSlaveKeys && 1 != redisInfo.getIsMaster()) {
+                    if (redisInfo.getKeys() < minSlaveKeys && 1 != redisInfo.getIsMaster()) {
                         minSlaveKeys = redisInfo.getKeys();
                     }
-                    if(redisInfo.getKeys() > maxSlaveKeys && 1 != redisInfo.getIsMaster()) {
+                    if (redisInfo.getKeys() > maxSlaveKeys && 1 != redisInfo.getIsMaster()) {
                         maxSlaveKeys = redisInfo.getKeys();
                     }
-                    if(1 == redisInfo.getIsMaster()) {
+                    if (1 == redisInfo.getIsMaster()) {
                         masterKeys = redisInfo.getKeys();
                     }
                 }
-
+                if(minSlaveKeys==Integer.MAX_VALUE && maxSlaveKeys==Integer.MIN_VALUE){
+                    continue;
+                }
                 int diff1 = masterKeys - minSlaveKeys;
                 int diff2 = masterKeys - maxSlaveKeys;
                 int maxDiff = Math.abs(diff1) > Math.abs(diff2)?diff1:diff2;
@@ -692,6 +764,24 @@ public class RedisDataCheckProfessor {
         System.out.println(DateUtil.getCurrentTime() + ",redis_config has refreshed. ");
         return (Map<String, Map<String, String>>) map.get("redis_config");
     }
+
+    /**
+     * 获取redis配置 注意：这些redis链接是不需要密码的，而且都是master没有slave
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws KeeperException
+     */
+    public static Map<String, List<String>> getRedisClusterConfig2() throws IOException, InterruptedException, KeeperException {
+        ZkUtils zk = new ZkUtils();
+        zk.connect(ZkPathConfigure.ZOOKEEPER_SERVERS, ZkPathConfigure.ZOOKEEPER_AUTH_USER,
+                ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
+        String redisConfig2 = new String(zk.getData(ZkPathConfig.REDIS_CHECK_CONFIG2));
+        Map<String, List<String>> map = jsonMapper.fromJson(redisConfig2, HashMap.class);
+        zk.close();
+        return map;
+    }
+
     public static void initEnv(String monitorUrls, String errorLogConfig, String swap, ZkUtils zkUtils) throws KeeperException, InterruptedException {
         if(Strings.isNullOrEmpty(swap)) {
             String time = DateUtil.getCurrentMin();

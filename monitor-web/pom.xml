@@ -11,8 +11,44 @@
 
     <artifactId>monitor-web</artifactId>
     <packaging>war</packaging>
-
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>3.2.9.RELEASE</spring.version>
+        <zookeeper.version>3.4.5</zookeeper.version>
+        <zkclient.version>0.1</zkclient.version>
+        <curator.version>2.5.0</curator.version>
+        <servlet.version>2.5</servlet.version>
+        <jetbrick-template.version>2.0.10</jetbrick-template.version>
+        <mybatis.version>3.2.7</mybatis.version>
+        <mybatis-spring.version>1.2.2</mybatis-spring.version>
+        <mysql.version>5.1.30</mysql.version>
+        <druid.version>1.0.14</druid.version>
+        <jackson.version>2.3.3</jackson.version>
+        <junit.version>3.8.1</junit.version>
+        <guava.version>16.0.1</guava.version>
+    </properties>
     <dependencies>
+        <!--mysql-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>${mybatis-spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
         <!-- spring -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -20,9 +56,19 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>jstl</artifactId>
             <version>1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.subchen</groupId>
+            <artifactId>jetbrick-template-springmvc</artifactId>
+            <version>${jetbrick-template.version}</version>
         </dependency>
     </dependencies>
 

@@ -1,6 +1,6 @@
 package com.sohu.sns.monitor.web.service.impl;
 
-import com.sohu.sns.monitor.web.dao.HttpResourceDAO;
+import com.sohu.sns.monitor.web.dao.http.HttpResourceDAO;
 import com.sohu.sns.monitor.web.domain.HttpResource;
 import com.sohu.sns.monitor.web.service.HttpResourceService;
 import org.springframework.beans.factory.annotation.Autowired;

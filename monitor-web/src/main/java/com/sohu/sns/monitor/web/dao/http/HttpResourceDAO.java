@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.web.dao;
+package com.sohu.sns.monitor.web.dao.http;
 
 import com.sohu.sns.monitor.web.domain.HttpResource;
 import org.springframework.stereotype.Repository;

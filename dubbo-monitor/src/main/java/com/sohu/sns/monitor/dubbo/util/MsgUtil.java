@@ -12,7 +12,7 @@ import java.util.Map;
  * Created by yzh on 2016/11/7.
  */
 public class MsgUtil {
-    private static final String WEI_XIN_URL = "http://sns-mail-sms.apps.sohuno.com/sendSms";
+    private static final String WEI_XIN_URL = "http://sns-mail-weixin.sce.sohuno.com/sendSms";
 
     /**
      * 发送微信通知

@@ -32,6 +32,26 @@
             <artifactId>monitor-common</artifactId>
             <version>${monitor.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <version>${spring-rabbit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sohu.snscommon</groupId>
+            <artifactId>util-common</artifactId>
+            <version>${snscommon.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

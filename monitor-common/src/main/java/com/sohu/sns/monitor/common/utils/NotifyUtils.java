@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class NotifyUtils {
     private static final HttpClientUtil httpClientUtil = HttpClientUtil.create(NotifyUtils.class.getName(), "sendWeixin", 3000);
-    private static final String WEI_XIN_URL = "http://sns-mail-sms.apps.sohuno.com/sendSms";
+    private static final String WEI_XIN_URL = "http://sns-mail-weixin.sce.sohuno.com/sendSms";
 
     private NotifyUtils() {
 
@@ -54,5 +54,9 @@ public class NotifyUtils {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH:mm:dd");
         String date = simpleDateFormat.format(new Date());
         return sendWeixin(phones, String.format(messageTemplate, date, message));
+    }
+
+    public static void main(String[] args) {
+        sendAlert("18910556026","test");
     }
 }

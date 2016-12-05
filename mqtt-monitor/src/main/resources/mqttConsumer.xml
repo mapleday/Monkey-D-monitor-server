@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"/>
+    <context:component-scan base-package="com.sohu.sns.monitor.mqtt,com.sohu.snscommon.utils"/>
+    <context:annotation-config/>
+
+    <!--加载ZK spring 配置属性-->
+    <bean class="com.sohu.snscommon.utils.properties.ZkPropConfig" lazy-init="false">
+        <property name="ignoreUnresolvablePlaceholders" value="false"/>
+        <property name="zkProperties">
+            <list>
+                <value>/sns_mq/cc_notify_mq</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--rabbitmq 连接配置-->
+    <rabbit:connection-factory id="notifyConnFactory" addresses="${mq.conn.addresses}" username="${mq.conn.username}"
+                               password="${mq.conn.pwd}" virtual-host="${mq.conn.virtual_host}"/>
+    <!--rabbitmq admin配置，只有添加此配置，才会自动生成queue和exchange-->
+    <rabbit:admin id="rabbitAdmin" connection-factory="notifyConnFactory"/>
+    <!--错误消息处理类-->
+    <bean id="ErrorMqHandler" class="com.sohu.sns.monitor.mqtt.onlinestatus.ErrorMqHandler"/>
+    <!--用户上下线 消息处理-->
+    <rabbit:queue id="sns_notify_queue" name="${mq.cc.notify.queue}" auto-declare="true" auto-delete="true"
+                  exclusive="false"/>
+    <rabbit:topic-exchange id="notify_exchange" name="${mq.cc.notify.exchange.name}" auto-declare="true"
+                           auto-delete="false">
+        <rabbit:bindings>
+            <rabbit:binding queue="sns_notify_queue" pattern="${mq.cc.notify.bind.key}"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+    <rabbit:listener-container connection-factory="notifyConnFactory" auto-startup="false"
+                               error-handler="ErrorMqHandler">
+        <rabbit:listener ref="onlineStatusMqListener" queues="sns_notify_queue"/>
+    </rabbit:listener-container>
+
+</beans>

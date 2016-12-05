@@ -13,7 +13,7 @@
     <packaging>war</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.0.5.RELEASE</spring.version>
+        <spring.version>4.2.7.RELEASE</spring.version>
         <zookeeper.version>3.4.5</zookeeper.version>
         <zkclient.version>0.1</zkclient.version>
         <curator.version>2.5.0</curator.version>

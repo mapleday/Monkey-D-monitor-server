@@ -29,7 +29,8 @@
         <guava.version>18.0</guava.version>
         <monitor.version>1.0-SNAPSHOT</monitor.version>
         <dubbo.version>2.5.3</dubbo.version>
-        <spring.version>4.0.5.RELEASE</spring.version>
+        <spring.version>4.2.7.RELEASE</spring.version>
+        <spring-rabbit.version>1.6.1.RELEASE</spring-rabbit.version>
     </properties>
 
     <dependencyManagement>

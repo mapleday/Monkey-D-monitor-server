@@ -89,8 +89,6 @@ public class RedisDataCheckProfessor {
         Map<String, Map<String, String>> redisIpPortMap = new HashMap<String, Map<String, String>>();
         checkRedisConfig(redisConfig, redisVisitFailedList, redisClusterInfo, masterInfo,
                 currentRecordBucket, redisIpPortMap);
-        checkRedisConfig2(redisConfig2, redisVisitFailedList, redisClusterInfo, masterInfo,
-                currentRecordBucket, redisIpPortMap);
         if (0 == type) {
             checkAndSendMail(begin,
                     redisVisitFailedList,
@@ -284,73 +282,6 @@ public class RedisDataCheckProfessor {
             masterSlaveInfo.put("master", masterBuffer.toString());
             masterSlaveInfo.put("slave", slaveBuffer.toString());
             redisIpPortMap.put(uid + "_" + desc, masterSlaveInfo);
-        }
-    }
-
-    /**
-     * @param redisConfig2
-     * @param redisVisitFailedList
-     * @param redisClusterInfo
-     * @param masterInfo
-     * @param currentRecordBucket
-     * @param redisIpPortMap
-     */
-    private void checkRedisConfig2(Map<String, List<String>> redisConfig2,
-                                   List<String> redisVisitFailedList,
-                                   Map<String, List<RedisInfo>> redisClusterInfo,
-                                   Map<String, RedisInfo> masterInfo,
-                                   Map<String, Integer> currentRecordBucket,
-                                   Map<String, Map<String, String>> redisIpPortMap
-    ) {
-        if (null == redisConfig2) {
-            return;
-        }
-        for (Map.Entry<String, List<String>> config : redisConfig2.entrySet()) {
-            List<String> ipPortList = config.getValue();
-            for (String ipt : ipPortList) {
-                String[] pair = ipt.split(":");
-                Jedis jedis = null;
-                try {
-                    jedis = new Jedis(pair[0], Integer.parseInt(pair[1]));
-                    RedisInfo redisInfo = infoExtraction(jedis.info(), 1, pair[0], config.getKey());
-
-                    /**
-                     * 添加master的信息
-                     */
-                    masterInfo.put(ipt, redisInfo);
-
-                    /**分析数据是否一致用**/
-                    if (redisClusterInfo.containsKey(ipt)) {
-                        if (null == redisClusterInfo.get(ipt)) {
-                            List<RedisInfo> temp = new ArrayList<RedisInfo>();
-                            temp.add(redisInfo);
-                            redisClusterInfo.put(ipt, temp);
-                        } else {
-                            redisClusterInfo.get(ipt).add(redisInfo);
-                        }
-                    } else {
-                        List<RedisInfo> temp = new ArrayList<RedisInfo>();
-                        temp.add(redisInfo);
-                        redisClusterInfo.put(ipt, temp);
-                    }
-
-                    /**分析数据变化趋势***/
-                    currentRecordBucket.put(joiner.join(ipt, pair[0], config.getKey()), redisInfo.getKeys());
-                } catch (Exception e) {
-                    redisVisitFailedList.add(joiner.join(String.valueOf(ipt), String.valueOf(pair[0]), ""));
-                    LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig2.getInfo", null, null, e);
-                    e.printStackTrace();
-                } finally {
-                    if (jedis != null) {
-                        jedis.close();
-                    }
-                }
-
-                Map<String, String> masterSlaveInfo = new HashMap<String, String>();
-                masterSlaveInfo.put("master", ipt);
-                masterSlaveInfo.put("slave", "");
-                redisIpPortMap.put(ipt + "_" + config.getKey(), masterSlaveInfo);
-            }
         }
     }
 

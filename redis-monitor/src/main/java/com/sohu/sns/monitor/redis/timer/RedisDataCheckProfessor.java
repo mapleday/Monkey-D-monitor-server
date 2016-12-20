@@ -59,10 +59,12 @@ public class RedisDataCheckProfessor {
 
     @Autowired
     private MysqlClusterService mysqlClusterService;
+
     /**
      * 检测异常
      * type==0 发送邮件 检测间隔一小时
      * type==1 发送微信 检测间隔一分钟
+     *
      * @throws InterruptedException
      * @throws IOException
      * @throws KeeperException
@@ -71,10 +73,10 @@ public class RedisDataCheckProfessor {
         long begin = System.currentTimeMillis();
 
         Map<String, Map<String, String>> redisConfig = getRedisClusterConfig();
-        if (null == redisConfig || redisConfig.isEmpty()){
+        if (null == redisConfig || redisConfig.isEmpty()) {
             return;
         }
-        if (REDIS_CHECK_URL.isEmpty()){
+        if (REDIS_CHECK_URL.isEmpty()) {
             return;
         }
         Map<String, List<String>> redisConfig2 = getRedisClusterConfig2();
@@ -89,7 +91,7 @@ public class RedisDataCheckProfessor {
                 currentRecordBucket, redisIpPortMap);
         checkRedisConfig2(redisConfig2, redisVisitFailedList, redisClusterInfo, masterInfo,
                 currentRecordBucket, redisIpPortMap);
-        if(0==type) {
+        if (0 == type) {
             checkAndSendMail(begin,
                     redisVisitFailedList,
                     redisClusterInfo,
@@ -97,10 +99,11 @@ public class RedisDataCheckProfessor {
                     currentRecordBucket,
                     redisIpPortMap);
         }
-        if(1==type){
-            checkAndSendMsg(begin,redisVisitFailedList,masterInfo,currentRecordBucket,redisIpPortMap);
+        if (1 == type) {
+            checkAndSendMsg(begin, redisVisitFailedList, masterInfo, currentRecordBucket, redisIpPortMap);
         }
     }
+
     private void checkAndSendMsg(long begin,
                                  List<String> redisVisitFailedList,
                                  Map<String, RedisInfo> masterInfo,
@@ -111,15 +114,15 @@ public class RedisDataCheckProfessor {
         String ipPortException = checkIpPort(redisIpPortMap);
 
         if (!(null == redisVisitFailedList || redisVisitFailedList.isEmpty())) {
-            msg.append(DateUtil.getDateHMS()+" 未能成功访问的Redis实例或uid为：");
-            for(String s:redisVisitFailedList){
-                msg.append(" "+s+" ");
+            msg.append(DateUtil.getDateHMS() + " 未能成功访问的Redis实例或uid为：");
+            for (String s : redisVisitFailedList) {
+                msg.append(" " + s + " ");
             }
         }
-        if(!(ipPortException==null||ipPortException.contains(NONE))){
-            msg.append(DateUtil.getDateHMS()+" "+ipPortException);
+        if (!(ipPortException == null || ipPortException.contains(NONE))) {
+            msg.append(DateUtil.getDateHMS() + " " + ipPortException);
         }
-        if(msg.toString().equals("")){
+        if (msg.toString().equals("")) {
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
             return;
         }
@@ -127,10 +130,11 @@ public class RedisDataCheckProfessor {
 
         updateZkSwap(time, currentRecordBucket, masterInfo, lastKeyDiffBucket, lastRedisIpPortMap);
         //发送微信
-        MsgUtil.sendWeixin(baseEmailUrl+weixinInterface,sendMsgTo,msg.toString());
-        System.out.println("sendWeixin_to : "+sendMsgTo);
+        MsgUtil.sendWeixin(baseEmailUrl + weixinInterface, sendMsgTo, msg.toString());
+        System.out.println("sendWeixin_to : " + sendMsgTo);
         System.out.println("checkAndSendMsg execute time : " + (System.currentTimeMillis() - begin));
     }
+
     private void checkAndSendMail(long begin,
                                   List<String> redisVisitFailedList,
                                   Map<String, List<RedisInfo>> redisClusterInfo,
@@ -162,9 +166,9 @@ public class RedisDataCheckProfessor {
         String growException = RedisEmailUtil.boldLine(RedisEmailUtil.GROW_EXCEPTION);
         String declineException = RedisEmailUtil.boldLine(RedisEmailUtil.DECLINE_EXCEPTION);
         String keysIncrException = String.format(growException, keyIncr.toString().
-                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
+                equals(RedisEmailUtil.CRLF + RedisEmailUtil.CRLF) ? NONE : keyIncr.toString());
         String KeysDeclineException = String.format(declineException, keyDecline.toString().
-                equals(RedisEmailUtil.CRLF+RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
+                equals(RedisEmailUtil.CRLF + RedisEmailUtil.CRLF) ? NONE : keyDecline.toString());
 
         StringBuilder emailContent = new StringBuilder();
         emailContent.append(String.format(RedisEmailUtil.TIME, time, lastCheckTime)).append(redisVisitFailedInfo).
@@ -213,16 +217,16 @@ public class RedisDataCheckProfessor {
                 e.printStackTrace();
                 continue;
             }
-            if (null == redisInses){
+            if (null == redisInses) {
                 continue;
             }
             StringBuilder masterBuffer = new StringBuilder();
             StringBuilder slaveBuffer = new StringBuilder();
             for (RedisIns redisIns : redisInses) {
-                if(1 == redisIns.getMaster()) {
+                if (1 == redisIns.getMaster()) {
                     masterBuffer.append(redisIns.getIp()).append(":").append(redisIns.getPort());
                 } else {
-                    if(0 != slaveBuffer.length()) {
+                    if (0 != slaveBuffer.length()) {
                         slaveBuffer.append(",");
                     }
                     slaveBuffer.append(redisIns.getIp()).append(":").append(redisIns.getPort());
@@ -243,7 +247,7 @@ public class RedisDataCheckProfessor {
                     /**
                      * 添加master的信息
                      */
-                    if(1 == redisInfo.getIsMaster()) {
+                    if (1 == redisInfo.getIsMaster()) {
                         masterInfo.put(uid, redisInfo);
                     }
 
@@ -270,9 +274,8 @@ public class RedisDataCheckProfessor {
                     redisVisitFailedList.add(joiner.join(uid, redisIns.getIp(), passwd));
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig.getInfo", null, null, e);
                     e.printStackTrace();
-                }
-                finally {
-                    if(jedis != null) {
+                } finally {
+                    if (jedis != null) {
                         jedis.close();
                     }
                 }
@@ -280,12 +283,11 @@ public class RedisDataCheckProfessor {
             Map<String, String> masterSlaveInfo = new HashMap<String, String>();
             masterSlaveInfo.put("master", masterBuffer.toString());
             masterSlaveInfo.put("slave", slaveBuffer.toString());
-            redisIpPortMap.put(uid+"_"+desc, masterSlaveInfo);
+            redisIpPortMap.put(uid + "_" + desc, masterSlaveInfo);
         }
     }
 
     /**
-     *
      * @param redisConfig2
      * @param redisVisitFailedList
      * @param redisClusterInfo
@@ -299,13 +301,13 @@ public class RedisDataCheckProfessor {
                                    Map<String, RedisInfo> masterInfo,
                                    Map<String, Integer> currentRecordBucket,
                                    Map<String, Map<String, String>> redisIpPortMap
-                                   ){
-        if(null == redisConfig2){
+    ) {
+        if (null == redisConfig2) {
             return;
         }
-        for(Map.Entry<String, List<String>> config : redisConfig2.entrySet()){
+        for (Map.Entry<String, List<String>> config : redisConfig2.entrySet()) {
             List<String> ipPortList = config.getValue();
-            for(String ipt : ipPortList){
+            for (String ipt : ipPortList) {
                 String[] pair = ipt.split(":");
                 Jedis jedis = null;
                 try {
@@ -335,12 +337,11 @@ public class RedisDataCheckProfessor {
                     /**分析数据变化趋势***/
                     currentRecordBucket.put(joiner.join(ipt, pair[0], config.getKey()), redisInfo.getKeys());
                 } catch (Exception e) {
-                    redisVisitFailedList.add(joiner.join(ipt, pair[0], null));
+                    redisVisitFailedList.add(joiner.join(String.valueOf(ipt), String.valueOf(pair[0]), ""));
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.checkRedisConfig2.getInfo", null, null, e);
                     e.printStackTrace();
-                }
-                finally {
-                    if(jedis != null) {
+                } finally {
+                    if (jedis != null) {
                         jedis.close();
                     }
                 }
@@ -348,45 +349,47 @@ public class RedisDataCheckProfessor {
                 Map<String, String> masterSlaveInfo = new HashMap<String, String>();
                 masterSlaveInfo.put("master", ipt);
                 masterSlaveInfo.put("slave", "");
-                redisIpPortMap.put(ipt+"_"+config.getKey(), masterSlaveInfo);
+                redisIpPortMap.put(ipt + "_" + config.getKey(), masterSlaveInfo);
             }
         }
     }
+
     /**
      * 检查ip&端口变化
+     *
      * @param map
      * @return
      */
     private static String checkIpPort(Map<String, Map<String, String>> map) {
         String ipPortException = RedisEmailUtil.boldLine(RedisEmailUtil.IP_PORT_EXCEPTION);
         String result;
-        if(null == map || map.isEmpty() ) {
+        if (null == map || map.isEmpty()) {
             result = String.format(ipPortException, NONE);
             return result;
         }
-        if(null == lastRedisIpPortMap || lastRedisIpPortMap.isEmpty()) {
+        if (null == lastRedisIpPortMap || lastRedisIpPortMap.isEmpty()) {
             result = String.format(ipPortException, NONE);
             lastRedisIpPortMap = map;
             return result;
         }
         Set<String> uids = map.keySet();
         StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
-        for(String uid : uids) {
-            if(!lastRedisIpPortMap.containsKey(uid)){
+        for (String uid : uids) {
+            if (!lastRedisIpPortMap.containsKey(uid)) {
                 continue;
             }
             String masterInfo = map.get(uid).get("master");
             String slaveInfo = map.get(uid).get("slave");
             String lastMasterInfo = lastRedisIpPortMap.get(uid).get("master");
             String lastSlaveInfo = lastRedisIpPortMap.get(uid).get("slave");
-            if(!masterInfo.equals(lastMasterInfo) || !slaveInfo.equals(lastSlaveInfo)) {
+            if (!masterInfo.equals(lastMasterInfo) || !slaveInfo.equals(lastSlaveInfo)) {
                 strBuffer.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(RedisEmailUtil.CRLF);
 
-                if(!masterInfo.equals(lastMasterInfo)) {
+                if (!masterInfo.equals(lastMasterInfo)) {
                     strBuffer.append(RedisEmailUtil.getSpace(10)).append("MASTER : last : ").append(lastMasterInfo)
                             .append(" | current : ").append(masterInfo).append(RedisEmailUtil.CRLF);
                 }
-                if(!slaveInfo.equals(lastSlaveInfo)) {
+                if (!slaveInfo.equals(lastSlaveInfo)) {
                     strBuffer.append(RedisEmailUtil.getSpace(10)).append("SLAVE : last : ").append(lastSlaveInfo)
                             .append(" | current : ").append(slaveInfo).append(RedisEmailUtil.CRLF);
                 }
@@ -394,7 +397,7 @@ public class RedisDataCheckProfessor {
                 strBuffer.append(RedisEmailUtil.CRLF);
             }
         }
-        if(strBuffer.toString().trim().equals("<br><br>")) {
+        if (strBuffer.toString().trim().equals("<br><br>")) {
             result = String.format(ipPortException, NONE);
         } else {
             result = String.format(ipPortException, strBuffer.toString());
@@ -405,6 +408,7 @@ public class RedisDataCheckProfessor {
 
     /**
      * 更新zk暂存区
+     *
      * @param time
      * @param map
      * @throws KeeperException
@@ -412,25 +416,25 @@ public class RedisDataCheckProfessor {
      */
     private static void updateZkSwap(String time, Map<String, Integer> map,
                                      Map<String, RedisInfo> masterInfo, Map<String, Integer> diffMap,
-                                     Map<String, Map<String,String>> ipPortMap)
+                                     Map<String, Map<String, String>> ipPortMap)
             throws KeeperException, InterruptedException, IOException {
-        if(null == time) {
+        if (null == time) {
             time = DateUtil.getCurrentMin();
         }
-        if(null == map) {
+        if (null == map) {
             map = new HashMap<String, Integer>();
         }
-        if(null == diffMap) {
+        if (null == diffMap) {
             diffMap = new HashMap<String, Integer>();
         }
         Map<String, String> lastMemoryInfo = new HashMap<String, String>();
-        if(null != masterInfo) {
+        if (null != masterInfo) {
             Set<String> uids = masterInfo.keySet();
-            for(String uid : uids) {
+            for (String uid : uids) {
                 lastMemoryInfo.put(uid, String.valueOf(masterInfo.get(uid).getUsedMemory()));
             }
         }
-        if(null == ipPortMap) {
+        if (null == ipPortMap) {
             ipPortMap = new HashMap<String, Map<String, String>>();
         }
 
@@ -536,14 +540,14 @@ public class RedisDataCheckProfessor {
                         masterKeys = redisInfo.getKeys();
                     }
                 }
-                if(minSlaveKeys==Integer.MAX_VALUE && maxSlaveKeys==Integer.MIN_VALUE){
+                if (minSlaveKeys == Integer.MAX_VALUE && maxSlaveKeys == Integer.MIN_VALUE) {
                     continue;
                 }
                 int diff1 = masterKeys - minSlaveKeys;
                 int diff2 = masterKeys - maxSlaveKeys;
-                int maxDiff = Math.abs(diff1) > Math.abs(diff2)?diff1:diff2;
+                int maxDiff = Math.abs(diff1) > Math.abs(diff2) ? diff1 : diff2;
                 diffMap.put(uid, maxDiff);
-                int lastMaxDiff = (null == lastKeyDiffBucket.get(uid)?0:lastKeyDiffBucket.get(uid));
+                int lastMaxDiff = (null == lastKeyDiffBucket.get(uid) ? 0 : lastKeyDiffBucket.get(uid));
                 if (0 != diff1 || 0 != diff2) {
                     StringBuilder temp = new StringBuilder();
                     temp.append(RedisEmailUtil.getSpace(6)).append("*").append(uid).append(" (" + map.get(uid).get(0).getDesc() + ")").append(" : ");
@@ -556,7 +560,7 @@ public class RedisDataCheckProfessor {
                 }
             }
             Collections.sort(list);
-            for(DiffInfo diffInfo : list) {
+            for (DiffInfo diffInfo : list) {
                 strBuffer.append(RedisEmailUtil.colorLine(diffInfo.getUid(), "red")).append(RedisEmailUtil.CRLF);
                 List<RedisInfo> temp = diffInfo.getList();
                 strBuffer.append(RedisEmailUtil.getSpace(10));
@@ -577,22 +581,23 @@ public class RedisDataCheckProfessor {
 
     /**
      * 分析redis中master Memory使用情况
+     *
      * @param masterInfos
      * @return
      */
     private String formatMemoryAnal(Map<String, RedisInfo> masterInfos) {
         String memoryAnal = RedisEmailUtil.boldLine(RedisEmailUtil.MEMORY_CHANGE_INFO);
         String result;
-        if(null == masterInfos || masterInfos.isEmpty()) {
+        if (null == masterInfos || masterInfos.isEmpty()) {
             result = String.format(memoryAnal, NONE);
         } else {
             StringBuilder strBuffer = new StringBuilder(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
             Set<String> uids = masterInfos.keySet();
             List<MemoryInfo> list = new LinkedList<MemoryInfo>();
-            for(String uid : uids) {
+            for (String uid : uids) {
                 RedisInfo redisInfo = masterInfos.get(uid);
                 long lastMemoryInfo = 0;
-                if(lastMemoryRecordBucket.containsKey(uid)) {
+                if (lastMemoryRecordBucket.containsKey(uid)) {
                     lastMemoryInfo = lastMemoryRecordBucket.get(uid);
                 }
                 long diff = redisInfo.getUsedMemory() - lastMemoryInfo;
@@ -608,8 +613,8 @@ public class RedisDataCheckProfessor {
 
             }
             Collections.sort(list);
-            for(MemoryInfo memoryInfo : list) {
-                if(Math.abs(memoryInfo.getIncr()) <= 1.0) continue;
+            for (MemoryInfo memoryInfo : list) {
+                if (Math.abs(memoryInfo.getIncr()) <= 1.0) continue;
                 strBuffer.append(RedisEmailUtil.colorLine(memoryInfo.getUid(), "red")).append(RedisEmailUtil.CRLF);
                 strBuffer.append(RedisEmailUtil.getSpace(10)).append("Max_Memory : ").append(memoryInfo.getMaxMemory()).append(" GB")
                         .append("&nbsp;&nbsp;|&nbsp;&nbsp;").append("Used_Memory : ").append(memoryInfo.getUsedMemory()).append(" GB")
@@ -623,13 +628,13 @@ public class RedisDataCheckProfessor {
     }
 
     private double parseMb(Long num) {
-        double result = num/1024.0/1024.0;
+        double result = num / 1024.0 / 1024.0;
         BigDecimal bigDecimal = new BigDecimal(result);
         return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
 
     private double parseGb(Long num) {
-        double result = num/1024.0/1024.0/1024.0;
+        double result = num / 1024.0 / 1024.0 / 1024.0;
         BigDecimal bigDecimal = new BigDecimal(result);
         return bigDecimal.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
     }
@@ -661,7 +666,7 @@ public class RedisDataCheckProfessor {
                         keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                         isChanged = true;
                     }
-                } else if (curKeys < lastKeys){
+                } else if (curKeys < lastKeys) {
                     double val = Math.abs(curKeys - lastKeys) / lastKeys.doubleValue();
                     if (val >= 0.02) {
                         StringBuilder temp = new StringBuilder();
@@ -686,6 +691,7 @@ public class RedisDataCheckProfessor {
 
     /**
      * meta库增量检查
+     *
      * @param map
      * @throws Exception
      */
@@ -697,19 +703,19 @@ public class RedisDataCheckProfessor {
         JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate("");
 
         Set<String> uids = map.keySet();
-        for(String uid : uids) {
+        for (String uid : uids) {
             List<RedisInfo> redisInfos = map.get(uid);
-            for(RedisInfo redisInfo : redisInfos) {
-                if(redisInfo.getDesc().matches(".*-meta-.*") || redisInfo.getDesc().matches(".*存储.*")) {
+            for (RedisInfo redisInfo : redisInfos) {
+                if (redisInfo.getDesc().matches(".*-meta-.*") || redisInfo.getDesc().matches(".*存储.*")) {
                     usedMemory += redisInfo.getUsedMemory();
                 }
             }
         }
         Long count = readJdbcTemplate.queryForObject(QUERY_IS_EXIST_DAY, Long.class, currentDay);
-        if(0 == count) {
+        if (0 == count) {
             Long lastDayCount = readJdbcTemplate.queryForObject(QUERY_IS_EXIST_DAY, Long.class, lastDay);
             double lastDayUsedMemory = 0.0;
-            if(0 != lastDayCount) {
+            if (0 != lastDayCount) {
                 lastDayUsedMemory = readJdbcTemplate.queryForObject(QUERY_LAST_DAY_USED_MEMORY, Double.class, lastDay);
             }
             writeJdbcTemplate.update(INSERT_DAY_RECORD, lastDayUsedMemory, parseGb(usedMemory), currentDay);
@@ -720,7 +726,6 @@ public class RedisDataCheckProfessor {
 
 
     /**
-     *
      * @return Map<String, Map<String, String>>
      */
     public static Map<String, Map<String, String>> getRedisClusterConfig() throws IOException, InterruptedException, KeeperException {
@@ -734,19 +739,19 @@ public class RedisDataCheckProfessor {
         System.out.println("Get redis cluster config");
         swapData = ZipUtils.gunzip(swapData);
         String[] array = swapData.split(SEP);
-        if(5 != array.length) {
+        if (5 != array.length) {
             lastCheckTime = DateUtil.getCurrentMin();
             lastRecordBucket = new HashMap<String, Integer>();
             lastMemoryRecordBucket = new HashMap<String, Long>();
             lastKeyDiffBucket = new HashMap<String, Integer>();
             lastRedisIpPortMap = new HashMap<String, Map<String, String>>();
-        }else {
+        } else {
             lastCheckTime = array[0];
             lastRecordBucket = jsonMapper.fromJson(array[1], HashMap.class);
             Map<String, String> temp = jsonMapper.fromJson(array[2], HashMap.class);
             Set<String> uids = temp.keySet();
             Map<String, Long> map = new HashMap<String, Long>();
-            for(String uid : uids) {
+            for (String uid : uids) {
                 map.put(uid, Long.parseLong(temp.get(uid)));
             }
             lastMemoryRecordBucket = map;
@@ -754,7 +759,7 @@ public class RedisDataCheckProfessor {
             Map<String, Object> ipPortMap = jsonMapper.fromJson(array[4], HashMap.class);
             Map<String, Map<String, String>> lastIpPortMap = new HashMap<String, Map<String, String>>();
             Set<String> uidDescSet = ipPortMap.keySet();
-            for(String str : uidDescSet) {
+            for (String str : uidDescSet) {
                 lastIpPortMap.put(str, (Map<String, String>) ipPortMap.get(str));
             }
             lastRedisIpPortMap = lastIpPortMap;
@@ -767,6 +772,7 @@ public class RedisDataCheckProfessor {
 
     /**
      * 获取redis配置 注意：这些redis链接是不需要密码的，而且都是master没有slave
+     *
      * @return
      * @throws IOException
      * @throws InterruptedException
@@ -783,9 +789,9 @@ public class RedisDataCheckProfessor {
     }
 
     public static void initEnv(String monitorUrls, String errorLogConfig, String swap, ZkUtils zkUtils) throws KeeperException, InterruptedException {
-        if(Strings.isNullOrEmpty(swap)) {
+        if (Strings.isNullOrEmpty(swap)) {
             String time = DateUtil.getCurrentMin();
-            Map<String, Long> map  = new HashMap<String, Long>();
+            Map<String, Long> map = new HashMap<String, Long>();
             String swapData = time + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map) + SEP + jsonMapper.toJson(map);
             zkUtils.setData(ZkPathConfig.REDIS_CHECK_SWAP, ZipUtils.gzip(swapData).getBytes(), -1);
         }
@@ -795,7 +801,7 @@ public class RedisDataCheckProfessor {
         baseEmailUrl = urls.get("base_url");
         emailInterface = urls.get("html_email_interface");
         weixinInterface = urls.get("send_sms_interface");
-        sendMsgTo = (String)errorLogConfigMap.get("phone_to");
+        sendMsgTo = (String) errorLogConfigMap.get("phone_to");
         List<String> emails = (List<String>) errorLogConfigMap.get("mail_to");
         StringBuilder sb = new StringBuilder();
         for (String email : emails) {

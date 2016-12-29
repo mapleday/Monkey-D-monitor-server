@@ -26,8 +26,8 @@ public class MqttMonitorApp {
         String server = args[1];
         ScheduleConn.start(connNum, server);
         PersistentConn.start(2, server);
-//        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("mqttConsumer.xml");
-//        context.start();
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("mqttConsumer.xml");
+        context.start();
         LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE,"app","main","start ok");
         CountDownLatch cd = new CountDownLatch(1);
         cd.await();

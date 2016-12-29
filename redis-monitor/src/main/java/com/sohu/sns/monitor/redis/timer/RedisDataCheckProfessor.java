@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
+import com.sohu.sns.monitor.common.dao.redisMeta.RedisMetaDao;
 import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.sns.monitor.redis.model.DiffInfo;
 import com.sohu.sns.monitor.redis.model.MemoryInfo;
 import com.sohu.sns.monitor.redis.model.RedisInfo;
 import com.sohu.sns.monitor.redis.model.RedisIns;
-import com.sohu.sns.monitor.redis.util.*;
-
-import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
+import com.sohu.sns.monitor.redis.util.DateUtil;
+import com.sohu.sns.monitor.redis.util.MsgUtil;
+import com.sohu.sns.monitor.redis.util.RedisEmailUtil;
+import com.sohu.sns.monitor.redis.util.ZipUtils;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -20,7 +22,6 @@ import com.sohu.snscommon.utils.zk.ZkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
 
@@ -51,14 +52,7 @@ public class RedisDataCheckProfessor {
     private static Map<String, Long> lastMemoryRecordBucket;
     private static Map<String, Integer> lastKeyDiffBucket;
     private static Map<String, Map<String, String>> lastRedisIpPortMap;
-    private static final String QUERY_IS_EXIST_DAY = "select count(1) from meta_redis_used_memory_day where log_day = ?";
-    private static final String QUERY_LAST_DAY_USED_MEMORY = "select used_memory from meta_redis_used_memory_day where log_day = ?";
-    private static final String INSERT_DAY_RECORD = "insert into meta_redis_used_memory_day (last_day_used_memory, used_memory, log_day, update_time) " +
-            "values (?, ?, ?, now())";
-    private static final String UPDATE_DAY_RECORD = "update meta_redis_used_memory_day set used_memory = ?, update_time = now() where log_day = ?";
 
-    @Autowired
-    private MysqlClusterService mysqlClusterService;
 
     /**
      * 检测异常
@@ -149,13 +143,6 @@ public class RedisDataCheckProfessor {
         StringBuilder keyIncr = new StringBuilder();
         StringBuilder keyDecline = new StringBuilder();
         formatKeysChangeExceptionRedis(currentRecordBucket, keyIncr, keyDecline);
-
-        try {
-            metaDataChangeAnal(redisClusterInfo);
-        } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisDataCheckProfessor.metaDataChangeAnal", null, null, e);
-            e.printStackTrace();
-        }
 
         if (!isChanged || null == mailTo || mailTo.isEmpty()) {
             System.out.println("execute time : " + (System.currentTimeMillis() - begin));
@@ -617,41 +604,6 @@ public class RedisDataCheckProfessor {
                 keysIncr.append(RedisEmailUtil.CRLF).append(RedisEmailUtil.CRLF);
                 isChanged = true;
             }
-        }
-    }
-
-    /**
-     * meta库增量检查
-     *
-     * @param map
-     * @throws Exception
-     */
-    private void metaDataChangeAnal(Map<String, List<RedisInfo>> map) throws Exception {
-        long usedMemory = 0L;
-        String currentDay = DateUtil.getCurrentDate();
-        String lastDay = DateUtil.getLastDay();
-        JdbcTemplate readJdbcTemplate = mysqlClusterService.getReadJdbcTemplate("");
-        JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate("");
-
-        Set<String> uids = map.keySet();
-        for (String uid : uids) {
-            List<RedisInfo> redisInfos = map.get(uid);
-            for (RedisInfo redisInfo : redisInfos) {
-                if (redisInfo.getDesc().matches(".*-meta-.*") || redisInfo.getDesc().matches(".*存储.*")) {
-                    usedMemory += redisInfo.getUsedMemory();
-                }
-            }
-        }
-        Long count = readJdbcTemplate.queryForObject(QUERY_IS_EXIST_DAY, Long.class, currentDay);
-        if (0 == count) {
-            Long lastDayCount = readJdbcTemplate.queryForObject(QUERY_IS_EXIST_DAY, Long.class, lastDay);
-            double lastDayUsedMemory = 0.0;
-            if (0 != lastDayCount) {
-                lastDayUsedMemory = readJdbcTemplate.queryForObject(QUERY_LAST_DAY_USED_MEMORY, Double.class, lastDay);
-            }
-            writeJdbcTemplate.update(INSERT_DAY_RECORD, lastDayUsedMemory, parseGb(usedMemory), currentDay);
-        } else {
-            writeJdbcTemplate.update(UPDATE_DAY_RECORD, parseGb(usedMemory), currentDay);
         }
     }
 

@@ -1,10 +1,11 @@
 package com.sohu.sns.monitor.httpmonitor;
 
-import com.sohu.sns.monitor.common.utils.NotifyUtils;
-import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
+import com.sohu.sns.monitor.common.module.HttpResource;
+import com.sohu.sns.monitor.common.services.NotifyService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -18,6 +19,8 @@ import java.util.Map;
  */
 @Component
 public class HttpMonitor {
+    @Autowired
+    NotifyService notifyService;
     /**
      * 监控
      *
@@ -64,6 +67,6 @@ public class HttpMonitor {
                 , monitorResult.getMonitorTimes()
                 , monitorResult.getFailedTimes()
                 , monitorResult.getFailedReason());
-        NotifyUtils.sendAlert(phones, msg);
+        notifyService.sendAllNotifyPerson(msg);
     }
 }

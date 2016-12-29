@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.sohu.sns.monitor.httpmonitor.dao.httpResource.HttpResourceDAO">
+<mapper namespace="com.sohu.sns.monitor.common.dao.httpResource.HttpResourceDAO">
+    <cache flushInterval="300"/>
 
-
-    <select id="getResources" resultType="com.sohu.sns.monitor.httpmonitor.model.HttpResource">
+    <select id="getResources" resultType="com.sohu.sns.monitor.common.module.HttpResource">
         SELECT id as id,
             resource_name as resourceName,
             resource_address as resourceAddress,

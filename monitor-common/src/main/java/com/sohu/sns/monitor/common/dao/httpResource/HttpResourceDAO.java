@@ -1,6 +1,6 @@
-package com.sohu.sns.monitor.httpmonitor.dao.httpResource;
+package com.sohu.sns.monitor.common.dao.httpResource;
 
-import com.sohu.sns.monitor.httpmonitor.model.HttpResource;
+import com.sohu.sns.monitor.common.module.HttpResource;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

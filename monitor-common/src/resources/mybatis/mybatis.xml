@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:/mybatis/jdbc.properties"/>
 
     <bean id="dataSource_write" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
         <property name="url" value="${jdbc.write.url}"/>
@@ -39,15 +41,13 @@
     <tx:annotation-driven transaction-manager="transactionManager_write" proxy-target-class="true"/>
 
     <!-- mybatis配置 -->
-    <bean id="sqlSessionFactory_write" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <bean id="sqlSessionFactory_write" class="org.mybatis.spring.SqlSessionFactoryBean" lazy-init="false">
         <property name="dataSource" ref="dataSource_write"/>
-        <property name="mapperLocations" value="classpath*:/com/sohu/sns/monitor/httpmonitor/dao/**/*.xml"/>
+        <property name="mapperLocations" value="classpath*:/com/sohu/sns/monitor/common/dao/**/*.xml"/>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_write"/>
-        <property name="basePackage" value="com.sohu.sns.monitor.httpmonitor"/>
+        <property name="basePackage" value="com.sohu.sns.monitor.common.dao"/>
     </bean>
-
-
 </beans>

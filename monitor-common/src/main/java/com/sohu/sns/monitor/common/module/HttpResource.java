@@ -1,11 +1,13 @@
-package com.sohu.sns.monitor.httpmonitor.model;
+package com.sohu.sns.monitor.common.module;
+
+import java.io.Serializable;
 
 /**
  * author:jy
  * time:16-10-13下午3:30
  * http资源配置
  */
-public class HttpResource {
+public class HttpResource implements Serializable {
     /**
      * 资源ID
      */

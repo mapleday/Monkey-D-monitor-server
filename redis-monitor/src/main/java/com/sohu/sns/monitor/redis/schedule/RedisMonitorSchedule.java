@@ -21,15 +21,8 @@ public class RedisMonitorSchedule {
     @Autowired
     private RedisDataCheckProfessor professor;
 
-    @Scheduled(fixedRate = 3600000L, initialDelay = 3600000L)
+    @Scheduled(fixedRate = 3600000L)
     public void checkRedisAndSendMail() {
-        try {
-            if(!new ZkLockUtil().getLock(3600000L, ZkPathConfig.LAST_EMAIL_TIME,ZkPathConfig.LAST_EMAIL_TIME_SUB)){
-                return ;
-            }
-        } catch (Exception e) {
-            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "get lock exception", null, e);
-        }
         try {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "准备发邮件...", "");
             professor.handle(0);
@@ -39,7 +32,7 @@ public class RedisMonitorSchedule {
         }
     }
 
-    @Scheduled(fixedRate = 60000L, initialDelay = 60000L)
+    @Scheduled(fixedRate = 60000L)
     public void checkRedisAndSendWeixin() {
         try {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", "准备发微信...", "");

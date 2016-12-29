@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sohu.sns.monitor.common.dao.redisMeta.RedisMetaDao">
+    <select id="getExistDay">
+        SELECT
+            COUNT(1)
+        FROM
+            meta_redis_used_memory_day
+        WHERE
+            log_day = #{logDay}
+    </select>
+
+    <select id="getLastDayMemory">
+        SELECT
+            used_memory
+        FROM
+            meta_redis_used_memory_day
+        WHERE
+            log_day = #{logDay}
+    </select>
+
+    <insert id="saveDayRecord" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+      INSERT INTO
+          meta_redis_used_memory_day (
+          last_day_used_memory,
+          used_memory,
+          log_day,
+          update_time)
+      VALUES(
+          #{lastDayUserMemory},
+          #{usedMemory},
+          #{logDay},
+          #{updateTime})
+    </insert>
+
+    <update id="updateDayRecord" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+        UPDATE
+          meta_redis_used_memory_day
+        SET
+            used_memory = #{usedMemory},
+            update_time = now()
+        WHERE
+          log_day = #{logDay}
+    </update>
+
+</mapper>

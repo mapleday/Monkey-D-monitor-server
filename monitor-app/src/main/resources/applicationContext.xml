@@ -30,4 +30,5 @@
 
     <import resource="classpath*:RedisMonitorContext.xml"/>
     <import resource="classpath*:httpMonitorContext.xml"/>
+    <import resource="classpath*:monitorCommonContext.xml"/>
 </beans>

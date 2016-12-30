@@ -18,7 +18,7 @@ public class RedisMonitorServer {
         try {
             ZkUtils.setZkConfigFilePath(args[0]);
             ZkUtils.initZkConfig(args[0]);
-            context = new ClassPathXmlApplicationContext("/RedisMonitorContext.xml");
+            context = new ClassPathXmlApplicationContext("/redisMonitorContext.xml");
             System.in.read();
         }catch (Exception e){
             LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorServer", null, null, e);

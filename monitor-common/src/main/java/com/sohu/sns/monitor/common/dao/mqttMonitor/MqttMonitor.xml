@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sohu.sns.monitor.common.dao.mqttMonitor.MqttMonitorDao">
+    <cache flushInterval="300"/>
+
+    <select id="getServers" resultType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        SELECT
+            id,
+            server_address AS serverAddress,
+            monitor_num AS  monitorNum,
+            stat
+        FROM
+            t_monitor_mqtt
+        WHERE
+            stat = 1
+    </select>
+</mapper>

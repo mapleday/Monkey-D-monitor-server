@@ -21,7 +21,6 @@ public class RedisMonitorSchedule {
     @Autowired
     private RedisDataCheckProfessor professor;
 
-    @Scheduled(fixedRate = 3600000L)
     public void checkRedisAndSendMail() {
         try {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendMail", "准备发邮件...", "");
@@ -32,7 +31,6 @@ public class RedisMonitorSchedule {
         }
     }
 
-    @Scheduled(fixedRate = 60000L)
     public void checkRedisAndSendWeixin() {
         try {
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "RedisMonitorSchedule.checkRedisAndSendWeixin", "准备发微信...", "");

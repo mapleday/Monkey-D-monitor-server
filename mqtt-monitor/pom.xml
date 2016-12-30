@@ -52,6 +52,10 @@
             <artifactId>spring-beans</artifactId>
             <version>${spring.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.sohu.sns.monitor</groupId>
+            <artifactId>monitor-common</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

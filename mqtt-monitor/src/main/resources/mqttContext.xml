@@ -2,15 +2,20 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
+    <context:component-scan base-package="com.sohu.sns.monitor.mqtt"/>
 
-    <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"/>
-    <context:component-scan base-package="com.sohu.sns.monitor"/>
+    <task:scheduler id="schedulerMqtt" pool-size="4"/>
+
+    <task:scheduled-tasks scheduler="schedulerMqtt">
+        <task:scheduled ref="persistentConn" method="start" fixed-delay="60000"
+                        initial-delay="3000"/>
+        <task:scheduled ref="scheduleConn" method="start" fixed-delay="60000"
+                        initial-delay="3000"/>
+    </task:scheduled-tasks>
 
     <import resource="classpath*:monitorCommonContext.xml"/>
-    <import resource="classpath*:redisMonitorContext.xml"/>
-    <import resource="classpath*:httpMonitorContext.xml"/>
-    <import resource="classpath*:mqttContext.xml"/>
 </beans>

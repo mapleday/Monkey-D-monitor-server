@@ -32,8 +32,6 @@ public class APP {
             ZkUtils.initZkConfig(args[0]);
             SnsDiamonds.setDiamondsEnvBySystem();
             context = new ClassPathXmlApplicationContext("applicationContext.xml");
-            MqttMonitorApp.start("192.168.93.11:80");
-            MqttMonitorApp.start("cc.sns.sohusce.com:80");
             System.out.println("start ok !!!!!!");
             System.in.read();
             System.out.println("in !!!!!!");

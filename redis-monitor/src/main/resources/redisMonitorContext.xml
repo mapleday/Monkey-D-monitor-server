@@ -16,4 +16,6 @@
         <task:scheduled ref="redisMonitorSchedule" method="checkRedisAndSendWeixin" fixed-delay="60000"
                         initial-delay="30000"/>
     </task:scheduled-tasks>
+
+    <import resource="classpath*:monitorCommonContext.xml"/>
 </beans>

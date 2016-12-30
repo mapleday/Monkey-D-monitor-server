@@ -13,4 +13,6 @@
     <task:scheduled-tasks scheduler="schedulerHttp">
         <task:scheduled ref="monitorSchedule" method="schedule" fixed-delay="10000" initial-delay="1000"/>
     </task:scheduled-tasks>
+
+    <import resource="classpath*:monitorCommonContext.xml"/>
 </beans>

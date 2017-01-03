@@ -1,7 +1,7 @@
 package com.sohu.sns.monitor.web.controler;
 
-import com.sohu.sns.monitor.web.domain.HttpResource;
-import com.sohu.sns.monitor.web.service.HttpResourceService;
+import com.sohu.sns.monitor.common.module.HttpResource;
+import com.sohu.sns.monitor.common.services.HttpResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -3,9 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
-
     <context:annotation-config/>
-    <context:component-scan base-package="com.sohu.sns.monitor.web"/>
-    <import resource="mybatis/mybatis.xml"/>
+    <bean id="springContextUtil" class="com.sohu.snscommon.utils.spring.SpringContextUtil"/>
+    <context:component-scan base-package="com.sohu.sns.monitor"/>
+
+    <import resource="classpath*:monitorCommonContext.xml"/>
     <import resource="springmvc.xml"/>
 </beans>

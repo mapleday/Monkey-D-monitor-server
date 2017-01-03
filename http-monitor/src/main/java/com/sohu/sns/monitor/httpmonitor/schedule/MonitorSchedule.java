@@ -72,7 +72,7 @@ public class MonitorSchedule {
                         taskSchedules.put(key, value + httpResource.getMonitorInterval());
                         MonitorResult monitorResult = monitor.monitor(httpResource);
                         if (monitorResult.isFailed() && monitorResult.getFailedTimes() >= httpResource.getAlarmThresholdTimes()) {
-                            monitor.notify("18910556026", monitorResult);
+                            monitor.notify(monitorResult);
                         }
                     }
                 });

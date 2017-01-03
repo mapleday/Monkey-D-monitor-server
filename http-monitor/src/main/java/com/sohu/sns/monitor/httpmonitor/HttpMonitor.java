@@ -8,9 +8,7 @@ import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * author:jy
@@ -21,6 +19,7 @@ import java.util.Map;
 public class HttpMonitor {
     @Autowired
     NotifyService notifyService;
+
     /**
      * 监控
      *
@@ -36,32 +35,40 @@ public class HttpMonitor {
         Integer monitorTimes = resource.getMonitorTimes();
 
         MonitorResult monitorResult = new MonitorResult();
-        StringBuilder faildReason = new StringBuilder();
+        Set<String> faildReasons = new HashSet();
+
         monitorResult.setMonitorTimes(monitorTimes);
         for (int i = 0; i < monitorTimes.intValue(); i++) {
             try {
                 HttpClientUtil.HttpResult post = httpClientUtil.get(resouceAddress, Collections.<String, String>emptyMap(), header);
                 int statusCode = post.getStatusCode();
                 if (statusCode != 200) {
+                    faildReasons.add(String.valueOf(statusCode));
                     monitorResult.setFailed(true);
-                    faildReason.append(String.valueOf(statusCode)).append("|");
                     monitorResult.setResouceAddress(resouceAddress);
                     monitorResult.addFailedTimes();
                     LOGGER.buziLog(ModuleEnum.UTIL, "HttpMonitor.monitor", String.valueOf(resource), String.valueOf(statusCode));
                 }
             } catch (Exception e) {
                 monitorResult.setFailed(true);
-                faildReason.append(e.getClass().getName()).append("|");
+                faildReasons.add(e.getClass().getName());
                 monitorResult.setResouceAddress(resouceAddress);
                 monitorResult.addFailedTimes();
                 LOGGER.buziLog(ModuleEnum.UTIL, "HttpMonitor.monitor", String.valueOf(resource), "is failed");
             }
-            monitorResult.setFailedReason(faildReason.toString());
+
+            if (!faildReasons.isEmpty()) {
+                StringBuilder faildReason = new StringBuilder();
+                for (String reason : faildReasons) {
+                    faildReason.append(reason + "|");
+                }
+                monitorResult.setFailedReason(faildReason.toString());
+            }
         }
         return monitorResult;
     }
 
-    public void notify(String phones, MonitorResult monitorResult) {
+    public void notify(MonitorResult monitorResult) {
         String messageFormat = "接口报警：( 接口： %s ) ( 监控次：%s ) ( 错误次数:%s ) ( 错误原因:%s )";
         String msg = String.format(messageFormat, monitorResult.getResouceAddress()
                 , monitorResult.getMonitorTimes()

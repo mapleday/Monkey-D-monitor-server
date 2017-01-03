@@ -43,7 +43,7 @@
     <!-- mybatis配置 -->
     <bean id="sqlSessionFactory_write" class="org.mybatis.spring.SqlSessionFactoryBean" lazy-init="false">
         <property name="dataSource" ref="dataSource_write"/>
-        <property name="mapperLocations" value="classpath*:/com/sohu/sns/monitor/common/dao/**/*.xml"/>
+        <property name="mapperLocations" value="classpath*:/com/sohu/sns/monitor/common/dao/notifyPerson/NotifyPerson.xml"/>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">

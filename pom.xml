@@ -9,13 +9,13 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
+        <module>monitor-common</module>
         <module>http-monitor</module>
         <module>redis-monitor</module>
         <module>monitor-app</module>
         <module>log-monitor</module>
         <module>dubbo-monitor</module>
         <module>mqtt-monitor</module>
-        <module>monitor-common</module>
         <module>monitor-web</module>
     </modules>
 

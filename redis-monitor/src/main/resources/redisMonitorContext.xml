@@ -17,5 +17,4 @@
                         initial-delay="30000"/>
     </task:scheduled-tasks>
 
-    <import resource="classpath*:monitorCommonContext.xml"/>
 </beans>

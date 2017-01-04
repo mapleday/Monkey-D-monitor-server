@@ -17,8 +17,8 @@ package com.sohu.sns.monitor.dubbo.controller;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
-import com.sohu.sns.monitor.dubbo.RegistryContainer;
 import com.sohu.sns.monitor.dubbo.domain.DubboService;
+import com.sohu.sns.monitor.dubbo.RegistryContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

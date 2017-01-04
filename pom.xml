@@ -41,6 +41,11 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.sohu.snscommon</groupId>
+                <artifactId>kafka-common</artifactId>
+                <version>${snscommon.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>

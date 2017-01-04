@@ -1,8 +1,8 @@
 package com.sohu.sns.monitor.httpmonitor.schedule;
 
-import com.sohu.sns.monitor.common.module.HttpResource;
 import com.sohu.sns.monitor.httpmonitor.HttpMonitor;
 import com.sohu.sns.monitor.httpmonitor.MonitorResult;
+import com.sohu.sns.monitor.common.module.HttpResource;
 import com.sohu.sns.monitor.common.services.HttpResourceService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;

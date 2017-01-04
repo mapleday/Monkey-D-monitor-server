@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.util;
+package com.sohu.sns.monitor.log.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

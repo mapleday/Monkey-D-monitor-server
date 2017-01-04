@@ -1,12 +1,9 @@
 package com.sohu.sns.monitor.mqtt;
 
-import com.sohu.sns.monitor.mqtt.tasks.PersistentConn;
-import com.sohu.sns.monitor.mqtt.tasks.ScheduleConn;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.zk.SnsDiamonds;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.util.concurrent.CountDownLatch;

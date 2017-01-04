@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.model;
+package com.sohu.sns.monitor.log.model;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

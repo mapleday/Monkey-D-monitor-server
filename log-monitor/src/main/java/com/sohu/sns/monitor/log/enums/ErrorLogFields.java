@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.enums;
+package com.sohu.sns.monitor.log.enums;
 
 /**
  * Created by chenshouqin on 2015/6/21.

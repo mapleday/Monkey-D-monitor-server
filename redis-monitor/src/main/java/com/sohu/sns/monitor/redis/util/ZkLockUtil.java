@@ -1,6 +1,5 @@
 package com.sohu.sns.monitor.redis.util;
 
-import com.sohu.sns.monitor.redis.config.ZkPathConfig;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 import com.sohu.snscommon.utils.constant.ModuleEnum;

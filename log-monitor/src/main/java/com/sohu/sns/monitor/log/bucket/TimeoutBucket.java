@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.bucket;
+package com.sohu.sns.monitor.log.bucket;
 
 import com.google.common.base.Strings;
 

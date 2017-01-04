@@ -3,7 +3,6 @@ package com.sohu.sns.monitor.mqtt.tasks;
 import com.sohu.sns.monitor.common.dao.mqttMonitor.MqttMonitorDao;
 import com.sohu.sns.monitor.common.module.MqttServerAddress;
 import com.sohu.sns.monitor.common.services.NotifyService;
-import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.mqtt.client.NettyClient;
 import com.sohu.sns.monitor.mqtt.client.SimpleMqttMessage;
 import com.sohu.snscommon.utils.LOGGER;
@@ -15,9 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**

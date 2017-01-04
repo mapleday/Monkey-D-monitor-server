@@ -1,7 +1,7 @@
 package com.sohu.sns.monitor.common.services;
 
-import com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao;
 import com.sohu.sns.monitor.common.module.NotifyPerson;
+import com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao;
 import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;

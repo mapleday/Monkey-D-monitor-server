@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.config;
+package com.sohu.sns.monitor.log.config;
 
 import com.sohu.snscommon.utils.config.ZkPathConfigure;
 

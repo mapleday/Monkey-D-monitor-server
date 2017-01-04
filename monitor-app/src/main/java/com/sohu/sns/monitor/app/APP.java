@@ -1,6 +1,5 @@
 package com.sohu.sns.monitor.app;
 
-import com.sohu.sns.monitor.mqtt.MqttMonitorApp;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.log.CustomRolloverFileOutputStream;

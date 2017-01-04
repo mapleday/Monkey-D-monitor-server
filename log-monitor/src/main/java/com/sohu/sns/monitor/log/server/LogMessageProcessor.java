@@ -1,11 +1,9 @@
-package com.sohu.sns.monitor.server;
+package com.sohu.sns.monitor.log.server;
 
 import com.codahale.metrics.MetricRegistry;
 import com.sohu.sns.common.utils.json.JsonMapper;
-import com.sohu.sns.monitor.server.consumer.MonitorErrorLogConsumer;
-import com.sohu.snscommon.dbcluster.service.impl.MysqlClusterServiceImpl;
+import com.sohu.sns.monitor.log.server.consumer.MonitorErrorLogConsumer;
 import com.sohu.snscommon.kafka.Kafka;
-import com.sohu.snscommon.utils.spring.SpringContextUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.zookeeper.KeeperException;
 
@@ -38,8 +36,10 @@ public class LogMessageProcessor {
         this.monitorMethods = (String) timeoutConfigMap.get("monitor_methods");
     }
 
-    /**'
+    /**
+     * '
      * 根据kafka的配置和topic & group等信息初始化消费者
+     *
      * @throws IOException
      * @throws InterruptedException
      * @throws KeeperException
@@ -50,23 +50,23 @@ public class LogMessageProcessor {
 
         /**解析超时异常的种类**/
         Set<String> timeoutTypes = new HashSet<String>();
-        if(null != timeoutTypesStr) {
+        if (null != timeoutTypesStr) {
             String[] timeoutArray = StringUtils.split(timeoutTypesStr, ",");
-            for(String str : timeoutArray) {
+            for (String str : timeoutArray) {
                 timeoutTypes.add(str.trim());
             }
         }
 
         /**解析需要发送监控短信的接口**/
         Set<String> methodsTypes = new HashSet<String>();
-        if(null != monitorMethods) {
+        if (null != monitorMethods) {
             String[] methodsArray = StringUtils.split(monitorMethods, ",");
-            for(String str : methodsArray) {
+            for (String str : methodsArray) {
                 methodsTypes.add(str);
             }
         }
 
-        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer(SpringContextUtil.getBean(MysqlClusterServiceImpl.class), timeoutTypes, methodsTypes));
+        kafka.consumeForever(topicName, groupName, 1, new MonitorErrorLogConsumer());
     }
 
     public void start() {

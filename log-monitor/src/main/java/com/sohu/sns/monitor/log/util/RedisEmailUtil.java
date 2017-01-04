@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.util;
+package com.sohu.sns.monitor.log.util;
 
 /**
  * Created by Gary Chan on 2016/4/16.

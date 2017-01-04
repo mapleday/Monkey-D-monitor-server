@@ -13,4 +13,5 @@
     <import resource="classpath*:redisMonitorContext.xml"/>
     <import resource="classpath*:httpMonitorContext.xml"/>
     <import resource="classpath*:mqttContext.xml"/>
+    <import resource="classpath*:logSpringConetxt.xml"/>
 </beans>

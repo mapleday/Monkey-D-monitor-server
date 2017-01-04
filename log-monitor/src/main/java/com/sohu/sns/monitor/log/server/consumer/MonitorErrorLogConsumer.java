@@ -1,21 +1,22 @@
-package com.sohu.sns.monitor.server.consumer;
+package com.sohu.sns.monitor.log.server.consumer;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.sohu.sns.common.utils.json.JsonMapper;
-import com.sohu.sns.monitor.bucket.TimeoutBucket;
-import com.sohu.sns.monitor.enums.ErrorLogFields;
-import com.sohu.sns.monitor.model.ErrorLog;
-import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
-import com.sohu.snscommon.dbcluster.service.exception.MysqlClusterException;
+import com.sohu.sns.monitor.log.bucket.TimeoutBucket;
+import com.sohu.sns.monitor.log.enums.ErrorLogFields;
+import com.sohu.sns.monitor.log.bucket.TimeoutBucket;
+import com.sohu.sns.monitor.log.enums.ErrorLogFields;
+import com.sohu.sns.monitor.log.model.ErrorLog;
+import com.sohu.sns.monitor.log.model.ErrorLog;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Gary on 2015/10/19.
@@ -26,11 +27,6 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
-
-    public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, Set<String> timeoutTypes, Set<String> methodsTypes) {
-    }
-
-    @Nullable
     @Override
     public Boolean apply(byte[] bytes) {
         String msg = null;
@@ -48,7 +44,6 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
      * 处理所获得的错误日志信息
      *
      * @param msg
-     * @throws MysqlClusterException
      */
     private void handle(String msg) throws Exception {
         if (Strings.isNullOrEmpty(msg)) return;

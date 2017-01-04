@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sohu.sns.monitor.common.dao.timeoutApiCollect.TimeoutApiCollectDao">
+    <select id="getTimeOutCount" resultType="int" parameterType="com.sohu.sns.monitor.common.module.TimeoutApiCollect">
+        SELECT count(1)
+        FROM timeout_api_collect
+        WHERE appId = #{appId}
+          AND moduleName = #{moduleName}
+          AND methodName = #{methodName}
+          AND date_str = #{dateStr}
+    </select>
+
+    <insert id="saveTimeOut" parameterType="com.sohu.sns.monitor.common.module.TimeoutApiCollect">
+        INSERT INTO timeout_api_collect
+        SET appId = #{appId},
+            moduleName = #{moduleName},
+            methodName = #{methodName},
+            timeoutCount = #{timeoutCount},
+            date_str = #{dateStr},
+            updateTime = #{updateTime}
+    </insert>
+
+    <update id="updateTimeOutCount" parameterType="com.sohu.sns.monitor.common.module.TimeoutApiCollect">
+        UPDATE timeout_api_collect
+        SET
+        <choose>
+            <when test="timeoutCount != null">
+                timeoutCount = #{timeoutCount},
+            </when>
+            <otherwise>
+                timeoutCount = 0,
+            </otherwise>
+        </choose>
+        <choose>
+            <when test="updateTime != null">
+                updateTime = #{updateTime}
+            </when>
+            <otherwise>
+                updateTime = now()
+            </otherwise>
+        </choose>
+        WHERE appId = #{appId}
+        AND moduleName = #{moduleName}
+        AND methodName = #{methodName}
+        AND date_str = #{dateStr}
+    </update>
+</mapper>

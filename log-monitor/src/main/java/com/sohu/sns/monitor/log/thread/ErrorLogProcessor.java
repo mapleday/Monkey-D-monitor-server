@@ -5,15 +5,18 @@ import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.monitor.log.bucket.TimeoutBucket;
 import com.sohu.sns.monitor.common.dao.timeoutApiCollect.TimeoutApiCollectDao;
 import com.sohu.sns.monitor.common.module.TimeoutApiCollect;
+import com.sohu.sns.monitor.log.config.ZkPathConfig;
 import com.sohu.sns.monitor.log.util.DateUtil;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
+import com.sohu.snscommon.utils.zk.SnsDiamonds;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,7 +36,9 @@ public class ErrorLogProcessor {
     TimeoutApiCollectDao timeoutApiCollectDao;
 
 
-    public static void init(String monitorUrls) {
+    @PostConstruct
+    public void init() {
+        String monitorUrls = SnsDiamonds.getZkData(ZkPathConfig.MONITOR_URL_CONFIG);
         Map<String, String> urls = jsonMapper.fromJson(monitorUrls, HashMap.class);
         ErrorLogProcessor.baseUrl = urls.get("base_url");
         ErrorLogProcessor.smsTimeoutWarnInterface = urls.get("sms_timeout_warn_interface");

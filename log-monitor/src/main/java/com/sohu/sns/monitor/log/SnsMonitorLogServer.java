@@ -27,20 +27,7 @@ public class SnsMonitorLogServer {
                     ZkPathConfigure.ZOOKEEPER_AUTH_PASSWORD, ZkPathConfigure.ZOOKEEPER_TIMEOUT);
             SnsDiamonds.setDiamondsEnvBySystem();
 
-            /**读取kafka的配置**/
-            String kafkaConfig = new String(zk.getData(ZkPathConfig.KAFKA_CONFIG));
-            /**读取超时异常的种类**/
-            String timeoutConfig = new String(zk.getData(ZkPathConfig.TIMEOUT_CONFIG));
-            /**读取所有的kafka_topics**/
-            String kafkaTopics = new String(zk.getData(ZkPathConfig.KAFKA_TOPICS_CONFIG));
-            /**监控各种urls**/
-            String monitorUrls = new String(zk.getData(ZkPathConfig.MONITOR_URL_CONFIG));
-            ErrorLogProcessor.init(monitorUrls);
-
             new ClassPathXmlApplicationContext("classpath:logSpringConetxt.xml").start();
-
-            /**启动监控错误日志的消费者**/
-            new LogMessageProcessor(kafkaTopics, kafkaConfig, timeoutConfig).start();
 
             LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "SnsMonitorLogServer.start", "start ok!", "");
 

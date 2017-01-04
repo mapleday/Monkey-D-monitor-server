@@ -2,11 +2,8 @@ package com.sohu.sns.monitor.thread;
 
 import com.sohu.sns.common.utils.DateUtilTool;
 import com.sohu.sns.common.utils.json.JsonMapper;
-import com.sohu.sns.monitor.bucket.ErrorLogBucket;
 import com.sohu.sns.monitor.bucket.TimeoutBucket;
-import com.sohu.sns.monitor.model.ErrorLog;
 import com.sohu.sns.monitor.util.DateUtil;
-import com.sohu.sns.monitor.util.ZipUtils;
 import com.sohu.snscommon.dbcluster.service.MysqlClusterService;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -57,32 +54,10 @@ public class ErrorLogProcessor implements Runnable {
 
                 if (inProcess) return;
 
-                /**错误信息统计桶**/
-                ConcurrentHashMap<String, List<ErrorLog>> bucket = ErrorLogBucket.exchange();
                 /**超时统计桶*/
                 ConcurrentHashMap<String, AtomicInteger> timeoutBucket = TimeoutBucket.exchange();
 
                 try {
-                    if (null != bucket && ! bucket.isEmpty()) {
-                        System.out.println("error_log_send_to_server timer, bucket_size : " + bucket.size() +
-                                ", time : "+ DateUtil.getCurrentTime());
-
-                        Map<String, String> convertedMap = new HashMap<String, String>();
-                        Set<String> keySet = bucket.keySet();
-                        for(String key : keySet) {
-                            convertedMap.put(key, jsonMapper.toJson(bucket.get(key)));
-                        }
-                        String errorLogs = ZipUtils.gzip(jsonMapper.toJson(convertedMap));
-                        Map<String, String> errorMap = new HashMap<String, String>();
-                        errorMap.put("errorLogs", errorLogs);
-                        try {
-//                            HttpClientUtil.getStringByPost(baseUrl+emailErrorlogInterface, errorMap, null);
-                        } catch (Exception e) {
-                            LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "send_errorLog_to_server_email", errorMap.size()+"", null, e);
-                            e.printStackTrace();
-                        }
-                    }
-
                     if (null != timeoutBucket && ! timeoutBucket.isEmpty()) {
                         System.out.println("timeout_count_send_to_server timer, bucket_size : " + timeoutBucket.size() +
                                 ", time : "+ DateUtil.getCurrentTime());
@@ -102,7 +77,6 @@ public class ErrorLogProcessor implements Runnable {
                     LOGGER.errorLog(ModuleEnum.MONITOR_SERVICE, "ErrorLogProcessor.Timer.run", DateUtilTool.getToday(), "", e);
                 } finally {
                     inProcess = false;
-                    bucket.clear();
                     timeoutBucket.clear();
                     LOGGER.statLog(ModuleEnum.MONITOR_SERVICE, "ErrorLogProcessor.Timer.run", "", "", System.currentTimeMillis() - startTime, 0, 0);
                 }

@@ -24,20 +24,10 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     private static final Joiner JOINER = Joiner.on("_").skipNulls();
 
-    private static final String INSERT_DATA = "replace into error_logs set appId = ?, instanceId = ?, " +
-            "moduleName = ?, method = ?, param = ?, returnValue = ?, exceptionName = ?, exceptionDesc = ?, " +
-            "stackTrace = ?, updateTime = now()";
-
     private JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
-    private MysqlClusterService mysqlClusterService;
-    private Set<String> timeoutTypes;
-    private Set<String> methodsTypes;
 
     public MonitorErrorLogConsumer(MysqlClusterService mysqlClusterService, Set<String> timeoutTypes, Set<String> methodsTypes) {
-        this.mysqlClusterService = mysqlClusterService;
-        this.timeoutTypes = (null == timeoutTypes ? new HashSet<String>() : timeoutTypes);
-        this.methodsTypes = methodsTypes;
     }
 
     @Nullable
@@ -56,15 +46,16 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
 
     /**
      * 处理所获得的错误日志信息
+     *
      * @param msg
      * @throws MysqlClusterException
      */
     private void handle(String msg) throws Exception {
-        if(Strings.isNullOrEmpty(msg)) return;
+        if (Strings.isNullOrEmpty(msg)) return;
         Map<String, String> msgMap = jsonMapper.fromJson(msg, HashMap.class);
-        if(null == msgMap || msgMap.isEmpty()) return;
+        if (null == msgMap || msgMap.isEmpty()) return;
         String[] arr = StringUtils.split(msgMap.get(ErrorLogFields.APP_ID.getName()), "_");
-        if(2 != arr.length) return;
+        if (2 != arr.length) return;
         ErrorLog errorLog = new ErrorLog();
         errorLog.setAppId(arr[0].replaceAll("\"", ""));
         errorLog.setInstanceId(arr[1].replaceAll("\"", ""));
@@ -77,32 +68,7 @@ public class MonitorErrorLogConsumer implements Function<byte[], Boolean> {
         errorLog.setStackTrace(msgMap.get(ErrorLogFields.STACK_TRACE.getName()));
         errorLog.setTime(new Date());
 
-//       ErrorLogBucket.insertData(errorLog);
-
-        /**超时统计*/
-        if(timeoutTypes.contains(errorLog.getExceptionName())) {
-            TimeoutBucket.insertData(JOINER.join(errorLog.getAppId(), errorLog.getModule(), errorLog.getMethod()));
-        }
-
-        /**特定方法短信监控**/
-        String method = JOINER.join(errorLog.getAppId(), errorLog.getModule(), errorLog.getMethod());
-        if(methodsTypes.contains(method)) {
-            TimeoutBucket.insertData(method);
-        }
-
-//        saveToDB(errorLog);
+        TimeoutBucket.insertData(JOINER.join(errorLog.getAppId(), errorLog.getModule(), errorLog.getMethod()));
     }
 
-    /**
-     * 将错误日志保存到数据库
-     * @param errorLog
-     * @throws MysqlClusterException
-     */
-    private void saveToDB(ErrorLog errorLog) throws Exception {
-        JdbcTemplate writeJdbcTemplate = mysqlClusterService.getWriteJdbcTemplate(null);
-        writeJdbcTemplate.update(INSERT_DATA, errorLog.getAppId(), errorLog.getInstanceId(),
-                errorLog.getModule(), errorLog.getMethod(), errorLog.getParam(),
-                errorLog.getReturnValue(), errorLog.getExceptionName(), errorLog.getExceptionDesc(),
-                errorLog.getStackTrace());
-    }
 }

@@ -24,14 +24,9 @@
     <update id="updateTimeOutCount" parameterType="com.sohu.sns.monitor.common.module.TimeoutApiCollect">
         UPDATE timeout_api_collect
         SET
-        <choose>
-            <when test="timeoutCount != null">
-                timeoutCount = #{timeoutCount},
-            </when>
-            <otherwise>
-                timeoutCount = 0,
-            </otherwise>
-        </choose>
+        <if test="timeoutCount != null">
+            timeoutCount = timeoutCount + #{timeoutCount},
+        </if>
         <choose>
             <when test="updateTime != null">
                 updateTime = #{updateTime}

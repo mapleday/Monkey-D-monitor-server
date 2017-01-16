@@ -21,6 +21,17 @@ public class HttpResourceService {
      * @return
      */
     public List<HttpResource> getResources() {
-        return httpResourceDAO.getResources();
+        List<HttpResource>  list=httpResourceDAO.getResources();
+        for(HttpResource l:list){
+            System.out.println(l);
+        }
+//        return httpResourceDAO.getResources();
+        return list;
     }
+
+    public void updateResource(HttpResource hr ){
+        httpResourceDAO.updateResource(hr);
+    }
+
+
 }

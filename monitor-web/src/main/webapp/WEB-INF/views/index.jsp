@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!--
 This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
@@ -11,11 +12,18 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.6 -->
+
   <link rel="stylesheet" href="resources/admin-lte/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/editor.dataTables.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/buttons.dataTables.min.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/select.dataTables.min.css">
+
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+  <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">-->
   <!-- Ionicons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">-->
+
   <!-- Theme style -->
   <link rel="stylesheet" href="resources/admin-lte/dist/css/AdminLTE.min.css">
   <!-- AdminLTE Skins. We have chosen the skin-blue for this starter
@@ -26,10 +34,86 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
+  <!--[if lt IE 9]-->  <!--[endif]-->
+  <!--<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>-->
+  <!--<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>-->
+
+  <script  src="resources/admin-lte/Editor-1.6.1/js/jquery-1.12.4.js"></script>
+  <script  src="resources/admin-lte/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+  <script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+  <script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.select.min.js"></script>
+  <script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.editor.js"></script>
+
+  <script type="text/javascript" class="init">
+      // use a global for the submit and return data rendering in the examples
+      var editor;
+      $(document).ready(function() {
+          editor = new $.fn.dataTable.Editor( {
+              ajax: {
+                  create:{
+                      type:'POST',
+                      url: 'createResource'
+                  },
+                  edit:{
+                      type:'PUT',
+                      url: 'updateResource?id=_id_'
+                  },
+                  remove:{
+                      type:'DELETE',
+                      url: 'deleteResource?id=_id_'
+                  }
+
+              },
+              table: "#example",
+              idSrc: "id",
+              fields: [
+                  {
+                  label: "resource_id:",
+                  name: "id"
+              },
+                  {
+                  label: "resource_name:",
+                  name: "resourceName"
+              },  {
+                  label: "resource_addr:",
+                  name: "resourceAddress"
+                  },{
+                  label: "monitor_timeout:",
+                  name:  "monitorTimeOut"
+              }, {
+                  label: "monitor_interval:",
+                  name: "monitorInterval"
+              }, {
+                  label: "monitor_times:",
+                  name: "monitorTimes"
+              }, {
+                  label: "alarm_threshold_times:",
+                  name: "alarmThresholdTimes"
+              }
+              ]
+          } );
+
+          $('#example').DataTable( {
+              dom: "Bfrtip",
+              ajax: "getHttpResource",
+              columns: [
+                  { data: "id" } ,
+                  { data: "resourceName" },
+                  { data: "resourceAddress"},
+                  { data: "monitorTimeOut" },
+                  { data: "monitorInterval" },
+                  { data: "monitorTimes" },
+                  { data: "alarmThresholdTimes" }
+              ],
+              select: true,
+              buttons: [
+                  { extend: "create", editor: editor },
+                  { extend: "edit",   editor: editor },
+                  { extend: "remove", editor: editor }
+              ]
+          } );
+      } );
+  </script>
 </head>
 <!--
 BODY TAG OPTIONS:
@@ -276,7 +360,7 @@ desired effect
   </aside>
 
   <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
+  <div class="content-wrapper "  >
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
@@ -290,12 +374,43 @@ desired effect
     </section>
 
     <!-- Main content -->
-    <section class="content">
-      ${httpResourcelist}
+    <section class="content" style="overflow: scroll">
+      <table id="example" class="display dataTable" cellpadding="0" width="100%" >
+        <thead>
+        <tr>
+          <th>resource_id</th>
+          <th>resource_name</th>
+          <th>resource_addr</th>
+          <th>monitor_timeout</th>
+          <th>monitor_interval</th>
+          <th>monitor_times</th>
+          <th>alarm_threshold_times</th>
+        </tr>
+        </thead>
+        <tfoot>
+        <tr>
+          <th>resource_id</th>
+          <th>resource_name</th>
+          <th>resource_addr</th>
+          <th>monitor_timeout</th>
+          <th>monitor_interval</th>
+          <th>monitor_times</th>
+          <th>alarm_threshold_times</th>
+        </tr>
+        </tfoot>
+      </table>
+
+
+
+
       <!-- Your Page Content Here -->
+
+
 
     </section>
     <!-- /.content -->
+
+
   </div>
   <!-- /.content-wrapper -->
 
@@ -323,7 +438,7 @@ desired effect
         <h3 class="control-sidebar-heading">Recent Activity</h3>
         <ul class="control-sidebar-menu">
           <li>
-            <a href="javascript::;">
+            <a href="javascript:;">
               <i class="menu-icon fa fa-birthday-cake bg-red"></i>
 
               <div class="menu-info">
@@ -339,7 +454,7 @@ desired effect
         <h3 class="control-sidebar-heading">Tasks Progress</h3>
         <ul class="control-sidebar-menu">
           <li>
-            <a href="javascript::;">
+            <a href="javascript:;">
               <h4 class="control-sidebar-subheading">
                 Custom Template Design
                 <span class="pull-right-container">
@@ -359,7 +474,7 @@ desired effect
       <!-- /.tab-pane -->
       <!-- Stats tab content -->
       <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
-      <!-- /.tab-pane -->
+      <!-- /.tsab-pane -->
       <!-- Settings tab content -->
       <div class="tab-pane" id="control-sidebar-settings-tab">
         <form method="post">
@@ -391,7 +506,7 @@ desired effect
 <!-- REQUIRED JS SCRIPTS -->
 
 <!-- jQuery 2.2.3 -->
-<script src="resources/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!--<script src="resources/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>-->
 <!-- Bootstrap 3.3.6 -->
 <script src="resources/admin-lte/bootstrap/js/bootstrap.min.js"></script>
 <!-- AdminLTE App -->

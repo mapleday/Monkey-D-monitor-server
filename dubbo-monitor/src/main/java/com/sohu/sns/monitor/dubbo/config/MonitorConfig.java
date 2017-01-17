@@ -38,10 +38,10 @@ import java.util.Properties;
 @ComponentScan(basePackages = {"com.sohu.sns.monitor.dubbo"}, includeFilters = {@ComponentScan.Filter(value = Service.class)})
 @Import({WebConfig.class, DubboConfig.class, MyBatisConfig.class, Security.class})
 public class MonitorConfig {
-    @Autowired
+    @Autowired  // 成员变量
     private Environment env;
 
-    @PostConstruct
+    @PostConstruct // 加载servlet时执行，只被执行一次。
     public void init() {
         initZk();
     }

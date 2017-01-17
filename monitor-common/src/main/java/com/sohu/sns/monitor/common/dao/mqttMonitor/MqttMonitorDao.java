@@ -12,4 +12,7 @@ import java.util.List;
 @Repository
 public interface MqttMonitorDao {
     public List<MqttServerAddress> getServers();
+    public int updateMqttServerAddress(MqttServerAddress mqttServerAddress);
+    public int addMqttServerAddress(MqttServerAddress mqttServerAddress);
+    public int deleteMqttServerAddress(MqttServerAddress mqttServerAddress);
 }

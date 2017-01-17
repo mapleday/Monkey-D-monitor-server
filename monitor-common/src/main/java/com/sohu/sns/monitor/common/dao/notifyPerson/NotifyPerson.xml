@@ -12,4 +12,41 @@
         WHERE
           t.status=1
     </select>
+
+
+    <update id="updateNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        UPDATE t_notify_person
+        <set>
+            <if test="id != null"> id = #{id}, </if>
+            <if test="name != null"> name = #{name}, </if>
+            <if test="email != null"> email = #{email}, </if>
+            <if test="phone != null"> phone = #{phone}, </if>
+            <if test="status != null"> status = #{status} </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <insert id="addNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        INSERT INTO t_notify_person
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null"> name, </if>
+            <if test="email != null"> email, </if>
+            <if test="phone != null"> phone, </if>
+            <if test="status != null"> status</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null"> #{name}, </if>
+            <if test="email != null"> #{email}, </if>
+            <if test="phone != null">  #{phone}, </if>
+            <if test="status != null">  #{status} </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        DELETE FROM t_notify_person where id = #{id}
+    </delete>
+
+
 </mapper>

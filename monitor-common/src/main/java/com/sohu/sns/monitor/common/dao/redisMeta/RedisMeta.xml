@@ -11,6 +11,13 @@
             log_day = #{logDay}
     </select>
 
+    <select id="getRedisMetaMemory">
+        SELECT
+        *
+        FROM
+        meta_redis_used_memory_day
+    </select>
+
     <select id="getLastDayMemory">
         SELECT
             used_memory
@@ -43,5 +50,9 @@
         WHERE
           log_day = #{logDay}
     </update>
+
+    <delete id="deleteDayRecord" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+        DELETE FROM meta_redis_used_memory_day where log_day = #{logDay}
+    </delete>
 
 </mapper>

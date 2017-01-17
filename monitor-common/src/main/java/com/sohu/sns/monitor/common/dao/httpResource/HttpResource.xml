@@ -15,6 +15,49 @@
         FROM
           t_monitor_http_resource t
         WHERE
-          t.status=1
+          1=1
     </select>
+
+    <update id="updateResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
+        UPDATE t_monitor_http_resource
+        <set>
+            <if test="id != null"> id = #{id}, </if>
+            <if test="resourceName != null"> resource_name = #{resourceName}, </if>
+            <if test="resourceAddress != null"> resource_address = #{resourceAddress}, </if>
+            <if test="monitorTimeOut != null"> monitor_time_out = #{monitorTimeOut}, </if>
+            <if test="monitorInterval != null"> monitor_time_interval = #{monitorInterval}, </if>
+            <if test="monitorTimes != null"> monitor_times = #{monitorTimes}, </if>
+            <if test="alarmThresholdTimes != null"> alarm_threshold_times = #{alarmThresholdTimes} </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <insert id="addResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
+        INSERT INTO t_monitor_http_resource
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="resourceName != null"> resource_name, </if>
+            <if test="resourceAddress != null"> resource_address, </if>
+            <if test="monitorTimeOut != null"> monitor_time_out, </if>
+            <if test="monitorInterval != null"> monitor_time_interval, </if>
+            <if test="monitorTimes != null"> monitor_times, </if>
+            <if test="alarmThresholdTimes != null"> alarm_threshold_times </if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="resourceName != null"> #{resourceName}, </if>
+            <if test="resourceAddress != null"> #{resourceAddress}, </if>
+            <if test="monitorTimeOut != null">  #{monitorTimeOut}, </if>
+            <if test="monitorInterval != null">  #{monitorInterval}, </if>
+            <if test="monitorTimes != null">  #{monitorTimes}, </if>
+            <if test="alarmThresholdTimes != null"> #{alarmThresholdTimes} </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
+        DELETE FROM t_monitor_http_resource where id = #{id}
+    </delete>
+
 </mapper>

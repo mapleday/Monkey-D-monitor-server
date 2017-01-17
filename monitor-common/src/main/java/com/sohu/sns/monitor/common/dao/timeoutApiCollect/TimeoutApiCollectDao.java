@@ -35,4 +35,13 @@ public interface TimeoutApiCollectDao {
      */
     public void updateTimeOutCount(TimeoutApiCollect collect);
 
+    /**
+     * 删除记录
+     *
+     * @param collect
+     */
+    public void deleteTimeOutCount(TimeoutApiCollect collect);
+
+    //public void deleteTimeOutCount(TimeoutApiCollect collect);
+
 }

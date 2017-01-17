@@ -40,4 +40,8 @@
         AND methodName = #{methodName}
         AND date_str = #{dateStr}
     </update>
+
+    <delete id="deleteTimeOutCount" parameterType="com.sohu.sns.monitor.common.module.TimeoutApiCollect">
+        DELETE FROM timeout_api_collect where appId = #{appId}
+    </delete>
 </mapper>

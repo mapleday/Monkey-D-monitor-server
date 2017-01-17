@@ -57,6 +57,7 @@ public class NotifyUtils {
     }
 
     public static void main(String[] args) {
-        sendAlert("18910556026","test");
+        //sendAlert("18910556026","test");
+        sendAlert("13589038573","test");
     }
 }

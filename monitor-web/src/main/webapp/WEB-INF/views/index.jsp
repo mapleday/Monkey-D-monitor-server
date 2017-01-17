@@ -1,5 +1,7 @@
-<!DOCTYPE html>
-<!--
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+　<!--
 This is a starter template page. Use this page to start your new project from
 scratch. This page gets rid of all links and provides the needed markup only.
 -->
@@ -120,46 +122,46 @@ scratch. This page gets rid of all links and provides the needed markup only.
           } );
 
 
-          var table = $('#example').DataTable( {
-              dom: "Bfrtip",
-              ajax: "getHttpResourcelist",
-              "scrollX": true,
-              "bAutoWidth": false,//自适应宽度
-              "aoColumnDefs": [
-                  {
-                      "searchable": true,
-                      "orderable": false,
-                      "targets": 1
-                  }, {
-                      "targets": 2,
-                      "searchable": true,
-                      "orderable": false,
-                  },
-                  {"sWidth": "15%", "aTargets": [0]},
-                  {"sWidth": "15%", "aTargets": [1]},
-                  {"sWidth": "15%", "aTargets": [2]},
-                  {"sWidth": "15%", "aTargets": [3]},
-                  {"sWidth": "20%", "aTargets": [4]},
-                  {"sWidth": "20%", "aTargets": [5]},
-                  {"sWidth": "20%", "aTargets": [6]},
-              ],
-              columns: [
-                  { data: "id"},
-                  { data: "resourceName" },
-                  { data: "resourceAddress"} ,
-                  { data: "monitorTimeOut" },
-                  { data: "monitorInterval" },
-                  { data: "monitorTimes" },
-                  { data: "alarmThresholdTimes" }
-              ],
+            var table = $('#example').DataTable( {
+                dom: "Bfrtip",
+                ajax: "getHttpResourcelist",
+                "scrollX": true,
+                "bAutoWidth": false,//自适应宽度
+                "aoColumnDefs": [
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "targets": 1
+                    }, {
+                        "targets": 2,
+                        "searchable": false,
+                        "orderable": false,
+                    },
+                    {"sWidth": "15%", "aTargets": [0]},
+                    {"sWidth": "15%", "aTargets": [1]},
+                    {"sWidth": "15%", "aTargets": [2]},
+                    {"sWidth": "15%", "aTargets": [3]},
+                    {"sWidth": "20%", "aTargets": [4]},
+                    {"sWidth": "20%", "aTargets": [5]},
+                    {"sWidth": "20%", "aTargets": [6]},
+                ],
+                columns: [
+                    { data: "id"},
+                    { data: "resourceName" },
+                    { data: "resourceAddress"} ,
+                    { data: "monitorTimeOut" },
+                    { data: "monitorInterval" },
+                    { data: "monitorTimes" },
+                    { data: "alarmThresholdTimes" }
+                ],
 
-              select: true,
-              buttons: [
-                  { extend: "create", text:"新增",editor: editor },
-                  { extend: "edit",  text:"修改", editor: editor },
-                  { extend: "remove",  text:"删除",editor: editor }
-              ]
-          } );
+                select: true,
+                buttons: [
+                    { extend: "create", text:"新增",editor: editor },
+                    { extend: "edit",  text:"修改", editor: editor },
+                    { extend: "remove",  text:"删除",editor: editor }
+                ]
+            } );
 
           editor.on('postSubmit', function (e,o,action) {
               //console.log(e);
@@ -418,7 +420,7 @@ desired effect
       <form action="#" method="get" class="sidebar-form">
         <div class="input-group">
           <input type="text" name="q" class="form-control" placeholder="Search...">
-          <span class="input-group-btn">
+              <span class="input-group-btn">
                 <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
                 </button>
               </span>
@@ -430,11 +432,11 @@ desired effect
       <ul class="sidebar-menu">
         <li class="header">HEADER</li>
         <!-- Optionally, you can add icons to the links -->
-        <li class="active"><a href="index"><i class="fa fa-circle-o"></i> <span>httpResource</span></a></li>
-        <li><a href="MqttServerAddress"><i class="fa fa-circle-o"></i> <span>MqttServerAddress</span></a></li>
-        <li><a href="NotifyPerson"><i class="fa fa-circle-o"></i> <span>NotifyPerson</span></a></li>
-        <li><a href="RedisMetaMemory"><i class="fa fa-circle-o"></i> <span>RedisMetaMemory</span></a></li>
-        <li><a href="TimeoutApiCollect"><i class="fa fa-circle-o"></i> <span>TimeoutApiCollect</span></a></li>
+        <li class="active"><a href="#example"><i class="fa fa-circle-o"></i> <span>Link 123</span></a></li>
+        <li><a href="#mqttmonitor"><i class="fa fa-link"></i> <span>Another Link 456</span></a></li>
+        <li><a href="#notify"><i class="fa fa-link"></i> <span>Another Link 456</span></a></li>
+        <li><a href="#redismeta"><i class="fa fa-link"></i> <span>Another Link 456</span></a></li>
+        <li><a href="#timeoutapi"><i class="fa fa-link"></i> <span>Another Link 456</span></a></li>
         <li class="treeview">
           <a href="#"><i class="fa fa-link"></i> <span>Multilevel</span>
             <span class="pull-right-container">
@@ -442,7 +444,7 @@ desired effect
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="#">Link in level 1</a></li>
+            <li><a href="test.html">Link in level 2</a></li>
             <li><a href="#">Link in level 2</a></li>
           </ul>
         </li>
@@ -456,9 +458,9 @@ desired effect
   <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
-      <h1>     HttpResource
+      <h1>     Header...
 
-
+        <small>Optional description</small>
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
@@ -468,32 +470,32 @@ desired effect
 
     <!-- Main content -->
     <section class="content">
-      <!--
-            <input type="button" value="增加资源"  onclick="javascript:alert('00')"/><br/>
-              <table  id="table1" class="table table-striped table-bordered" cellspacing="0" width="100%">
-                <tr>
-                    <td>资源ID：</td>
-                    <td>资源名称： </td>
-                    <td>监控资源超时时间： </td>
-                    <td>监控间隔：</td>
-                    <td>监控次数：</td>
-                    <td>报警阀值：</td>
-                    <td>操作 </td>
-                </tr>
-                <c:forEach var="httpResource" items="${httpResourcelist}">
-                <tr>
-                  <td><c:out value='${httpResource.id}'/></td>
-                  <td><c:out value='${httpResource.resourceName}'/></td>
-                  <td><c:out value='${httpResource.monitorTimeOut}'/></td>
-                  <td><c:out value='${httpResource.monitorInterval}'/></td>
-                  <td><c:out value='${httpResource.monitorTimes}'/></td>
-                  <td><c:out value='${httpResource.alarmThresholdTimes}'/></td>
-                  <td><a href="">修改</a>/<a href="">删除</a></td>
-                </tr>
+<!--
+      <input type="button" value="增加资源"  onclick="javascript:alert('00')"/><br/>
+        <table  id="table1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+          <tr>
+              <td>资源ID：</td>
+              <td>资源名称： </td>
+              <td>监控资源超时时间： </td>
+              <td>监控间隔：</td>
+              <td>监控次数：</td>
+              <td>报警阀值：</td>
+              <td>操作 </td>
+          </tr>
+          <c:forEach var="httpResource" items="${httpResourcelist}">
+          <tr>
+            <td><c:out value='${httpResource.id}'/></td>
+            <td><c:out value='${httpResource.resourceName}'/></td>
+            <td><c:out value='${httpResource.monitorTimeOut}'/></td>
+            <td><c:out value='${httpResource.monitorInterval}'/></td>
+            <td><c:out value='${httpResource.monitorTimes}'/></td>
+            <td><c:out value='${httpResource.alarmThresholdTimes}'/></td>
+            <td><a href="">修改</a>/<a href="">删除</a></td>
+          </tr>
 
-              </c:forEach>
-              </table>
-      -->
+        </c:forEach>
+        </table>
+-->
 
       <table id="example" class="display dataTable" cellspacing="0">
         <thead>
@@ -509,6 +511,34 @@ desired effect
         </thead>
       </table>
       <!-- Your Page Content Here -->
+
+    </section>
+    <section class="content">
+
+      <table id="mqttmonitor" class="display dataTable" cellspacing="0">
+      </table>
+
+
+    </section>
+    <section class="content">
+
+      <table id="notify" class="display dataTable" cellspacing="0">
+      </table>
+
+
+    </section>
+    <section class="content">
+
+      <table id="redismeta" class="display dataTable" cellspacing="0">
+      </table>
+
+
+    </section>
+    <section class="content">
+
+      <table id="timeoutapi" class="display dataTable" cellspacing="0">
+      </table>
+
 
     </section>
     <!-- /.content -->

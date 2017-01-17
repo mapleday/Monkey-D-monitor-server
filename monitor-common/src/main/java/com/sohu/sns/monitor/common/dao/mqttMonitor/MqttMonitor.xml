@@ -15,4 +15,40 @@
         WHERE
             stat = 1
     </select>
+
+    <update id="updateMqttServerAddress" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        UPDATE t_monitor_mqtt
+        <set>
+            <if test="id != null"> id = #{id}, </if>
+            <if test="serverAddress != null"> server_address = #{serverAddress}, </if>
+            <if test="monitorNum != null"> monitor_num = #{monitorNum}, </if>
+            <if test="stat != null"> stat = #{stat} </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+
+    <insert id="addMqttServerAddress" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        INSERT INTO t_monitor_mqtt
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="serverAddress != null"> server_address, </if>
+            <if test="monitorNum != null"> monitor_num, </if>
+            <if test="stat != null"> stat </if>
+
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+
+            <if test="serverAddress != null"> #{serverAddress}, </if>
+            <if test="monitorNum != null"> #{monitorNum}, </if>
+            <if test="stat != null">  #{stat} </if>
+
+        </trim>
+    </insert>
+
+    <delete id="deleteMqttServerAddress" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        DELETE FROM t_monitor_mqtt where id = #{id}
+    </delete>
+
 </mapper>

@@ -52,17 +52,53 @@ scratch. This page gets rid of all links and provides the needed markup only.
               ajax: {
                   create:{
                       type:'POST',
-                      url: 'createResource'
+                      url: 'createResource',
+                      data:function (data) {
+
+                          var result={};
+                          for (var i in data.data){
+                              var result=data.data[i];
+//                              result.id=i;
+                              result.action=data.action;
+                          }
+                          console.log(result);
+                          return result;
+
+                      }
+
+
                   },
                   edit:{
-                      type:'PUT',
-                      url: 'updateResource?id=_id_'
+                      type:'POST',
+                      url: 'updateResource',
+                      data:function(data){
+                              var result={};
+                              for (var i in data.data){
+                                  var result=data.data[i];
+//                                  result.id=i;
+                                  result.action=data.action;
+
+                              }
+                              console.log(result);
+                              return result;
+                      }
+
                   },
                   remove:{
-                      type:'DELETE',
-                      url: 'deleteResource?id=_id_'
-                  }
+                      type:'POST',
+                      url: 'deleteResource',
+                      data:function(data){
+                          var result={};
+                          for (var i in data.data){
+                              var result=data.data[i];
+//                              result.id=i;
+                              result.action=data.action;
 
+                          }
+                          console.log(result);
+                          return result;
+                      }
+                  }
               },
               table: "#example",
               idSrc: "id",
@@ -93,6 +129,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
               ]
           } );
 
+
+
           $('#example').DataTable( {
               dom: "Bfrtip",
               ajax: "getHttpResource",
@@ -107,12 +145,26 @@ scratch. This page gets rid of all links and provides the needed markup only.
               ],
               select: true,
               buttons: [
-                  { extend: "create", editor: editor },
+                  { extend: "create", editor: editor
+
+                  },
                   { extend: "edit",   editor: editor },
                   { extend: "remove", editor: editor }
               ]
           } );
+//          editor
+//              .title('create')
+//              .buttons({
+//                  label:"Save",
+//                  fn:function(){
+//                      this.submit();
+//                  }
+//              }).create();
+
+
       } );
+
+
   </script>
 </head>
 <!--

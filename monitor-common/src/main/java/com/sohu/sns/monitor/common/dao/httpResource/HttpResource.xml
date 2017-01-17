@@ -13,26 +13,23 @@
             monitor_times as monitorTimes,
             alarm_threshold_times as alarmThresholdTimes
         FROM
-          t_monitor_http_resource t
+          t_monitor_http_resource_test t
         WHERE
           t.status=1
     </select>
 
     <update id="updateResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
-        UPDATE t_monitor_http_resource set
-        resource_name=#{resourceName},resource_address=#{resourceAddress},monitor_time_out=#{monitorTimeOut},
-        monitor_time_interval=#{monitorInterval},monitor_times=#{monitorTimes},alarm_threshold_times=#{alarmThresholdTimes}
-        WHERE id={#id}
+        UPDATE t_monitor_http_resource_test set resource_name=#{resourceName},resource_address=#{resourceAddress},monitor_time_out=#{monitorTimeOut},monitor_time_interval=#{monitorInterval},monitor_times=#{monitorTimes},alarm_threshold_times=#{alarmThresholdTimes} WHERE id=#{id}
 
     </update>
 
-    <delete id="deleteResource" parameterType="int">
-        DELETE FROM  t_monitor_http_resource WHERE id=#{id}
+    <delete id="deleteResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
+        DELETE FROM  t_monitor_http_resource_test WHERE id=#{id}
     </delete>
 
-    <insert id="createResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource" useGeneratedKeys="true" keyProperty="id">
-        INSERT into  t_monitor_http_resource(id,resource_name,resource_address,monitor_time_out,monitor_time_interval,monitor_times
-        alarm_threshold_times) VALUES (#{id},#{resourceName},#{resourceAddress},#{monitorTimeOut},#{monitorInterval},#{monitorTimes}),
-       #{alarmThresholdTimes}
+    <insert id="createResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource" useGeneratedKeys="true" keyProperty="id" >
+        INSERT into  t_monitor_http_resource_test(id,resource_name,resource_address,monitor_time_out,monitor_time_interval,monitor_times,
+        alarm_threshold_times) VALUES (#{id},#{resourceName},#{resourceAddress},#{monitorTimeOut},#{monitorInterval},#{monitorTimes},
+       #{alarmThresholdTimes})
     </insert>
 </mapper>

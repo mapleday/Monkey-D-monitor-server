@@ -33,5 +33,14 @@ public class HttpResourceService {
         httpResourceDAO.updateResource(hr);
     }
 
+    public void  deleteResource(HttpResource hr){
+        httpResourceDAO.deleteResource(hr);
+    }
+
+
+    public  void createResource(HttpResource hr){
+        httpResourceDAO.createResource(hr);
+    }
+
 
 }

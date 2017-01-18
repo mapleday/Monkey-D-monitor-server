@@ -17,6 +17,7 @@
         <module>dubbo-monitor</module>
         <module>mqtt-monitor</module>
         <module>monitor-web</module>
+        <module>es-monitor</module>
     </modules>
 
     <properties>

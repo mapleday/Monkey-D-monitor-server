@@ -92,19 +92,27 @@ public class EsSchedule {
 
     }
 
+
     public void monitorQps() {
         Date endTime = new Date();
         Date monitorTime = new Date(endTime.getTime() - 60 * 60 * 1000);
         Map<String, EsResult> monitorResults = queryEs(monitorTime, endTime);
 
         Set<EsResult> orderResults = new TreeSet();
+
+        //总qps 统计进去。
+        EsResult sumResult=new EsResult();
         for (Map.Entry<String, EsResult> entry : monitorResults.entrySet()) {
+
             EsResult result = entry.getValue();
+            sumResult.setQps(sumResult.getQps()+entry.getValue().getQps());
+
             double qps = result.getQps();
             if (qps > 1) {
                 orderResults.add(result);
             }
         }
+        orderResults.add(sumResult);
 
         StringBuilder sb = new StringBuilder().append("QPS统计");
 
@@ -166,7 +174,6 @@ public class EsSchedule {
     }
 
     public static void main(String[] args) {
-        //monitor();
         DecimalFormat decimalFormat = new DecimalFormat("0.000");
         System.out.println(decimalFormat.format(1.036));
     }

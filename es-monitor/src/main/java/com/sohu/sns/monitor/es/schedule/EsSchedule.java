@@ -31,6 +31,7 @@ public class EsSchedule {
 
     public void monitor() {
         Date endTime = new Date();
+        // 5分钟和最近一周时间。
         Date monitorTime = new Date(endTime.getTime() - 5 * 60 * 1000);
         Date referenceTime = new Date(endTime.getTime() - 7 * 24 * 60 * 60 * 1000L);
 
@@ -54,10 +55,18 @@ public class EsSchedule {
             double refAvgTime = refResult.getAvgTime();
             long refTotoalCount = refResult.getTotoalCount();
 
+
+
             if (monitroAvgTime >= refAvgTime * 1.3 || monitorTotoalCount >= refTotoalCount * 1.3) {
                 notifyResults.add(monitorEsResult);
                 System.out.println(monitorEsResult + " is very very high......");
             }
+
+            if(monitorEsResult.getQps()>=50){
+                notifyResults.add(monitorEsResult);
+                System.out.println(monitorEsResult+":QPS is very very high......");
+            }
+
         }
 
         Set<EsResult> orderResults = new TreeSet();
@@ -98,13 +107,24 @@ public class EsSchedule {
         }
 
         StringBuilder sb = new StringBuilder().append("QPS统计");
+
+        Set<String> speInterfaceUri = new HashSet<String>();
+        speInterfaceUri.add("/v6/users/show_reduced");
+        speInterfaceUri.add("/v6/users/guide");
+        speInterfaceUri.add("/v6/feeds/profile/template");
+        speInterfaceUri.add("/v6/feeds/timeline/template");
+
         for (EsResult result : orderResults) {
             String key = result.getInterfaceUri();
-            double qps = result.getQps();
-            double avgTime = result.getAvgTime();
-            sb.append(key + " qps:" + qps + " avg:" + avgTime + " \n ");
+
+            if(speInterfaceUri.contains(key)) {
+                double qps = result.getQps();
+                double avgTime = result.getAvgTime();
+                sb.append(key + " qps:" + qps + " avg:" + avgTime + " \n ");
+            }
+
         }
-//        notifyService.sendAllNotifyPerson(sb.toString());
+        notifyService.sendAllNotifyPerson(sb.toString());
     }
 
     private Map<String, EsResult> queryEs(Date startTime, Date endTime) {
@@ -146,6 +166,7 @@ public class EsSchedule {
     }
 
     public static void main(String[] args) {
+        //monitor();
         DecimalFormat decimalFormat = new DecimalFormat("0.000");
         System.out.println(decimalFormat.format(1.036));
     }

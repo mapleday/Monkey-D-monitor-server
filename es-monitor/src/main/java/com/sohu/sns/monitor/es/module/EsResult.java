@@ -43,6 +43,7 @@ public class EsResult implements Comparable<EsResult> {
         this.qps = qps;
     }
 
+
     @Override
     public String toString() {
         return "EsResult{" +
@@ -56,6 +57,6 @@ public class EsResult implements Comparable<EsResult> {
 
     @Override
     public int compareTo(EsResult o) {
-        return (int) (o.getQps() - this.getQps());
+        return (int) ((o.getQps() - this.getQps()) * 100000);
     }
 }

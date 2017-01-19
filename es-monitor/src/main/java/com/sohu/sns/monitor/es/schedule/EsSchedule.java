@@ -60,9 +60,7 @@ public class EsSchedule {
             if (monitroAvgTime >= refAvgTime * 1.3 || monitorTotoalCount >= refTotoalCount * 1.3) {
                 notifyResults.add(monitorEsResult);
                 System.out.println(monitorEsResult + " is very very high......");
-            }
-
-            if(monitorEsResult.getQps()>=50){
+            }else if(monitorEsResult.getQps()>=50){
                 notifyResults.add(monitorEsResult);
                 System.out.println(monitorEsResult+":QPS is very very high......");
             }
@@ -98,8 +96,15 @@ public class EsSchedule {
         Date monitorTime = new Date(endTime.getTime() - 60 * 60 * 1000);
         Map<String, EsResult> monitorResults = queryEs(monitorTime, endTime);
 
-        Set<EsResult> orderResults = new TreeSet();
+        StringBuilder sb = new StringBuilder().append("QPS统计");
+        Set<String> speInterfaceUri = new HashSet<String>();
+        speInterfaceUri.add("/v6/users/show_reduced");
+        speInterfaceUri.add("/v6/users/guide");
+        speInterfaceUri.add("/v6/feeds/profile/template");
+        speInterfaceUri.add("/v6/feeds/timeline/template");
 
+
+        Set<EsResult> orderResults = new TreeSet();
         //总qps 统计进去。
         EsResult sumResult=new EsResult();
         for (Map.Entry<String, EsResult> entry : monitorResults.entrySet()) {
@@ -107,31 +112,20 @@ public class EsSchedule {
             EsResult result = entry.getValue();
             sumResult.setQps(sumResult.getQps()+entry.getValue().getQps());
 
-            double qps = result.getQps();
-            if (qps > 1) {
-                orderResults.add(result);
-            }
-        }
-        orderResults.add(sumResult);
-
-        StringBuilder sb = new StringBuilder().append("QPS统计");
-
-        Set<String> speInterfaceUri = new HashSet<String>();
-        speInterfaceUri.add("/v6/users/show_reduced");
-        speInterfaceUri.add("/v6/users/guide");
-        speInterfaceUri.add("/v6/feeds/profile/template");
-        speInterfaceUri.add("/v6/feeds/timeline/template");
-
-        for (EsResult result : orderResults) {
+            //特定接口QPS
             String key = result.getInterfaceUri();
-
             if(speInterfaceUri.contains(key)) {
                 double qps = result.getQps();
                 double avgTime = result.getAvgTime();
                 sb.append(key + " qps:" + qps + " avg:" + avgTime + " \n ");
             }
 
+            double qps = result.getQps();
+            if (qps > 1) {
+                orderResults.add(result);
+            }
         }
+        orderResults.add(sumResult);
         notifyService.sendAllNotifyPerson(sb.toString());
     }
 

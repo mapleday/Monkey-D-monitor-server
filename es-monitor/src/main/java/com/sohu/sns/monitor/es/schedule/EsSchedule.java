@@ -122,7 +122,8 @@ public class EsSchedule {
         StringBuilder sb = new StringBuilder().append("QPS统计 \n");
         for (EsResult result : orderResults) {
             String key = result.getInterfaceUri();
-            double qps = result.getQps();
+            DecimalFormat decimalFormat = new DecimalFormat("0.000");
+            double qps = Double.parseDouble(decimalFormat.format(result.getQps()));
             double avgTime = result.getAvgTime();
             sb.append(key + " qps:" + qps + " avg:" + avgTime + " total：" + result.getTotoalCount() + " \n ");
         }
@@ -171,6 +172,6 @@ public class EsSchedule {
 
     public static void main(String[] args) {
         DecimalFormat decimalFormat = new DecimalFormat("0.000");
-        System.out.println(decimalFormat.format(1.036));
+        System.out.println(Double.parseDouble(decimalFormat.format(1.036546465)));
     }
 }

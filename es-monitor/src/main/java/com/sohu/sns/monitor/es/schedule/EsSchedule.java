@@ -15,6 +15,7 @@ import org.elasticsearch.search.aggregations.metrics.avg.InternalAvg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -49,25 +50,33 @@ public class EsSchedule {
                 continue;
             }
 
-            EsResult refResult = monitorResults.get(key);
+            EsResult refResult = refResults.get(key);
             double refAvgTime = refResult.getAvgTime();
             long refTotoalCount = refResult.getTotoalCount();
 
-            if (monitroAvgTime >= refAvgTime * 1.5 || monitorTotoalCount >= refTotoalCount * 1.5) {
+            if (monitroAvgTime >= refAvgTime * 1.3 || monitorTotoalCount >= refTotoalCount * 1.3) {
                 notifyResults.add(monitorEsResult);
                 System.out.println(monitorEsResult + " is very very high......");
             }
         }
 
-        StringBuilder sb = new StringBuilder().append("QPS预警");
+        Set<EsResult> orderResults = new TreeSet();
         if (!notifyResults.isEmpty()) {
             for (EsResult result : notifyResults) {
+                double qps = result.getQps();
+                if (qps > 1) {
+                    orderResults.add(result);
+                }
+            }
+        }
+
+        StringBuilder sb = new StringBuilder().append("QPS预警");
+        if (!orderResults.isEmpty()) {
+            for (EsResult result : orderResults) {
                 String key = result.getInterfaceUri();
                 double qps = result.getQps();
                 double avgTime = result.getAvgTime();
-                if (qps > 1) {
-                    sb.append(key + " qps:" + qps + " avg:" + avgTime + " | ");
-                }
+                sb.append(key + " qps:" + qps + " avg:" + avgTime + " | ");
             }
             notifyService.sendAllNotifyPerson(sb.toString());
         }
@@ -78,17 +87,24 @@ public class EsSchedule {
         Date endTime = new Date();
         Date monitorTime = new Date(endTime.getTime() - 60 * 60 * 1000);
         Map<String, EsResult> monitorResults = queryEs(monitorTime, endTime);
-        StringBuilder sb = new StringBuilder().append("QPS统计");
+
+        Set<EsResult> orderResults = new TreeSet();
         for (Map.Entry<String, EsResult> entry : monitorResults.entrySet()) {
-            String key = entry.getKey();
             EsResult result = entry.getValue();
             double qps = result.getQps();
-            double avgTime = result.getAvgTime();
             if (qps > 1) {
-                sb.append(key + " qps:" + qps + " avg:" + avgTime + " | ");
+                orderResults.add(result);
             }
         }
-        notifyService.sendAllNotifyPerson(sb.toString());
+
+        StringBuilder sb = new StringBuilder().append("QPS统计");
+        for (EsResult result : orderResults) {
+            String key = result.getInterfaceUri();
+            double qps = result.getQps();
+            double avgTime = result.getAvgTime();
+            sb.append(key + " qps:" + qps + " avg:" + avgTime + " \n ");
+        }
+//        notifyService.sendAllNotifyPerson(sb.toString());
     }
 
     private Map<String, EsResult> queryEs(Date startTime, Date endTime) {
@@ -115,16 +131,22 @@ public class EsSchedule {
             String uri = bucket.getKey().toString();
             InternalAvg aggregation = (InternalAvg) bucket.getAggregations().asList().get(0);
             double avg = aggregation.getValue();
-            double qps = count / ((endTime.getTime() - startTime.getTime()) / 1000);
+            double qps = count / ((endTime.getTime() - startTime.getTime()) / 1000.0);
 
             EsResult esResult = new EsResult();
-            esResult.setAvgTime(avg);
-            esResult.setQps(qps);
+            DecimalFormat decimalFormat = new DecimalFormat("0.000");
+            esResult.setAvgTime(Double.parseDouble(decimalFormat.format(avg)));
+            esResult.setQps(Double.parseDouble(decimalFormat.format(qps)));
             esResult.setInterfaceUri(uri);
             esResult.setTotoalCount(count);
             results.put(uri, esResult);
         }
 
         return results;
+    }
+
+    public static void main(String[] args) {
+        DecimalFormat decimalFormat = new DecimalFormat("0.000");
+        System.out.println(decimalFormat.format(1.036));
     }
 }

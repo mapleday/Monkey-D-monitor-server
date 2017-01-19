@@ -10,8 +10,8 @@
     <context:component-scan base-package="com.sohu.sns.monitor"/>
     <task:scheduler id="schedulerEs" pool-size="4"/>
     <task:scheduled-tasks scheduler="schedulerEs">
-        <task:scheduled ref="esSchedule" method="monitor" fixed-delay="30000" initial-delay="1000"/>
-        <task:scheduled ref="esSchedule" method="monitorQps" fixed-delay="30000" initial-delay="2000"/>
+        <task:scheduled ref="esSchedule" method="monitor" fixed-delay="300000" initial-delay="9000"/>
+        <task:scheduled ref="esSchedule" method="monitorQps" fixed-delay="3600000" initial-delay="1800000"/>
     </task:scheduled-tasks>
 
     <import resource="classpath*:monitorCommonContext.xml"/>

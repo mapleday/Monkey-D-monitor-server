@@ -5,7 +5,7 @@ package com.sohu.sns.monitor.es.module;
  * time:17-1-18下午5:59
  * es查询结果
  */
-public class EsResult {
+public class EsResult implements Comparable<EsResult> {
     private String interfaceUri;
     private double avgTime;
     private long totoalCount;
@@ -51,5 +51,11 @@ public class EsResult {
                 ", totoalCount=" + totoalCount +
                 ", qps=" + qps +
                 '}';
+    }
+
+
+    @Override
+    public int compareTo(EsResult o) {
+        return (int) (o.getQps() - this.getQps());
     }
 }

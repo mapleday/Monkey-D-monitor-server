@@ -14,4 +14,5 @@
     <import resource="classpath*:httpMonitorContext.xml"/>
     <import resource="classpath*:mqttContext.xml"/>
     <import resource="classpath*:logSpringConetxt.xml"/>
+    <import resource="classpath*:esMonitorContext.xml"/>
 </beans>

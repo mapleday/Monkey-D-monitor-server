@@ -1,21 +1,20 @@
-import org.apache.lucene.queryparser.xml.FilterBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.AvgBuilder;
+import org.elasticsearch.search.aggregations.metrics.avg.InternalAvg;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * author:jy
@@ -44,7 +43,7 @@ public class EsTest {
         AvgBuilder interfaceAvgTime = AggregationBuilders.avg("interfaceAvgTime").field("request_time");
 
         QueryBuilder qb = QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery("@timestamp").gte(new Date(1484723154040L)).lte(new Date(1484724054040L)))
+                .must(QueryBuilders.rangeQuery("@timestamp").gte(new Date(System.currentTimeMillis() - 60 * 60 * 1000)).lte(new Date()))
                 .must(QueryBuilders.regexpQuery("interface.raw", "/v[56]/.*"));
 
         SearchResponse searchResponse = client.prepareSearch("logstash-detail-msapi-*")
@@ -53,9 +52,17 @@ public class EsTest {
                 .setExplain(true)
                 .execute()
                 .actionGet();
-        System.out.println(searchResponse);
+        StringTerms interfaceCountAggr = (StringTerms) searchResponse.getAggregations().asMap().get("interfaceCount");
+        List<Terms.Bucket> buckets = interfaceCountAggr.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            long docCount = bucket.getDocCount();
+            Object key = bucket.getKey();
+            InternalAvg aggregation = (InternalAvg) bucket.getAggregations().asList().get(0);
+            double avg = aggregation.getValue();
+            System.out.println(key + "_" + (docCount / 3600.0) + "_" + docCount + "_" + avg);
+        }
 
-        System.out.println("=========================================");
+       /* System.out.println("=========================================");
 
 
         TermsBuilder qpsCount = AggregationBuilders.terms("interfaceCount")
@@ -63,14 +70,22 @@ public class EsTest {
                 .size(100)
                 .order(Terms.Order.count(true));
         DateHistogramBuilder qpsDate = AggregationBuilders.dateHistogram("timestamp").field("@timestamp")
-                .interval(DateHistogramInterval.seconds(1)).minDocCount(1);
+                .interval(DateHistogramInterval.minutes(5)).minDocCount(1);
         SearchResponse searchResponse1 = client.prepareSearch("logstash-detail-msapi-*")
                 .setQuery(qb)
                 .addAggregation(qpsDate.subAggregation(qpsCount))
                 .execute()
                 .actionGet();
 
-        System.out.println(searchResponse1);
+        StringTerms aggregation = (StringTerms) searchResponse1.getAggregations().asList().get(0);
+        List<Terms.Bucket> buckets1 = aggregation.getBuckets();
+        for (Terms.Bucket bucket : buckets1) {
+            long docCount = bucket.getDocCount();
+            Object key = bucket.getKey();
+            InternalAvg aggregation = (InternalAvg) bucket.getAggregations().asList().get(0);
+            double value = aggregation.getValue();
+            System.out.println(key + "_" + docCount + "_" + value);
+        }*/
 
 
         // on shutdown

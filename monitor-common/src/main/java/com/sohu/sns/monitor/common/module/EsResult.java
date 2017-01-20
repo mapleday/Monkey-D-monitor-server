@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.es.module;
+package com.sohu.sns.monitor.common.module;
 
 import java.io.Serializable;
 

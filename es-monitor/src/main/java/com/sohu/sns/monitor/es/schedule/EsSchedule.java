@@ -1,7 +1,8 @@
 package com.sohu.sns.monitor.es.schedule;
 
+import com.sohu.sns.monitor.common.module.EsResult;
 import com.sohu.sns.monitor.common.services.NotifyService;
-import com.sohu.sns.monitor.es.module.EsResult;
+import com.sohu.sns.monitor.common.services.QpsDetailService;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -14,6 +15,10 @@ import org.elasticsearch.search.aggregations.metrics.avg.AvgBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.InternalAvg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -22,12 +27,16 @@ import java.util.*;
  * author:jy
  * time:17-1-18下午8:29
  */
+
+
 @Component
 public class EsSchedule {
     private static long lastNotifyTime = 0;//上次预警时间
 
     @Autowired
     TransportClient client;
+    @Autowired
+    QpsDetailService qpsDetailService;
 
     @Autowired
     NotifyService notifyService;
@@ -121,13 +130,18 @@ public class EsSchedule {
         orderResults.add(sumResult);
         StringBuilder sb = new StringBuilder().append("QPS统计 \n");
         for (EsResult result : orderResults) {
+
+            if(result.getInterfaceUri()!=null) {
+                qpsDetailService.updateDetail(result);
+            }
+
             String key = result.getInterfaceUri();
             DecimalFormat decimalFormat = new DecimalFormat("0.000");
             double qps = Double.parseDouble(decimalFormat.format(result.getQps()));
             double avgTime = result.getAvgTime();
             sb.append(key + " qps:" + qps + " avg:" + avgTime + " total：" + result.getTotoalCount() + " \n ");
         }
-
+        sb.append("\n 详情:");
         System.out.println(sb.toString());
         notifyService.sendAllNotifyPerson(sb.toString());
     }
@@ -174,4 +188,6 @@ public class EsSchedule {
         DecimalFormat decimalFormat = new DecimalFormat("0.000");
         System.out.println(Double.parseDouble(decimalFormat.format(1.036546465)));
     }
+
+
 }

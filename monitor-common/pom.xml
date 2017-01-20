@@ -18,12 +18,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sohu.snscommon</groupId>
-            <artifactId>util-common</artifactId>
-            <version>${snscommon.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
         </dependency>
@@ -35,6 +29,7 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

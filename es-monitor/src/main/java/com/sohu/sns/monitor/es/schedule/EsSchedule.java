@@ -64,7 +64,7 @@ public class EsSchedule {
                     || monitorEsResult.getAvgTime() >= 0.5;
             boolean isCanNotify = (System.currentTimeMillis() - lastNotifyTime > 30 * 60 * 1000)
                     || monitorEsResult.getAvgTime() >= 1.5;
-            boolean notNotify = monitorEsResult.getQps() < 1 && monitorEsResult.getAvgTime() < 0.2;
+            boolean notNotify = monitorEsResult.getQps() < 1 || monitorEsResult.getAvgTime() < 0.2;
             if (isHighResult && isCanNotify && !notNotify) {
                 orderResults.add(monitorEsResult);
                 System.out.println(monitorEsResult + " is very very high......");

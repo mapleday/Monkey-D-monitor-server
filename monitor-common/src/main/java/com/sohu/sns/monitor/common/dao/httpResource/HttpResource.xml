@@ -15,7 +15,7 @@
         FROM
           t_monitor_http_resource t
         WHERE
-          1=1
+          t.status=1
     </select>
 
     <update id="updateResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">

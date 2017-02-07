@@ -70,12 +70,10 @@ public class EsSchedule {
 
             boolean isHighResult = monitroAvgTime >= refAvgTime * 1.3
                     || monitorTotoalCount >= refTotoalCount * 1.3
-                    || monitorEsResult.getQps() >= 50
                     || monitorEsResult.getAvgTime() >= 0.5;
             boolean isCanNotify = (System.currentTimeMillis() - lastNotifyTime > 30 * 60 * 1000)
-                    || monitorEsResult.getQps() >= 100
                     || monitorEsResult.getAvgTime() >= 1.5;
-            boolean notNotify = monitorEsResult.getQps() < 1 && monitorEsResult.getAvgTime() < 0.2;
+            boolean notNotify = monitorEsResult.getQps() < 1 || monitorEsResult.getAvgTime() < 0.2;
             if (isHighResult && isCanNotify && !notNotify) {
                 orderResults.add(monitorEsResult);
                 System.out.println(monitorEsResult + " is very very high......");
@@ -119,6 +117,7 @@ public class EsSchedule {
             EsResult result = entry.getValue();
             double qps = result.getQps();
             sumResult.setQps(sumResult.getQps() + result.getQps());
+            sumResult.setTotoalCount(sumResult.getTotoalCount() + result.getTotoalCount());
 
             //特定接口QPS
             String key = result.getInterfaceUri();

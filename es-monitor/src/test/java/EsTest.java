@@ -10,9 +10,13 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.AvgBuilder;
 import org.elasticsearch.search.aggregations.metrics.avg.InternalAvg;
+import org.elasticsearch.search.sort.SortBuilder;
+import org.elasticsearch.search.sort.SortBuilders;
+import org.elasticsearch.search.sort.SortOrder;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -40,11 +44,17 @@ public class EsTest {
                 .field("interface.raw")
                 .size(100)
                 .order(Terms.Order.count(true));
+
         AvgBuilder interfaceAvgTime = AggregationBuilders.avg("interfaceAvgTime").field("request_time");
 
         QueryBuilder qb = QueryBuilders.boolQuery()
                 .must(QueryBuilders.rangeQuery("@timestamp").gte(new Date(System.currentTimeMillis() - 60 * 60 * 1000)).lte(new Date()))
                 .must(QueryBuilders.regexpQuery("interface.raw", "/v[56]/.*"));
+
+
+//        SortBuilder sort = SortBuilders.fieldSort("order_Date")//排序字段
+//                        .order(SortOrder.DESC);//升序或者降序
+
 
         SearchResponse searchResponse = client.prepareSearch("logstash-detail-msapi-*")
                 .setQuery(qb)
@@ -54,12 +64,14 @@ public class EsTest {
                 .actionGet();
         StringTerms interfaceCountAggr = (StringTerms) searchResponse.getAggregations().asMap().get("interfaceCount");
         List<Terms.Bucket> buckets = interfaceCountAggr.getBuckets();
+
+        DecimalFormat decimalFormat = new DecimalFormat("0.000");
         for (Terms.Bucket bucket : buckets) {
             long docCount = bucket.getDocCount();
             Object key = bucket.getKey();
             InternalAvg aggregation = (InternalAvg) bucket.getAggregations().asList().get(0);
             double avg = aggregation.getValue();
-            System.out.println(key + "_" + (docCount / 3600.0) + "_" + docCount + "_" + avg);
+            System.out.println(key + "                  _ qps: " + (Double.parseDouble(decimalFormat.format(docCount / 3600.0)) + "_                        " + docCount + "_   " + avg));
         }
 
        /* System.out.println("=========================================");

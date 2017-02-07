@@ -17,8 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -130,6 +129,7 @@ public class EsSchedule {
         StringBuilder sb = new StringBuilder().append("QPS统计 \n");
         for (EsResult result : orderResults) {
 
+            //定期更新
             if(result.getInterfaceUri()!=null) {
                 qpsDetailService.updateDetail(result);
             }
@@ -184,8 +184,9 @@ public class EsSchedule {
     }
 
     public static void main(String[] args) {
-        DecimalFormat decimalFormat = new DecimalFormat("0.000");
-        System.out.println(Double.parseDouble(decimalFormat.format(1.036546465)));
+
+//        DecimalFormat decimalFormat = new DecimalFormat("0.000");
+//        System.out.println(Double.parseDouble(decimalFormat.format(1.036546465)));
     }
 
 

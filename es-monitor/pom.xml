@@ -26,11 +26,7 @@
             <groupId>com.sohu.sns.monitor</groupId>
             <artifactId>monitor-common</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.sohu.sns.monitor</groupId>
-            <artifactId>monitor-web</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+
     </dependencies>
 
 

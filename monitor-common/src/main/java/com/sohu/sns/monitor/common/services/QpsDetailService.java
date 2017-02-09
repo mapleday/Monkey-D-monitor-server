@@ -29,7 +29,7 @@ public class QpsDetailService {
 
     public void updateDetail(EsResult esResult){
 
-        this.qpsDetailDao.updateEsResult(esResult);
+        qpsDetailDao.updateEsResult(esResult);
     }
 
 }

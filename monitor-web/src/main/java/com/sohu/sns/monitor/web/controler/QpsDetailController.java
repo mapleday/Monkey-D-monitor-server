@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by Administrator on 2017/1/20.
+ * Created by lc on 2017/1/20.
  */
 @Controller
-public class DetailController {
+public class QpsDetailController {
 
     @Autowired
     QpsDetailService qpsDetailService;

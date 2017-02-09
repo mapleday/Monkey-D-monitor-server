@@ -10,15 +10,15 @@
         avgtime as avgTime,
         totalcount as totoalCount,
         qps as qps,
-        last_update_time as updateTime
+        update_time as updateTime
         FROM
-        esresult t
+        t_msapi_qps t
         WHERE
           1=1
     </select>
 
     <update id="updateEsResult" parameterType="com.sohu.sns.monitor.common.module.EsResult">
-        UPDATE esresult
+        UPDATE t_msapi_qps
         <set>
             <if test="interfaceUri != null"> interfaceuri = #{interfaceUri}, </if>
             <if test="avgTime != 0"> avgtime = #{avgTime}, </if>

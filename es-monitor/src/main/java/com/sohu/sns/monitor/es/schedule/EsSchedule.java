@@ -162,7 +162,7 @@ public class EsSchedule {
 
 
         }
-        //sb.append("\n 详情:");
+
         System.out.println(sb.toString());
         notifyService.sendAllNotifyPerson(sb.toString());
     }
@@ -236,12 +236,6 @@ public class EsSchedule {
 
         return bucket;
 
-    }
-
-    public static void main(String[] args) {
-
-//        DecimalFormat decimalFormat = new DecimalFormat("0.000");
-//        System.out.println(Double.parseDouble(decimalFormat.format(1.036546465)));
     }
 
 

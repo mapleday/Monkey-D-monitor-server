@@ -8,7 +8,9 @@ import java.util.List;
 
 @Repository
 public interface QpsDetailDao {
+    //查询qps信息
     public List<EsResult> getQpsDetail();
+    //更新qps信息
     public void updateEsResult(EsResult esResult);
 
 }

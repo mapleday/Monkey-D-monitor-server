@@ -1,6 +1,7 @@
 package com.sohu.sns.monitor.common.module;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * author:jy
@@ -53,6 +54,8 @@ public class EsResult implements Comparable<EsResult> , Serializable {
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
     }
+
+
 
     @Override
     public String toString() {

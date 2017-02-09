@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>mqtt</title>
+  <link rel="stylesheet" href="resources/admin-lte/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/editor.dataTables.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/buttons.dataTables.min.css">
+  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/select.dataTables.min.css">
+</head>
+<body>
+
+<div style="text-align: center">
+  <h3 >Mqtt</h3>
+</div>
+<table id="example" class="display dataTable" cellpadding="0" width="100%" style="overflow: scroll" >
+  <thead>
+  <tr>
+    <th>id</th>
+    <th>serverAddress</th>
+    <th>monitorNum</th>
+    <th>stat</th>
+  </tr>
+  </thead>
+</table>
+
+
+<!--editor js-->
+
+<script  src="resources/admin-lte/Editor-1.6.1/js/jquery-1.12.4.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
+
+
+<script type="text/javascript">
+    // use a global for the submit and return data rendering in the examples
+    var editor;
+    $(document).ready(function() {
+        editor = new $.fn.dataTable.Editor( {
+            ajax: {
+                create:{
+                    type:'POST',
+                    url: 'createMqtt',
+                    data:function (data) {
+
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+
+                    }
+
+
+                },
+                edit:{
+                    type:'POST',
+                    url: 'updateMqtt',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                                  result.id=i;
+                            result.action=data.action;
+
+                        }
+                        console.log(result);
+                        return result;
+                    }
+
+                },
+                remove:{
+                    type:'POST',
+                    url: 'deleteMqtt',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                }
+            },
+            table: "#example",
+            idSrc: "id",
+            fields: [
+                {
+                    label: "id:",
+                    name: "id"
+                },
+                {
+                    label: "serverAddress:",
+                    name: "serverAddress"
+                },  {
+                    label: "monitorNum:",
+                    name: "monitorNum"
+                },{
+                    label: "stat:",
+                    name:  "stat"
+                }
+            ]
+        } );
+
+        $('#example').DataTable( {
+            dom: "Bfrtip",
+            ajax: "getMqtt",
+            columns: [
+                { data: "id" } ,
+                { data: "serverAddress" },
+                { data: "monitorNum"},
+                { data: "stat"}
+            ],
+            select: true,
+            buttons: [
+                { extend: "create", editor: editor},
+                { extend: "edit",   editor: editor },
+                { extend: "remove", editor: editor }
+            ]
+        } );
+    } );
+
+
+</script>
+</body>
+</html>

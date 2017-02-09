@@ -2,6 +2,7 @@ package com.sohu.sns.monitor.web.controler;
 
 import com.sohu.sns.monitor.common.module.HttpResource;
 import com.sohu.sns.monitor.common.services.HttpResourceService;
+import com.sohu.sns.monitor.common.services.MqttServerAddressService;
 import com.sohucs.org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,10 @@ import java.util.*;
  * Created by yw on 2017/1/13.
  */
 @Controller
-public class JsonControler {
+public class HttpResourceControler {
     @Autowired
     HttpResourceService httpResourceService;
+
     @ResponseBody
     @RequestMapping(value="/getHttpResource")
     public Map getHttpResource(){
@@ -44,8 +46,6 @@ public class JsonControler {
     public HttpResource  deleteResource(HttpResource hr){
         httpResourceService.deleteResource(hr);
         return new HttpResource();
-
-
     }
 
     @ResponseBody
@@ -56,9 +56,7 @@ public class JsonControler {
         ArrayList<HttpResource> list=new ArrayList<HttpResource>();
         list.add(hr);
         map.put("data",list);
-//      System.out.print(hr+"ok!");
         return map;
-
     }
 
 }

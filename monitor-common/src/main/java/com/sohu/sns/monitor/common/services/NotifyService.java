@@ -5,6 +5,7 @@ import com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao;
 import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
+import kafka.utils.NOT_READY;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,4 +37,26 @@ public class NotifyService {
             NotifyUtils.sendAlert(notifyPerson.getPhone(), message);
         }
     }
+
+    /**
+     * update by yw on 2017.2.9
+     */
+    public List<NotifyPerson> getAllPerson(){
+        return notifyPersonDao.getAllPerson();
+    }
+
+    public void creatPerson(NotifyPerson np){
+        notifyPersonDao.createPerson(np);
+    }
+
+    public void updatePerson(NotifyPerson np){
+        notifyPersonDao.updatePerson(np);
+    }
+
+    public void deletePerson(NotifyPerson np){
+        notifyPersonDao.deletePerson(np);
+    }
+
+
+
 }

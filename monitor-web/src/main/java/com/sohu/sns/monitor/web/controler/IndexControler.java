@@ -14,38 +14,30 @@ import java.util.List;
 /**
  * author:jy
  * time:16-11-22上午11:44
+ *
+ * update by yw on 2017/2/9
  */
 @Controller
 public class IndexControler {
-    @Autowired
-    HttpResourceService httpResourceService;
-
     @RequestMapping("/index")
     public String index(Model model) {
-        List<HttpResource> httpResourcelist = httpResourceService.getResources();
-        List<String> httpResourcelistName=new ArrayList<String>();
-        for (HttpResource hr:httpResourcelist){
-            System.out.println("MM---"+hr);
-
-
-        }
-        httpResourcelistName.add("id");
-        httpResourcelistName.add("resourceName");
-        httpResourcelistName.add("resourceAddress");
-        httpResourcelistName.add("monitorTimeOut");
-        httpResourcelistName.add("monitorInterval");
-        httpResourcelistName.add("monitorTimes");
-        model.addAttribute("httpResourcelist",httpResourcelist);
-        model.addAttribute("httpResourcelistName",httpResourcelistName);
-
         return "index";
     }
 
-//    @RequestMapping("/index3")
-//    public String index3(){
-//        return "index3";
-//    }
+    @RequestMapping("/HttpResource")
+    public String HttpResource(){
+        return "HttpResource";
+    }
 
+    @RequestMapping("/mqtt")
+    public String mqttServerAddress(){
+        return  "mqttServerAddress";
+    }
+
+    @RequestMapping("/notifyPerson")
+    public String notifyPerson(){
+        return "notifyPerson";
+    }
 
 
 }

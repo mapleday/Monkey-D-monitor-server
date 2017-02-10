@@ -23,3 +23,4 @@
 /.settings
 /bin
 /LOG_FILE*
+*/LOG_FILE_IS_UNDEFINED

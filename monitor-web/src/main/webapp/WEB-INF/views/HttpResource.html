@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HttpResourceTable</title>
+    <link rel="stylesheet" href="resources/admin-lte/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/editor.dataTables.css">
+    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/select.dataTables.min.css">
+</head>
+<body>
+<div style="text-align: center">
+    <h3 >HttpResource</h3>
+</div>
+
+
+<table id="example" class="display dataTable" cellpadding="0" width="100%" style="overflow: scroll" >
+    <thead>
+    <tr>
+        <th>resource_id</th>
+        <th>resource_name</th>
+        <th>resource_addr</th>
+        <th>monitor_timeout</th>
+        <th>monitor_interval</th>
+        <th>monitor_times</th>
+        <th>alarm_threshold_times</th>
+        <th>stat</th>
+    </tr>
+    </thead>
+</table>
+
+
+<!--editor js-->
+
+<script  src="resources/admin-lte/Editor-1.6.1/js/jquery-1.12.4.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
+
+
+<script type="text/javascript">
+    // use a global for the submit and return data rendering in the examples
+    var editor;
+    $(document).ready(function() {
+        editor = new $.fn.dataTable.Editor( {
+            ajax: {
+                create:{
+                    type:'POST',
+                    url: 'createResource',
+                    data:function (data) {
+
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+
+                    }
+
+
+                },
+                edit:{
+                    type:'POST',
+                    url: 'updateResource',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                                  result.id=i;
+                            result.action=data.action;
+
+                        }
+                        console.log(result);
+                        return result;
+                    }
+
+                },
+                remove:{
+                    type:'POST',
+                    url: 'deleteResource',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                }
+            },
+            table: "#example",
+            idSrc: "id",
+            fields: [
+                {
+                    label: "resource_id:",
+                    name: "id"
+                },
+                {
+                    label: "resource_name:",
+                    name: "resourceName"
+                },  {
+                    label: "resource_addr:",
+                    name: "resourceAddress"
+                },{
+                    label: "monitor_timeout:",
+                    name:  "monitorTimeOut"
+                }, {
+                    label: "monitor_interval:",
+                    name: "monitorInterval"
+                }, {
+                    label: "monitor_times:",
+                    name: "monitorTimes"
+                }, {
+                    label: "alarm_threshold_times:",
+                    name: "alarmThresholdTimes"
+                }, {
+                    label: "stat:",
+                    name: "stat"
+                }
+            ]
+        } );
+
+        $('#example').DataTable( {
+            dom: "Bfrtip",
+            ajax: "getHttpResource",
+            columns: [
+                { data: "id" } ,
+                { data: "resourceName" },
+                { data: "resourceAddress"},
+                { data: "monitorTimeOut" },
+                { data: "monitorInterval" },
+                { data: "monitorTimes" },
+                { data: "alarmThresholdTimes" },
+                {data:"stat"}
+            ],
+            select: true,
+            buttons: [
+                { extend: "create", editor: editor},
+                { extend: "edit",   editor: editor },
+                { extend: "remove", editor: editor }
+            ]
+        } );
+    } );
+
+
+</script>
+</body>
+</html>

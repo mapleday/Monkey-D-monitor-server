@@ -8,9 +8,7 @@
         SELECT
               id, name, email, phone, `status`
         FROM
-              t_notify_person t
-        WHERE
-          t.status=1
+              t_notify_person
     </select>
 
 
@@ -49,4 +47,17 @@
     </delete>
 
 
+
+    <update id="updatePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        UPDATE t_notify_person SET id=#{id},name=#{name},email=#{email},phone=#{phone},status=#{status}
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deletePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        DELETE FROM t_notify_person WHERE id=#{id}
+    </delete>
+
+    <insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        INSERT INTO t_notify_person(id,name,email,phone,status)VALUES (#{id},#{name},#{email},#{phone},#{status});
+    </insert>
 </mapper>

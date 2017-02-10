@@ -2,77 +2,42 @@ package com.sohu.sns.monitor.web.controler;
 
 import com.sohu.sns.monitor.common.module.HttpResource;
 import com.sohu.sns.monitor.common.services.HttpResourceService;
-
-import com.sohucs.org.apache.commons.collections.map.HashedMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * author:jy
  * time:16-11-22上午11:44
+ *
+ * update by yw on 2017/2/9
  */
 @Controller
 public class IndexControler {
-    @Autowired
-    HttpResourceService httpResourceService;
-
     @RequestMapping("/index")
     public String index(Model model) {
-        //List<HttpResource> httpResourcelist = httpResourceService.getResources();
-        //model.addAttribute("httpResourcelist",httpResourcelist);
         return "index";
     }
 
-
-    @RequestMapping(value = "/updatehttpResource")
-    @ResponseBody
-    public int updatehttpResource(HttpResource httpResource) {
-        return httpResourceService.updatehttpResource(httpResource);
+    @RequestMapping("/HttpResource")
+    public String HttpResource(){
+        return "HttpResource";
     }
 
-    /**
-     * 增加资源
-     * @param httpResource
-     * @return
-     */
-    @RequestMapping(value = "/addhttpResource")
-    @ResponseBody
-    public int addhttpResource(HttpResource httpResource) {
-        return httpResourceService.addhttpResource(httpResource);
+    @RequestMapping("/mqtt")
+    public String mqttServerAddress(){
+        return  "mqttServerAddress";
     }
 
-    /**
-     * 删除资源
-     * @param httpResource
-     * @return
-     */
-    @RequestMapping(value = "/deletehttpResource")
-    @ResponseBody
-    public String deletehttpResource(HttpResource httpResource) {
-        if(httpResourceService.deletehttpResource(httpResource)==1){
-            return "remove";
-        }
-        return null;
+    @RequestMapping("/notifyPerson")
+    public String notifyPerson(){
+        return "notifyPerson";
     }
 
 
-
-    /**
-     * ajax异步请求， 返回list
-     */
-    @RequestMapping(value = "/getHttpResourcelist",produces="application/json")
-    @ResponseBody
-    public Object getHttpResourcelist() {
-        Map<String,Object> result = new HashedMap();
-        List<HttpResource> httpResourcelist = httpResourceService.getResources();
-        result.put("data",httpResourcelist);
-        result.put("options", new ArrayList());
-        result.put("files",new ArrayList());
-        return result;
-    }
 }

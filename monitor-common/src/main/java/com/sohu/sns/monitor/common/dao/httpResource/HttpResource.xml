@@ -15,7 +15,7 @@
         FROM
           t_monitor_http_resource t
         WHERE
-          1=1
+          t.status=1
     </select>
 
     <update id="updateResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
@@ -60,4 +60,19 @@
         DELETE FROM t_monitor_http_resource where id = #{id}
     </delete>
 
+
+    <update id="updateResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
+        UPDATE t_monitor_http_resource set resource_name=#{resourceName},resource_address=#{resourceAddress},monitor_time_out=#{monitorTimeOut},monitor_time_interval=#{monitorInterval},monitor_times=#{monitorTimes},alarm_threshold_times=#{alarmThresholdTimes},status=#{stat} WHERE id=#{id}
+
+    </update>
+
+    <delete id="deleteResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
+        DELETE FROM  t_monitor_http_resource WHERE id=#{id}
+    </delete>
+
+    <insert id="createResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource" useGeneratedKeys="true" keyProperty="id" >
+        INSERT into  t_monitor_http_resource(id,resource_name,resource_address,monitor_time_out,monitor_time_interval,monitor_times,
+        alarm_threshold_times,status) VALUES (#{id},#{resourceName},#{resourceAddress},#{monitorTimeOut},#{monitorInterval},#{monitorTimes},
+       #{alarmThresholdTimes},#{stat})
+    </insert>
 </mapper>

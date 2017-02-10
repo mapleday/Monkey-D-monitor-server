@@ -6,6 +6,8 @@ import java.io.Serializable;
  * author:jy
  * time:16-10-13下午3:30
  * http资源配置
+ *
+ * author: yw on 2017/2/8.
  */
 public class HttpResource implements Serializable {
     /**
@@ -36,6 +38,10 @@ public class HttpResource implements Serializable {
      * 报警阀值
      */
     private Integer alarmThresholdTimes;
+    /**
+     * 监控状态
+     */
+    private Integer stat;
 
     public String getResourceName() {
         return resourceName;
@@ -93,6 +99,14 @@ public class HttpResource implements Serializable {
         this.alarmThresholdTimes = alarmThresholdTimes;
     }
 
+    public Integer getStat() {
+        return stat;
+    }
+
+    public void setStat(Integer stat) {
+        this.stat = stat;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,7 +132,7 @@ public class HttpResource implements Serializable {
                 ", monitorTimeOut=" + monitorTimeOut +
                 ", monitorInterval=" + monitorInterval +
                 ", monitorTimes=" + monitorTimes +
-                ", alarmThresholdTimes=" + alarmThresholdTimes +
+                ", alarmThresholdTimes=" + alarmThresholdTimes +",stat="+stat+
                 '}';
     }
 }

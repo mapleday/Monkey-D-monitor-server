@@ -37,35 +37,25 @@ public class NotifyService {
         }
     }
 
-
+    /**
+     * update by yw on 2017.2.9
+     */
     public List<NotifyPerson> getAllPerson(){
         return notifyPersonDao.getAllPerson();
     }
 
-    /**
-     * 添加记录
-     * @return
-     */
-    public int addNotifyPerson(NotifyPerson notifyPerson){
-        return notifyPersonDao.addNotifyPerson(notifyPerson);
+    public void creatPerson(NotifyPerson np){
+        notifyPersonDao.createPerson(np);
     }
 
-    /**
-     * 修改记录
-     * @param notifyPerson
-     * @return
-     */
-    public int updateNotifyPerson(NotifyPerson notifyPerson){
-        return notifyPersonDao.updateNotifyPerson(notifyPerson);
+    public void updatePerson(NotifyPerson np){
+        notifyPersonDao.updatePerson(np);
     }
 
-    /**
-     * 删除记录
-     * @param notifyPerson
-     * @return
-     */
-    public int deleteNotifyPerson(NotifyPerson notifyPerson){
-        return notifyPersonDao.deleteNotifyPerson(notifyPerson);
+    public void deletePerson(NotifyPerson np){
+        notifyPersonDao.deletePerson(np);
     }
+
+
 
 }

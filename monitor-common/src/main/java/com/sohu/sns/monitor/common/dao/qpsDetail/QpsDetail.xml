@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sohu.sns.monitor.common.dao.qpsDetail.QpsDetailDao">
+    <cache flushInterval="300"/>
+
+    <select id="getQpsDetail" resultType="com.sohu.sns.monitor.common.module.EsResult">
+        SELECT
+        interfaceuri as interfaceUri,
+        avgtime as avgTime,
+        totalcount as totoalCount,
+        qps as qps,
+        update_time as updateTime
+        FROM
+        t_msapi_qps t
+        WHERE
+          1=1
+    </select>
+
+    <update id="updateEsResult" parameterType="com.sohu.sns.monitor.common.module.EsResult">
+        UPDATE t_msapi_qps
+        <set>
+            <if test="interfaceUri != null"> interfaceuri = #{interfaceUri}, </if>
+            <if test="avgTime != 0"> avgtime = #{avgTime}, </if>
+            <if test="totoalCount != null"> totalcount = #{totoalCount}, </if>
+            <if test="qps != null"> qps = #{qps} </if>
+        </set>
+        WHERE interfaceUri = #{interfaceUri}
+    </update>
+
+
+
+</mapper>

@@ -1,9 +1,9 @@
 package com.sohu.sns.monitor.httpmonitor.schedule;
 
-import com.sohu.sns.monitor.httpmonitor.HttpMonitor;
-import com.sohu.sns.monitor.httpmonitor.MonitorResult;
 import com.sohu.sns.monitor.common.module.HttpResource;
 import com.sohu.sns.monitor.common.services.HttpResourceService;
+import com.sohu.sns.monitor.httpmonitor.HttpMonitor;
+import com.sohu.sns.monitor.httpmonitor.MonitorResult;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +58,18 @@ public class MonitorSchedule {
             }
         }
 
+        if (resources.size() < taskSchedules.size()) {
+            //有监控被删除
+            for (Integer id : taskSchedules.keySet()) {
+                HttpResource httpResource = new HttpResource();
+                httpResource.setId(id);
+                if (!resources.contains(httpResource)) {
+                    taskSchedules.remove(id);
+                    tasks.remove(id);
+                }
+            }
+        }
+
         Long currentTime = Long.valueOf(System.currentTimeMillis());
         for (Iterator<Map.Entry<Integer, Long>> iterator = taskSchedules.entrySet().iterator(); iterator.hasNext(); ) {
             Map.Entry<Integer, Long> next = iterator.next();
@@ -69,8 +81,13 @@ public class MonitorSchedule {
                 monitorExecutorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        taskSchedules.put(key, value + httpResource.getMonitorInterval());
+                        if (taskSchedules.contains(key)) {
+                            taskSchedules.put(key, value + httpResource.getMonitorInterval());
+                        }
                         MonitorResult monitorResult = monitor.monitor(httpResource);
+                        if (monitorResult == null){
+                            return;
+                        }
                         if (monitorResult.isFailed() && monitorResult.getFailedTimes() >= httpResource.getAlarmThresholdTimes()) {
                             monitor.notify(monitorResult);
                         }
@@ -79,8 +96,6 @@ public class MonitorSchedule {
             }
         }
 
-
     }
-
 
 }

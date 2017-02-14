@@ -116,9 +116,14 @@ public class EsSchedule {
         StringBuilder sb = new StringBuilder().append("QPS统计 \n");
 
         Map<String, EsResult> monitorResults = queryEs(monitorTime, endTime);
+        Map<String,EsResult> averageMonitorResults = queryEs(new Date(endTime.getTime() - 7*60*60*1000),new Date(endTime.getTime() - 60*60*1000));
+
+
+
         System.out.println(monitorResults);
         //总qps 统计进去。
         EsResult sumResult = new EsResult();
+        EsResult averageResult = new EsResult();
 
         //qps峰值
         InternalHistogram.Bucket bucket = queryQpsMax(monitorTime, endTime);
@@ -132,6 +137,7 @@ public class EsSchedule {
             EsResult result = entry.getValue();
             double qps = result.getQps();
             sumResult.setQps(sumResult.getQps() + result.getQps());
+            sumResult.setAvgTime(sumResult.getAvgTime()+result.getAvgTime());
             sumResult.setTotoalCount(sumResult.getTotoalCount() + result.getTotoalCount());
 
             //特定接口QPS
@@ -140,6 +146,15 @@ public class EsSchedule {
                 orderResults.add(result);
             }
         }
+
+        //前6小时平均qps
+        for (Map.Entry<String,EsResult> entry:averageMonitorResults.entrySet()){
+            EsResult result = entry.getValue();
+            averageResult.setQps(averageResult.getQps()+result.getQps());
+            averageResult.setAvgTime(averageResult.getAvgTime()+result.getAvgTime());
+            averageResult.setTotoalCount(averageResult.getTotoalCount()+result.getTotoalCount());
+        }
+
 
         orderResults.add(sumResult);
 
@@ -164,7 +179,11 @@ public class EsSchedule {
         }
 
         System.out.println(sb.toString());
-        notifyService.sendAllNotifyPerson(sb.toString());
+
+        if(sumResult.getQps()>averageResult.getQps()*1.3 || sumResult.getQps()< averageResult.getQps()/1.3 || sumResult.getAvgTime()>averageResult.getAvgTime()*1.3)  {
+            notifyService.sendAllNotifyPerson(sb.toString());
+        }
+
     }
 
     private Map<String, EsResult> queryEs(Date startTime, Date endTime) {

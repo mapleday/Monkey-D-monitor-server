@@ -6,19 +6,21 @@
 
     <select id="getMqtt" resultType="com.sohu.sns.monitor.common.module.MqttServerAddress">
         SELECT
-            id as id,
-            server_address AS serverAddress,
-            monitor_num AS  monitorNum,
-            stat as stat
+        id as id,
+        server_address AS serverAddress,
+        monitor_num AS  monitorNum,
+        stat as stat
         FROM
-            t_monitor_mqtt as t
-        WHERE
-            t.stat = 1
+        t_monitor_mqtt
     </select>
 
     <update id="updateMqtt" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
-        UPDATE t_monitor_mqtt SET
-        id=#{id},server_address=#{serverAddress},monitor_num=#{monitorNum},stat=#{stat}
+        UPDATE t_monitor_mqtt
+        <set>
+            <if test="serverAddress!=null">server_address=#{serverAddress},</if>
+            <if test="monitorNum!=null">monitor_num=#{monitorNum},</if>
+            <if test="stat!=null">stat=#{stat}</if>
+        </set>
         WHERE id=#{id}
     </update>
 
@@ -26,7 +28,20 @@
         DELETE FROM  t_monitor_mqtt WHERE  id=#{id}
     </delete>
 
-    <insert id="createMqtt" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
-        INSERT  INTO t_monitor_mqtt(id,server_address,monitor_num,stat) VALUES (#{id},#{serverAddress},#{monitorNum},#{stat})
+    <insert id="createMqtt" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress" useGeneratedKeys="true" keyProperty="id">
+        INSERT  INTO t_monitor_mqtt
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="id!=null">id,</if>-->
+            <if test="serverAddress!=null">server_address,</if>
+            <if test="monitorNum!=null">monitor_num,</if>
+            <if test="stat!=null">stat</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="id!=null">#{id},</if>-->
+            <if test="serverAddress!=null">#{serverAddress},</if>
+            <if test="monitorNum!=null">#{monitorNum},</if>
+            <if test="stat!=null">#{stat}</if>
+        </trim>
     </insert>
 </mapper>

@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="resources/js/jquery/jquery-1.12.4.js"></script>
+    <script src="resources/js/bootstrap/bootstrap.min.js"></script>
+    <title></title>
+</head>
+<body>
+<div>
+    <div class="page-header">
+        <h1>SNS 值班工具 <small>不断完善中。。。。。。</small></h1>
+    </div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">SNS API接口</a></li>
+        <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">唯一名接口</a></li>
+        <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Redis 集群查询</a></li>
+        <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">持久化库查询</a></li>
+        <li role="presentation"><a href="#commentban" aria-controls="commentban" role="tab" data-toggle="tab">用户、手机号黑名单 comment ban设置</a></li>
+        <li role="presentation"><a href="#msg" aria-controls="msg" role="tab" data-toggle="tab">用户状态控制消息说明</a></li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="home">
+            <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="api1">
+                        <h4 class="panel-title">
+                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#capi1" aria-expanded="true" aria-controls="capi1">
+                                feed读取接口
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="capi1" class="panel-collapse collapse" role="tabpanel" aria-labelledby="api1">
+                        <div class="panel-body">
+                            <h3>获取自己及所关注用户的最新feed列表(/v5/feeds/follows_timeline)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v5/feeds/follows_timeline" >
+                                    <input class="form-control" placeholder="用户userId"   type="text" name="user_id" />
+                                    <input class="form-control" placeholder="token" type="text" name="token" value="some token" />
+                                    <input class="form-control" placeholder="since time..." type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="count" type="text" name="feed_count" value="10" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success" type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3>获取自己及所关注用户的最新feed列表(/v6/feeds/timeline/template)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v6/feeds/timeline/template" >
+                                    <input class="form-control" placeholder="用户userId"   type="text" name="user_id" />
+                                    <input class="form-control" placeholder="token" type="text" name="token" value="some token" />
+                                    <input class="form-control" placeholder="since time..." type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="count" type="text" name="feed_count" value="10" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input type="hidden" name="User_Agent" value="ios"/>
+                                    <input type="hidden" name="S-VS" value="5.6.9"/>
+                                    <input class="btn btn-success" type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3>获取某用户的最新feed列表(/v5/feeds/user_timeline)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v5/feeds/user_timeline" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="feed_count"  type="text" name="feed_count" value="20" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"  type="submit" value="submit test request" />
+
+                                </form>
+                            </div>
+                            <h3>获取某用户的最新feed列表(/v6/feeds/profile/template)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v6/feeds/profile/template" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="feed_count"  type="text" name="feed_count" value="20" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"  type="submit" value="submit test request" />
+
+                                </form>
+                            </div>
+                            <h3>获取某条feed的直接转发feed列表(/v6/feeds/repost/list)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v6/feeds/repost/list" >
+                                    <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="feed_count"  type="text" name="feed_count" value="20" />
+                                    <input class="form-control" placeholder="flag 获取最新时可不传，获取到的列表中最后项的flag"  type="text" name="flag" value="1" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"  type="submit" value="submit test request" />
+
+                                </form>
+                            </div>
+                            <h3>获取某条feed的说两句转发feed列表(/v6/feeds/comment/list)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v5/feeds/repost_timeline/comment" >
+                                    <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="feed_count"  type="text" name="feed_count" value="20" />
+                                    <input class="form-control" placeholder="flag 获取最新时可不传，获取到的列表中最后项的flag"  type="text" name="flag" value="1" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"  type="submit" value="submit test request" />
+                                </form>
+                            </div>
+
+                            <h3 > 根据feed_id获取feed详情信息(/v5/feeds/show)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v5/feeds/show" >
+                                <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id"  />
+                                <input class="form-control" placeholder="log_user_id"  type="text" name="log_user_id"  />
+                                <input class="form-control" placeholder="profile_user_id:可选"  type="text" name="profile_user_id"/>
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success"  type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                            <h3 > 根据feed_id获取feed详情信息(/v6/feeds/show)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v6/feeds/show" >
+                                <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id"  />
+                                <input class="form-control" placeholder="log_user_id"  type="text" name="log_user_id"  />
+                                <input class="form-control" placeholder="profile_user_id"  type="text" name="profile_user_id"/>
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success"  type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                            <h3>获取某条feed的纯转发列表(/v5/feeds/repost_timeline/pure)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v5/feeds/repost_timeline/pure" >
+                                <input class="form-control" placeholder="user_id:"  type="text" name="user_id"/>
+                                <input class="form-control" placeholder="token:"  type="text" name="token" value="sometoken" />
+                                <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id" />
+                                <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                <input class="form-control" placeholder="feed_count"  type="text" name="feed_count" value="20" />
+                                <input class="form-control" placeholder="flag 获取最新时可不传，获取到的列表中最后项的flag"  type="text" name="flag" value="1" />
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success" type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                            <h3> 获取某条feed的评论转发列表(/v5/feeds/repost_timeline/comment)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v5/feeds/repost_timeline/comment" >
+                                <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                <input class="form-control" placeholder="token:"  type="text" name="token" />
+                                <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id" />
+                                <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                <input class="form-control" placeholder="feed_count"  type="text" name="feed_count" value="20" />
+                                <input class="form-control" placeholder="flag 获取最新时可不传，获取到的列表中最后项的flag"  type="text" name="flag" value="1" />
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success" type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="api2">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#capi2" aria-expanded="false" aria-controls="capi2">
+                                feed写入接口
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="capi2" class="panel-collapse collapse" role="tabpanel" aria-labelledby="api2">
+                        <div class="panel-body">
+
+                            <h3 > 转发feed(/v5/feeds/repost)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v5/feeds/repost" >
+                                <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                <input class="form-control" placeholder="repost_feed_id:"  type="text" name="repost_feed_id"  />
+                                <input class="form-control" placeholder="token:"  type="text" name="token" value="fqwefqwefqwefqwefwef" />
+                                <input class="form-control" placeholder="content: 转发内容"  type="text" name="content"  />
+                                <input class="form-control" placeholder="type: （1表示源） 2说两句转 3直接转发"  type="text" name="type" />
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success" type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                            <h3 > 删除feed(/v5/feeds/delete)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v5/feeds/delete" >
+                                <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                <input class="form-control" placeholder="token:"  type="text" name="token" value="fqwefqwefqwefqwefwef" />
+                                <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id"  />
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success"   type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                            <h3 > 删除feed(/v6/feeds/delete)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v6/feeds/delete" >
+                                <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                <input class="form-control" placeholder="token:"  type="text" name="token" value="fqwefqwefqwefqwefwef" />
+                                <input class="form-control" placeholder="feed_id:"  type="text" name="feed_id"  />
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success"   type="submit" value="submit test request" />
+                            </form>
+                            </div>
+                            <h3 > 删除feed的一条纯评论(/v6/feeds/comment/remove)</h3>
+                            <div class="input-group">
+                            <form method="get" action="http://msapi.t.sohu.com/v6/feeds/comment/remove" >
+                                <input class="form-control" placeholder="log_user_id:"  type="text" name="log_user_id" />
+                                <input class="form-control" placeholder="token:"  type="text" name="token" value="fqwefqwefqwefqwefwef" />
+                                <input class="form-control" placeholder="comment_id:"  type="text" name="comment_id"  />
+                                <input type="hidden" value="KB5xceXTtd0SFksathnRaYvlyc" name="sig"/>
+                                <input class="btn btn-success"   type="submit" value="submit test request" />
+                            </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="api3">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#capi3" aria-expanded="false" aria-controls="api3">
+                                用户读取接口
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="capi3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="api3">
+                        <div class="panel-body">
+
+                            <h3 >获取用户基本信息(/v5/users/show)</h3>
+                            <div class="input-group">
+                                <form method="get" action="http://msapi.t.sohu.com/v5/users/show" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="profile_user_id:"  type="text" name="profile_user_id" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success" type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3 >获取关注列表(/v5/user_relations/follows)</h3>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/v5/user_relations/follows" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="profile_user_id:"  type="text" name="profile_user_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="count"  type="text" name="count" value="20" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success" type="submit" value="submit test request" />
+                                </form>
+                            </div>
+
+                            <h3 > 粉丝列表(/v5/user_relations/followers)</h3>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/user_relations/followers" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="profile_user_id:"  type="text" name="profile_user_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="count"  type="text" name="count" value="20" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"   type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3 > 相互关注列表(/v6/user_relations/mutalfollow)</h3>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/v6/user_relations/mutalfollow" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="profile_user_id:"  type="text" name="profile_user_id" />
+                                    <input class="form-control" placeholder="since_time:"  type="text" name="since_time" value="3014-10-18 09:31:06.000" />
+                                    <input class="form-control" placeholder="count"  type="text" name="count" value="20" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"   type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3 > 搜索用户(/search/user)</h3>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/search/user" >
+                                    <input class="form-control" placeholder="user_id："  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="query：用户名"  type="text" name="query" />
+                                    <input class="form-control" placeholder="page_index:"  type="text" name="page_index" value="1" />
+                                    <input class="form-control" placeholder="page_size"  type="text" name="page_size" value="20" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"   type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3 > 获取用户的隐私设置(/v5/users/prvc/get)</h3>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/v5/users/prvc/get" >
+                                    <input class="form-control" placeholder="log_user_id"  type="text" name="log_user_id" />
+                                    <input class="form-control" placeholder="token"  type="text" name="token" value="123123123123123" />
+                                    <input class="form-control" placeholder="prvc_types" type="text" name="prvc_types" />
+                                    <input class="form-control" placeholder="judge_type" type="text" name="judge_type" />
+                                    <input class="form-control" placeholder="profile_user_id" type="text" name = "profile_user_id" />
+                                    <input class="form-control" placeholder="time_id:" type="text" name = "time_id" />
+                                    <input class="form-control" placeholder="count:" type="text" name = "count" />
+                                    <input type="hidden" name="sig" value= "KB5xceXTtd0SFksathnRaYvlyc"/>
+
+                                    <input class="btn btn-success"  type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                            <h3 id="/v5/users/nums"> 用户关注粉丝动态数量(/v5/users/nums)</h3>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/v5/users/nums" >
+                                    <input class="form-control" placeholder="log_user_id"  type="text" name="log_user_id" />
+                                    <input type="hidden" name="sig" value= "KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"   type="submit" value="submit test request" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="tab" id="api4">
+                        <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#capi4" aria-expanded="false" aria-controls="api4">
+                                用户写入接口
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="capi4" class="panel-collapse collapse" role="tabpanel" aria-labelledby="api4">
+                        <div class="panel-body">
+                            <h3 > 修改用户基本信息(/v5/users/update)改哪些参数时，只需提交要改的参数</h3>
+                            <div class="well">
+                                默认头像地址 http://sucimg.itc.cn/avatarimg/s_10000001_1426866965953
+                            </div>
+                            <div class="input-group">
+
+                                <form method="get" action="http://msapi.t.sohu.com/v5/users/update" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="token:"  type="text" name="token" value="fqwefqwefqwefqwefwef" />
+                                    <input class="form-control" placeholder="user_name:"  type="text" name="user_name"  />
+                                    <input class="form-control" placeholder="display_name:"  type="text" name="display_name" value="" />
+                                    <input class="form-control" placeholder="avatar: 头像图片地址"  type="text" name="avatar"  />
+                                    <input class="form-control" placeholder="sex:姓名别 0女 1男"  type="text" name="sex" />
+                                    <input class="form-control" placeholder="type: 用户类型 0普通用户，1自媒体，2媒体机构，4政企"  type="text" name="type"  />
+                                    <input class="form-control" placeholder="mobile:"  type="text" name="mobile"  />
+                                    <input class="form-control" placeholder="city:"  type="text" name="city" />
+                                    <input class="form-control" placeholder="description: 描述信息"  type="text" name="description" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"   type="submit" value="submit test request" />
+                                </form>
+
+                                <h3 > 强制修改用户基本信息(/v5/users/forceupdate)改哪些参数时，只需提交要改的参数</h3>
+
+                                <form method="get" action="http://msapi.t.sohu.com/v5/users/forceupdate" >
+                                    <input class="form-control" placeholder="user_id:"  type="text" name="user_id" />
+                                    <input class="form-control" placeholder="token:"  type="text" name="token" value="fqwefqwefqwefqwefwef" />
+                                    <input class="form-control" placeholder="user_name:"  type="text" name="user_name"  />
+                                    <input class="form-control" placeholder="display_name:"  type="text" name="display_name" value="" />
+                                    <input class="form-control" placeholder="avatar: 头像图片地址"  type="text" name="avatar"  />
+                                    <input class="form-control" placeholder="sex:姓名别 0女 1男"  type="text" name="sex" />
+                                    <input class="form-control" placeholder="type: 用户类型 0普通用户，1自媒体，2媒体机构，4政企"  type="text" name="type"  />
+                                    <input class="form-control" placeholder="mobile:"  type="text" name="mobile"  />
+                                    <input class="form-control" placeholder="city:"  type="text" name="city" />
+                                    <input class="form-control" placeholder="description: 描述信息"  type="text" name="description" />
+                                    <input type="hidden" name="sig" value="KB5xceXTtd0SFksathnRaYvlyc"/>
+                                    <input class="btn btn-success"   type="submit" value="submit test request" />
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div role="tabpanel" class="tab-pane" id="profile">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                <h3 id="/api/username/check"> 校验用户名是否已存在(/api/username/check)</h3>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/check">
+                        <input class="form-control" placeholder="user_name:" name="user_name" />
+                        <input class="form-control" placeholder="op_user_id: 非必选" name="op_user_id" />
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="appid:" name="appid" value="108800"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success"  type="submit" value="submit test request"/>
+                    </form>
+                </div>
+                <hr/>
+                <h3 id="/api/username/query1"> 根据用户名查询用户信息(/api/username/query)</h3>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/query">
+                        <input class="form-control" placeholder="user_name:" name="user_name" />
+                        <input class="form-control" placeholder="op_user_id: 非必选" name="op_user_id" value="morganyang"/>
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="appid:" name="appid" value="108800"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success"  type="submit" value="submit test request"/>
+                    </form>
+                </div>
+                <hr/>
+                <hr/>
+                <h3 id="/api/username/query2"> 根据用户passport查询用户信息(/api/username/query)</h3>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/query">
+                        <input class="form-control" placeholder="passport_id:" name="passport_id" />
+                        <input class="form-control" placeholder="op_user_id:非必选" name="op_user_id" value="morganyang"/>
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="appid:" name="appid" value="108800"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success"  type="submit" value="submit test request"/>
+                    </form>
+                </div>
+
+                <form class="navbar-form navbar-left" role="search">
+                    <div class="form-group">
+                        <input id="long_date" type="text" class="form-control" placeholder="时间戳">
+                    </div>
+                    <button type="button" class="btn btn-default" onclick="getDate();" >转化返回结果的时间</button>
+                    <input id="str_date" type="text" class="form-control" placeholder="结果">
+                </form>
+
+                <script type="text/javascript">
+                    Date.prototype.format = function(format){
+                        var o = {
+                            "M+" : this.getMonth()+1, //month
+                            "d+" : this.getDate(), //day
+                            "h+" : this.getHours(), //hour
+                            "m+" : this.getMinutes(), //minute
+                            "s+" : this.getSeconds(), //second
+                            "q+" : Math.floor((this.getMonth()+3)/3), //quarter
+                            "S" : this.getMilliseconds() //millisecond
+                        }
+
+                        if(/(y+)/.test(format)) {
+                            format = format.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+                        }
+
+                        for(var k in o) {
+                            if(new RegExp("("+ k +")").test(format)) {
+                                format = format.replace(RegExp.$1, RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));
+                            }
+                        }
+                        return format;
+                    }
+
+                    function getDate() {
+                        var time = document.getElementById("long_date").value;
+                        var date = new Date();
+                        date.setTime(time);
+                        document.getElementById("str_date").value = date.format("yyyy-MM-dd hh:mm:ss");
+
+                    }
+                </script>
+
+                <div class="jumbotron">
+                    <h3>返回结果解释</h3>
+                    <p>{
+                        "data":<br/>
+                        {<br/>
+                        "op_time":1430141607564, 更新时间<br/>
+                        "passport_id":"sohuzmtyrj2kxd@sohu.com", passportid<br/>
+                        "type":"1",<br/>
+                        用户类型 0：普通用户，1：自媒体用户，2：媒体机构，3：视频自媒体(和自媒体用户类型合并)，4：政企<br/>
+                        "user_info": "其他用户信息",<br/>
+                        "user_name": "土摩托" 用户名<br/>
+                        },<br/>
+                        "desc":"success",<br/>
+                        "status":1000<br/>
+                        }<br/>
+                    </p>
+
+                </div>
+
+                <h3 id="/api/username/lock">1.2.1 锁定用户名(/api/username/lock)</h3>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/lock">
+                        <input class="form-control" placeholder="passport_id:" name="passport_id" value=""/>
+                        <input class="form-control" placeholder="user_name:" name="user_name" value=""/>
+                        <input class="form-control" placeholder="op_user_id:" name="op_user_id" value="morganyang"/>
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="appid:" name="appid" value="108800"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success"  type="submit" value="submit test request"/>
+                    </form>
+                </div>
+                <hr/>
+                <h3 id="/api/username/audit">1.2.2 审核用户名(/api/username/audit)</h3>
+                    <div class="well">
+                        appid 值填写 106600 会同时更改 sns user缓存
+                    </div>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/audit">
+                        <input class="form-control" placeholder="passport_id:" name="passport_id" value=""/>
+                        <input class="form-control" placeholder="user_name:" name="user_name" value=""/>
+                        <input class="form-control" placeholder="op_user_id:" name="op_user_id" value="morganyang"/>
+                        <input class="form-control" placeholder="status: 必选 (1表示通过，0表示驳回)" name="status" value="1"/>
+                        <input class="form-control" placeholder="type: 用户类型 0：普通用户，1：自媒体用户，2：媒体机构，3：视频自媒体，4：政企" name="type" />
+                        <input class="form-control" placeholder="avatar:" name="avatar"/>
+                        <input class="form-control" placeholder="user_info: 非必选" name="user_info" value=""/>
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="appid:" name="appid" value="106600"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success"   type="submit" value="submit test request"/>
+                    </form>
+                </div>
+                <hr/>
+                <h3 id="/api/username/avatar">1.2.2 修改自媒体用户头像(/api/username/avatar)</h3>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/avatar">
+                        <input class="form-control" placeholder="passport_id:" name="passport_id" value=""/>
+                        <input class="form-control" placeholder="op_user_id:" name="op_user_id" value="morganyang"/>
+                        <input class="form-control" placeholder="avatar: 必选" name="avatar"/>
+                        <input class="form-control" placeholder="user_info:  非必选" name="user_info" value=""/>
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="appid:" name="appid" value="106600"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success" type="submit" value="submit test request"/>
+                    </form>
+                </div>
+
+                <hr/>
+                <h3 id="/api/username/release">1.2.3 释放用户名(/api/username/release)</h3>
+                <div class="input-group">
+
+                    <form method="get" action="http://uname.t.sohu.com/api/username/release">
+                        <input class="form-control" placeholder="passport_id: 非必选" name="passport_id" />
+                        <input class="form-control" placeholder="user_name:" name="user_name"/>
+                        <input class="form-control" placeholder="op_user_id:" name="op_user_id" value="morganyang"/>
+                        <input class="form-control" placeholder="ct:" name="ct" value="199924353223"/>
+                        <input class="form-control" placeholder="" name="appid:" value="108800"/>
+                        <input  type="hidden" name="sig" value="YiJEhagHKZecj7AwzrpwR52JN8A="/>
+                        <input class="btn btn-success"  type="submit" value="submit test request"/>
+                    </form>
+                </div>
+                    </div>
+            </div>
+
+            <!--<h3 id="sig_algorithm">sig计算方法</h3>-->
+            <!--
+            sig = MD5(key1=val1key2val2...appKey),如参数：
+            appid ==> 108800 
+            ct ==> 1000 
+            passport_id ==> sohuzmtdxw9h1t@sohu.com 
+            user_name ==> 大调 
+            appKey ==> k#0ryy&^kk 
+            sig = MD5(appid=108800ct=1000passport_id=sohuzmtdxw9h1t@sohu.comuser_name=大调k#0ryy&^kk)  -->
+        </div>
+        <div role="tabpanel" class="tab-pane" id="messages">
+            <div class="panel panel-default"><div class="panel-body">
+            <h3 >查询Redis Cache 集群 K-V</h3>
+            <div class="input-group">
+                <form method="get" action="/duty" >
+                    <input class="form-control" placeholder="数据key前缀加key要素，例如10_zmetest001@sohu.com" name="key" />
+                    <input type="hidden"  name="p" value="getRelaItem"/>
+                    <input class="btn btn-success"  type="submit" value="submit test request"/>
+                </form>
+            </div>
+            <h3 >查询Redis Cache 集群 ZSET</h3>
+            <div class="input-group">
+                <form method="get" action="/duty" >
+                    <input class="form-control" placeholder="数据key前缀加key要素，例如21_zmetest001@sohu.com" name="key" />
+                    <input type="hidden"  name="p" value="getRelaZset"/>
+                    <input class="btn btn-success"  type="submit" value="submit test request"/>
+                </form>
+            </div>
+            <h3 >查询Meta Redis 集群 K_V</h3>
+            <div class="input-group">
+                <form method="get" action="/duty" >
+                    <input class="form-control" placeholder="数据key前缀加key要素，例如10_zmetest001@sohu.com" name="key" />
+                    <input type="hidden"  name="p" value="getMetaItem"/>
+                    <input class="btn btn-success"  type="submit" value="submit test request"/>
+                </form>
+            </div>
+            </div></div>
+
+        </div>
+        <div role="tabpanel" class="tab-pane" id="settings">
+            <div class="panel panel-default"><div class="panel-body">
+            <h3 >查询 Meta DB 持久化</h3>
+            <div class="input-group">
+                <form method="get" action="/duty" >
+                    <input class="form-control" placeholder="数据key前缀加key要素，例如10_zmetest001@sohu.com" name="key" />
+                    <input type="hidden"  name="p" value="getMetaDbItem"/>
+                    <input class="btn btn-success"  type="submit" value="submit test request"/>
+                </form>
+            </div>
+            <h3 >查询 Rela DB 持久化</h3>
+            <div class="input-group">
+                <form method="get" action="/duty" >
+                    <input class="form-control" placeholder="数据key前缀加key要素，例如21_zmetest001@sohu.com" name="key" />
+                    <input type="hidden"  name="p" value="getRelaDbZset"/>
+                    <input class="btn btn-success"  type="submit" value="submit test request"/>
+                </form>
+            </div>
+            </div></div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="commentban">
+            <div class="panel panel-default"><div class="panel-body">
+                2447ea1c6ba49640707aaf83d93f7976
+                <div class="jumbotron">
+                    <h3>用户、手机号黑名单使用说明</h3>
+                    <p>
+                        reids配置地址：http://api.cloud.sohuno.com/api/redis/release?uid=2740&vip=0<br/>
+                        2447ea1c6ba49640707aaf83d93f7976
+                    </p>
+
+                    <p>
+                        access_keyword_list 保存的是64期敏感词的和敏感表情图，过滤的规则就是只要url内包含或者post body就会返回300009错误
+                    </p>
+                    <p>
+                        comment_switch 是一个开关的zset里面保存的是各种开关，目前只有一个开关access_key_word 控制是否过滤url敏感词，
+                        关闭的方式就是从zset中删除此value
+                    </p>
+                    <p>
+                        mobile_ban_list 是手机号黑名单，凡是被禁言的用户，在大V下发言会把绑定的手机号记录在此zset中。
+                        再次黑名单中的手机号所绑定的psssport是无法发言的
+                    </p>
+                    <p>
+                        passport_ban_list 是用户passport黑名单，在此名单中的passportId无法使用sns的任何接口。
+                    </p>
+                    <p>
+                        vip_list 大v的列表，在此列表中的大v，针对其feed转发或者评论会触发手机号黑名单的过滤。
+                    </p>
+
+                </div>
+            </div></div>
+
+        </div>
+        <div role="tabpanel" class="tab-pane" id="msg">
+            <div class="panel panel-default"><div class="panel-body">
+
+                <h3>用户禁言消息说明</h3>
+                <div class="well">
+
+                    <p >{"data":{"avatarLock":false,"commentStatus":0,"introLock":false,"nickLock":true,"userId":"zmttest003@sohu.com"},"type":26}<br/></p>
+                    <p>
+                    avatarLock 锁定头像，commentStatus 禁言状态 1代表禁言，0代表可以发言 nickLock 锁定用户名 introLock 锁定简介
+                    <br />
+
+                    mq链接地址
+                    http://10.16.5.134:15672<br/>
+                    sns/Sns113&2$<br/>
+                    sns_m2_queue<br/>
+                    </p>
+                </div>
+                <img src="resources/images/9909CD9C-5AFE-4EE7-99C6-332E094F68AA.jpg" width="60%">
+
+                <h3>删除feed本地缓存</h3>
+
+                <div class="well">
+                    <p>{"type":56,"data”:"NTE3NDQ5Nzk="}</p>
+
+                    <p>
+                        data 替换成feedId
+                    </p>
+                    <p>地址 http://10.16.4.240:15672/#/</p>
+                    <p>sns/Sns113&2$</p>
+                    <p>在 lc_exchange 下发消息</p>
+                </div>
+                <img src="resources/images/E9A3B1B5-DE54-41F9-BD30-F6C357EBBD68.jpg" width="60%">
+
+
+            </div></div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+<script type="text/javascript">
+
+    function submitWithHeader(obj) {
+        $(obj).submitForm({
+            header : d,
+            dataType: "text",
+            callback: function (data) {
+
+                data = eval("(" + data + ")");
+                alert(data.Content);
+                if (data.Result > 0) {
+                    location.href = data.Redirect;
+                }
+            },
+            before: function () {
+                startFileUpload();
+                var errMsg = "";
+            }
+        }).submit();
+    }
+
+
+</script>
+</html>

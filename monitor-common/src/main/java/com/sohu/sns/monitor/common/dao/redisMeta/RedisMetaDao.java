@@ -28,26 +28,45 @@ public interface RedisMetaDao {
      */
     public Double getLastDayMemory(String logDay);
 
-    /**
-     * 保存内存使用记录
-     *
-     * @param redisMetaMemory
-     */
-    public void saveDayRecord(RedisMetaMemory redisMetaMemory);
+//    /**
+//     * 保存内存使用记录
+//     *
+//     * @param redisMetaMemory
+//     */
+//    public void saveDayRecord(RedisMetaMemory redisMetaMemory);
+
+//    /**
+//     * 更新内存使用记录
+//     *
+//     * @param redisMetaMemory
+//     */
+//    public void updateDayRecord(RedisMetaMemory redisMetaMemory);
+
+//    /**
+//     * 删除内存使用记录
+//     *
+//     * @param redisMetaMemory
+//     */
+//    public void deleteDayRecord(RedisMetaMemory redisMetaMemory);
 
     /**
-     * 更新内存使用记录
-     *
-     * @param redisMetaMemory
+     * 获取 内存使用表中所有数据
+     * @return
      */
-    public void updateDayRecord(RedisMetaMemory redisMetaMemory);
+    public List<RedisMetaMemory> getRedisMeta();
 
     /**
-     * 删除内存使用记录
-     *
-     * @param redisMetaMemory
+     * 增加 一条内存使用记录
      */
-    public void deleteDayRecord(RedisMetaMemory redisMetaMemory);
+    public void createRedisMeta(RedisMetaMemory redisMetaMemory);
 
-    public List<RedisMetaMemory> getRedisMetaMemory();
+    /**
+     * 删除 一条内存使用记录
+     */
+    public void deleteRedisMeta(RedisMetaMemory redisMetaMemory);
+
+    /**
+     * 更新 一条内存使用记录
+     */
+    public void updateRedisMeta(RedisMetaMemory redisMetaMemory);
 }

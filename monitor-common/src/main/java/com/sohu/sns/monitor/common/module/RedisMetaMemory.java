@@ -1,5 +1,8 @@
 package com.sohu.sns.monitor.common.module;
 
+import com.sohucs.com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -7,7 +10,7 @@ import java.util.Date;
  * time:16-12-29下午5:15
  * meta redis 使用的内存情况
  */
-public class RedisMetaMemory {
+public class RedisMetaMemory implements Serializable{
     private Integer id;
     private Double lastDayUserMemory;
     private Double usedMemory;
@@ -46,10 +49,12 @@ public class RedisMetaMemory {
         this.logDay = logDay;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     public Date getUpdateTime() {
         return updateTime;
     }
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
     }

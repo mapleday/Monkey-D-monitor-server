@@ -44,16 +44,16 @@ public class NotifyService {
         return notifyPersonDao.getAllPerson();
     }
 
-    public void creatPerson(NotifyPerson np){
-        notifyPersonDao.createPerson(np);
+    public void creatPerson(NotifyPerson notifyPerson){
+        notifyPersonDao.createPerson(notifyPerson);
     }
 
-    public void updatePerson(NotifyPerson np){
-        notifyPersonDao.updatePerson(np);
+    public void updatePerson(NotifyPerson notifyPerson){
+        notifyPersonDao.updatePerson(notifyPerson);
     }
 
-    public void deletePerson(NotifyPerson np){
-        notifyPersonDao.deletePerson(np);
+    public void deletePerson(NotifyPerson notifyPerson){
+        notifyPersonDao.deletePerson(notifyPerson);
     }
 
 

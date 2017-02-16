@@ -6,15 +6,13 @@ import com.sohu.sns.monitor.common.module.MqttServerAddress;
 import java.util.List;
 
 /**
- * author:yw on 2017.2.9
+ *  author:yw on 2017.2.9
  *
  */
 @Repository
 public interface MqttServerAddressDao {
-
     public List<MqttServerAddress> getMqtt();
-    public void updateMqtt(MqttServerAddress msa);
-    public void deleteMqtt(MqttServerAddress msa);
-    public void createMqtt(MqttServerAddress msa);
-
+    public void updateMqtt(MqttServerAddress mqttServerAddress);
+    public void deleteMqtt(MqttServerAddress mqttServerAddress);
+    public void createMqtt(MqttServerAddress mqttServerAddress);
 }

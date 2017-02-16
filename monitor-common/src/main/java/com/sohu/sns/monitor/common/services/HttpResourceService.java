@@ -24,17 +24,20 @@ public class HttpResourceService {
         return httpResourceDAO.getResources();
     }
 
-    public void updateResource(HttpResource hr ){
-        httpResourceDAO.updateResource(hr);
+    public List<HttpResource> getAllResources() {
+        return httpResourceDAO.getAllResources();
     }
 
-    public void  deleteResource(HttpResource hr){
-        httpResourceDAO.deleteResource(hr);
+    public void updateResource(HttpResource httpResource ){
+        httpResourceDAO.updateResource(httpResource);
     }
 
+    public void  deleteResource(HttpResource httpResource){
+        httpResourceDAO.deleteResource(httpResource);
+    }
 
-    public  void createResource(HttpResource hr){
-        httpResourceDAO.createResource(hr);
+    public  void createResource(HttpResource httpResource){
+        httpResourceDAO.createResource(httpResource);
     }
 
 

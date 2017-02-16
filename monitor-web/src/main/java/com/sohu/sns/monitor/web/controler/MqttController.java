@@ -21,6 +21,11 @@ public class MqttController {
     @Autowired
     MqttServerAddressService mqttServerAddressService;
 
+    @RequestMapping("/mqtt")
+    public String mqttServerAddress(){
+        return  "mqttServerAddress";
+    }
+
     @ResponseBody
     @RequestMapping(value="/getMqtt")
     public Map getMqttServerAddress(){

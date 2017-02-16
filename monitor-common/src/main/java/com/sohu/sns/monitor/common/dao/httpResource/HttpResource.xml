@@ -18,52 +18,31 @@
           t.status=1
     </select>
 
-    <update id="updateResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
-        UPDATE t_monitor_http_resource
-        <set>
-            <if test="id != null"> id = #{id}, </if>
-            <if test="resourceName != null"> resource_name = #{resourceName}, </if>
-            <if test="resourceAddress != null"> resource_address = #{resourceAddress}, </if>
-            <if test="monitorTimeOut != null"> monitor_time_out = #{monitorTimeOut}, </if>
-            <if test="monitorInterval != null"> monitor_time_interval = #{monitorInterval}, </if>
-            <if test="monitorTimes != null"> monitor_times = #{monitorTimes}, </if>
-            <if test="alarmThresholdTimes != null"> alarm_threshold_times = #{alarmThresholdTimes} </if>
-        </set>
-        WHERE id = #{id}
-    </update>
-
-
-    <insert id="addResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
-        INSERT INTO t_monitor_http_resource
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-
-            <if test="resourceName != null"> resource_name, </if>
-            <if test="resourceAddress != null"> resource_address, </if>
-            <if test="monitorTimeOut != null"> monitor_time_out, </if>
-            <if test="monitorInterval != null"> monitor_time_interval, </if>
-            <if test="monitorTimes != null"> monitor_times, </if>
-            <if test="alarmThresholdTimes != null"> alarm_threshold_times </if>
-        </trim>
-        VALUES
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-
-            <if test="resourceName != null"> #{resourceName}, </if>
-            <if test="resourceAddress != null"> #{resourceAddress}, </if>
-            <if test="monitorTimeOut != null">  #{monitorTimeOut}, </if>
-            <if test="monitorInterval != null">  #{monitorInterval}, </if>
-            <if test="monitorTimes != null">  #{monitorTimes}, </if>
-            <if test="alarmThresholdTimes != null"> #{alarmThresholdTimes} </if>
-        </trim>
-    </insert>
-
-    <delete id="deleteResources" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
-        DELETE FROM t_monitor_http_resource where id = #{id}
-    </delete>
-
+    <select id="getAllResources" resultType="com.sohu.sns.monitor.common.module.HttpResource">
+        SELECT id as id,
+        resource_name as resourceName,
+        resource_address as resourceAddress,
+        monitor_time_out as monitorTimeOut,
+        monitor_time_interval as monitorInterval,
+        monitor_times as monitorTimes,
+        alarm_threshold_times as alarmThresholdTimes,
+        status as stat
+        FROM
+        t_monitor_http_resource
+    </select>
 
     <update id="updateResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
-        UPDATE t_monitor_http_resource set resource_name=#{resourceName},resource_address=#{resourceAddress},monitor_time_out=#{monitorTimeOut},monitor_time_interval=#{monitorInterval},monitor_times=#{monitorTimes},alarm_threshold_times=#{alarmThresholdTimes},status=#{stat} WHERE id=#{id}
-
+        UPDATE t_monitor_http_resource
+        <set>
+            <if test="resourceName!=null">resource_name=#{resourceName},</if>
+            <if test="resourceAddress!=null">resource_address=#{resourceAddress},</if>
+            <if test="monitorTimeOut!=null">monitor_time_out=#{monitorTimeOut},</if>
+            <if test="monitorInterval!=null">monitor_time_interval=#{monitorInterval},</if>
+            <if test="monitorTimes!=null">monitor_times=#{monitorTimes},</if>
+            <if test="alarmThresholdTimes!=null">alarm_threshold_times=#{alarmThresholdTimes},</if>
+            <if test="stat!=null">status=#{stat}</if>
+        </set>
+        WHERE id=#{id}
     </update>
 
     <delete id="deleteResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource">
@@ -71,8 +50,27 @@
     </delete>
 
     <insert id="createResource" parameterType="com.sohu.sns.monitor.common.module.HttpResource" useGeneratedKeys="true" keyProperty="id" >
-        INSERT into  t_monitor_http_resource(id,resource_name,resource_address,monitor_time_out,monitor_time_interval,monitor_times,
-        alarm_threshold_times,status) VALUES (#{id},#{resourceName},#{resourceAddress},#{monitorTimeOut},#{monitorInterval},#{monitorTimes},
-       #{alarmThresholdTimes},#{stat})
+        INSERT into  t_monitor_http_resource
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="resourceName!=null">resource_name,</if>
+            <if test="resourceAddress!=null">resource_address,</if>
+            <if test="monitorTimeOut!=null">monitor_time_out,</if>
+            <if test="monitorInterval!=null">monitor_time_interval,</if>
+            <if test="monitorTimes!=null">monitor_times,</if>
+            <if test="alarmThresholdTimes!=null">alarm_threshold_times,</if>
+            <if test="stat!=null">status</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="resourceName!=null">#{resourceName},</if>
+            <if test="resourceAddress!=null">#{resourceAddress},</if>
+            <if test="monitorTimeOut!=null">#{monitorTimeOut},</if>
+            <if test="monitorInterval!=null">#{monitorInterval},</if>
+            <if test="monitorTimes!=null">#{monitorTimes},</if>
+            <if test="alarmThresholdTimes!=null">#{alarmThresholdTimes},</if>
+            <if test="stat!=null">#{stat}</if>
+        </trim>
     </insert>
 </mapper>

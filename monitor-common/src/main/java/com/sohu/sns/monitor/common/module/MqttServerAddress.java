@@ -8,16 +8,16 @@ import java.io.Serializable;
  * mqtt服务器地址
  */
 public class MqttServerAddress implements Serializable {
-    private int id;
+    private Integer id;
     private String serverAddress;
-    private int monitorNum;
+    private Integer monitorNum;
     private Integer stat;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -29,11 +29,11 @@ public class MqttServerAddress implements Serializable {
         this.serverAddress = serverAddress;
     }
 
-    public int getMonitorNum() {
+    public Integer getMonitorNum() {
         return monitorNum;
     }
 
-    public void setMonitorNum(int monitorNum) {
+    public void setMonitorNum(Integer monitorNum) {
         this.monitorNum = monitorNum;
     }
 

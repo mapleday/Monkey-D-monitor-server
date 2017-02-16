@@ -3,37 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>mqtt</title>
-  <link rel="stylesheet" href="resources/admin-lte/bootstrap/css/bootstrap.min.css">
-  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/editor.dataTables.css">
-  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/jquery.dataTables.min.css">
-  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/buttons.dataTables.min.css">
-  <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/select.dataTables.min.css">
+
+  <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/editor.dataTables.css">
+  <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/buttons.dataTables.min.css">
+  <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/select.dataTables.min.css">
 </head>
 <body>
 
 <div style="text-align: center">
   <h3 >Mqtt</h3>
 </div>
-<table id="example" class="display dataTable" cellpadding="0" width="100%" style="overflow: scroll" >
+<table id="example" class="display dataTable" cellpadding="0" width="100%" style="table-layout:fixed;word-break:break-all" >
   <thead>
   <tr>
-    <th>id</th>
-    <th>serverAddress</th>
-    <th>monitorNum</th>
-    <th>stat</th>
+    <th>序号</th>
+    <th>服务器地址</th>
+    <th>监控次数</th>
+    <th>监控状态</th>
   </tr>
   </thead>
 </table>
 
-
 <!--editor js-->
 
-<script  src="resources/admin-lte/Editor-1.6.1/js/jquery-1.12.4.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.select.min.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.editor.min.js"></script>
-
+<script  src="resources/js/jquery/jquery-1.12.4.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.editor.min.js"></script>
 
 
 <script type="text/javascript">
@@ -50,15 +49,11 @@
                         var result={};
                         for (var i in data.data){
                             var result=data.data[i];
-//                              result.id=i;
                             result.action=data.action;
                         }
                         console.log(result);
                         return result;
-
                     }
-
-
                 },
                 edit:{
                     type:'POST',
@@ -67,14 +62,11 @@
                         var result={};
                         for (var i in data.data){
                             var result=data.data[i];
-//                                  result.id=i;
                             result.action=data.action;
-
                         }
                         console.log(result);
                         return result;
                     }
-
                 },
                 remove:{
                     type:'POST',
@@ -83,9 +75,7 @@
                         var result={};
                         for (var i in data.data){
                             var result=data.data[i];
-//                              result.id=i;
                             result.action=data.action;
-
                         }
                         console.log(result);
                         return result;
@@ -96,17 +86,18 @@
             idSrc: "id",
             fields: [
                 {
-                    label: "id:",
-                    name: "id"
+                    label: "序号:",
+                    name: "id",
+                    type:  "readonly"
                 },
                 {
-                    label: "serverAddress:",
+                    label: "服务器地址:",
                     name: "serverAddress"
                 },  {
-                    label: "monitorNum:",
+                    label: "监控次数:",
                     name: "monitorNum"
                 },{
-                    label: "stat:",
+                    label: "监控状态:",
                     name:  "stat"
                 }
             ]
@@ -115,6 +106,7 @@
         $('#example').DataTable( {
             dom: "Bfrtip",
             ajax: "getMqtt",
+            autoWidth: false,
             columns: [
                 { data: "id" } ,
                 { data: "serverAddress" },
@@ -129,8 +121,6 @@
             ]
         } );
     } );
-
-
 </script>
 </body>
 </html>

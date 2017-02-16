@@ -11,17 +11,17 @@ public class NotifyPerson implements Serializable {
     /**
      * 自增主键
      */
-    private int id;
+    private Integer id;
     private String name;
     private String email;
     private String phone;
-    private int status;
+    private Integer status;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -49,11 +49,11 @@ public class NotifyPerson implements Serializable {
         this.phone = phone;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

@@ -13,8 +13,9 @@ import java.util.List;
 @Repository
 public interface HttpResourceDAO {
     public List<HttpResource> getResources();
-    public void updateResource(HttpResource hr);
-    public void deleteResource(HttpResource hr);
-    public void createResource(HttpResource hr);
+    public List<HttpResource> getAllResources();
+    public void updateResource(HttpResource httpResource);
+    public void deleteResource(HttpResource httpResource);
+    public void createResource(HttpResource httpResource);
 
 }

@@ -8,11 +8,11 @@ import java.util.List;
 /**
  * author:jy
  * time:16-12-30上午11:20
+ *
+ *
+ *
  */
 @Repository
 public interface MqttMonitorDao {
     public List<MqttServerAddress> getServers();
-    public int updateMqttServerAddress(MqttServerAddress mqttServerAddress);
-    public int addMqttServerAddress(MqttServerAddress mqttServerAddress);
-    public int deleteMqttServerAddress(MqttServerAddress mqttServerAddress);
 }

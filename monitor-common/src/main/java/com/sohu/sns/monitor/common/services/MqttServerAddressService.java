@@ -19,15 +19,15 @@ public class MqttServerAddressService {
         return mqttServerAddressDao.getMqtt();
     }
 
-    public void updateMqttServerAddress(MqttServerAddress msa){
-        mqttServerAddressDao.updateMqtt(msa);
+    public void updateMqttServerAddress(MqttServerAddress mqttServerAddress){
+        mqttServerAddressDao.updateMqtt(mqttServerAddress);
     }
 
-    public void deleteMqttServerAddress(MqttServerAddress msa){
-        mqttServerAddressDao.deleteMqtt(msa);
+    public void deleteMqttServerAddress(MqttServerAddress mqttServerAddress){
+        mqttServerAddressDao.deleteMqtt(mqttServerAddress);
     }
 
-    public void createMqttServerAddress(MqttServerAddress msa){
-        mqttServerAddressDao.createMqtt(msa);
+    public void createMqttServerAddress(MqttServerAddress mqttServerAddress){
+        mqttServerAddressDao.createMqtt(mqttServerAddress);
     }
 }

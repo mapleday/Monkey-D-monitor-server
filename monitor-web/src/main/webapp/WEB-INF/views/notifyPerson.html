@@ -3,37 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <title>notifyPerson</title>
-    <link rel="stylesheet" href="resources/admin-lte/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/editor.dataTables.css">
-    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" href="resources/admin-lte/Editor-1.6.1/css/select.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/editor.dataTables.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/select.dataTables.min.css">
 </head>
 <body>
 
 <div style="text-align: center">
     <h3 >notifyPerson</h3>
 </div>
-<table id="example" class="display dataTable" cellpadding="0" width="100%" style="overflow: scroll" >
+<table id="example" class="display dataTable" cellpadding="0" width="100%" style="table-layout:fixed;word-break:break-all;overflow: scroll" >
     <thead>
     <tr>
-        <th>id</th>
-        <th>name</th>
-        <th>email</th>
-        <th>phone</th>
-        <th>status</th>
+        <th>序号</th>
+        <th>姓名</th>
+        <th>邮箱</th>
+        <th>电话</th>
+        <th>微信通知状态</th>
     </tr>
     </thead>
 </table>
 
-
 <!--editor js-->
 
-<script  src="resources/admin-lte/Editor-1.6.1/js/jquery-1.12.4.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.select.min.js"></script>
-<script  src="resources/admin-lte/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+<script  src="resources/js/jquery/jquery-1.12.4.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
 
 
 
@@ -56,10 +56,7 @@
                         }
                         console.log(result);
                         return result;
-
                     }
-
-
                 },
                 edit:{
                     type:'POST',
@@ -68,14 +65,11 @@
                         var result={};
                         for (var i in data.data){
                             var result=data.data[i];
-//                                  result.id=i;
                             result.action=data.action;
-
                         }
                         console.log(result);
                         return result;
                     }
-
                 },
                 remove:{
                     type:'POST',
@@ -84,9 +78,7 @@
                         var result={};
                         for (var i in data.data){
                             var result=data.data[i];
-//                              result.id=i;
                             result.action=data.action;
-
                         }
                         console.log(result);
                         return result;
@@ -97,20 +89,21 @@
             idSrc: "id",
             fields: [
                 {
-                    label: "id:",
-                    name: "id"
+                    label: "序号:",
+                    name: "id",
+                    type:  "readonly"
                 },
                 {
-                    label: "name:",
+                    label: "姓名:",
                     name: "name"
                 },  {
-                    label: "email:",
+                    label: "邮箱:",
                     name: "email"
                 },{
-                    label: "phone:",
+                    label: "电话:",
                     name:  "phone"
                 },{
-                    label: "status:",
+                    label: "微信通知状态:",
                     name:  "status"
 
                 }
@@ -135,8 +128,6 @@
             ]
         } );
     } );
-
-
 </script>
 </body>
 </html>

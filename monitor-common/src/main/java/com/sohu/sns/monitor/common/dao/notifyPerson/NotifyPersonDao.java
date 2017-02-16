@@ -15,7 +15,7 @@ public interface NotifyPersonDao {
      * 查询所有人
      */
     public List<NotifyPerson> getAllPerson();
-    public void updatePerson(NotifyPerson np);
-    public void deletePerson(NotifyPerson np);
-    public void createPerson(NotifyPerson np);
+    public void updatePerson(NotifyPerson notifyPerson);
+    public void deletePerson(NotifyPerson notifyPerson);
+    public void createPerson(NotifyPerson notifyPerson);
 }

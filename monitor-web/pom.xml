@@ -26,6 +26,7 @@
         <jackson.version>2.3.3</jackson.version>
         <junit.version>3.8.1</junit.version>
         <guava.version>16.0.1</guava.version>
+        <shiro.version>1.2.0</shiro.version>
     </properties>
     <dependencies>
         <dependency>
@@ -52,6 +53,28 @@
             <!--<scope>compile</scope>-->
         <!--</dependency>-->
 
+        <!-- Shiro security -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-cas</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <!-- end of Shiro security -->
+
     </dependencies>
 
     <build>
@@ -67,6 +90,8 @@
             </plugin>
         </plugins>
     </build>
+
+
 
 
 </project>

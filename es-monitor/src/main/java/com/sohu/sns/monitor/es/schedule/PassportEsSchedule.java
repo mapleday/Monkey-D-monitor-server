@@ -43,8 +43,8 @@ public class PassportEsSchedule {
 
     public void monitor() {
         //查询今天和昨天的最近5分钟接口调用情况
-        List<PassportEsResult> results = PassportEsAnalysis.getInstance().analysisTowDayQpm(1.6f);
-        List<PassportEsResult> results2 = PassportEsAnalysis.getInstance().analysisTowDayAppKey(2.6f);
+        List<PassportEsResult> results = PassportEsAnalysis.getInstance().analysisTowDayQpm(2.5f);
+        List<PassportEsResult> results2 = PassportEsAnalysis.getInstance().analysisTowDayAppKey(3.0f);
 
         StringBuilder sb = new StringBuilder();
         if (!results.isEmpty()) {
@@ -65,7 +65,7 @@ public class PassportEsSchedule {
         for (PassportEsResult result : results) {
             sb.append( String.format( "%s,%s,数量=%s,昨天=%s,总计=%s,昨天总计=%s\n",
                     result.getTimeKey(),result.getInterfaceUri(),result.getCount(),
-                    result.getLastCount(),result.getLastCount(),result.getLastTotalCount() ) );
+                    result.getLastCount(),result.getLastTotalCount(),result.getLastTotalCount() ) );
         }
     }
 

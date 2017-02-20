@@ -15,7 +15,9 @@ public interface NotifyPersonDao {
      * 查询所有人
      */
     public List<NotifyPerson> getAllPerson();
+    public List<NotifyPerson> getGroupPerson(String groupName);
     public int updateNotifyPerson(NotifyPerson notifyPerson);
     public int addNotifyPerson(NotifyPerson notifyPerson);
     public int deleteNotifyPerson(NotifyPerson notifyPerson);
+
 }

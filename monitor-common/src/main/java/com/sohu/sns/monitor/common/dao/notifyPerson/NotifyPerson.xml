@@ -12,6 +12,14 @@
         WHERE
           t.status=1
     </select>
+    <select id="getGroupPerson" parameterType="java.lang.String" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
+        SELECT
+        id, name, email, phone, `status`
+        FROM
+        t_notify_person t
+        WHERE
+        t.group=#{group_name}
+    </select>
 
 
     <update id="updateNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">

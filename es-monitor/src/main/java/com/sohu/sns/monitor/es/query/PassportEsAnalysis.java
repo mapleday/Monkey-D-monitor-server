@@ -21,6 +21,8 @@ public class PassportEsAnalysis {
 
     final Float compareLevel[] = new Float[]{ 10.0f, 5.0f, 3.5f, 2.5f, 1.5f };
 
+    final String colorLevel[] = new String[] {"","#FFC125","#FFC125","#FF8247","#FF8247","#FF8247","#FF4500","#FF4500","#FF4500","#FF4500","#FF4500"};
+
     public static PassportEsAnalysis getInstance() {
         return instance;
     }
@@ -39,6 +41,20 @@ public class PassportEsAnalysis {
         return analysisTowDay(todayResult, yesTodayResult, alertRate);
     }
 
+    public List<PassportEsResult> analysisTowDayPassportSohu(float alertRate) {
+        long start = System.currentTimeMillis();
+        Map<String, PassportEsResult> todayResult = PassportEsQuery.getInstance().queryPassportSohu(start, MINUTE_INTERVAL);
+        Map<String, PassportEsResult> yesTodayResult = PassportEsQuery.getInstance().queryPassportSohu(start - ONE_DAY_MILLIS, MINUTE_INTERVAL);
+        return analysisTowDay(todayResult, yesTodayResult, alertRate);
+    }
+
+    public List<PassportEsResult> analysisTowDayPlusSohu(float alertRate) {
+        long start = System.currentTimeMillis();
+        Map<String, PassportEsResult> todayResult = PassportEsQuery.getInstance().queryPlusSohu(start, MINUTE_INTERVAL);
+        Map<String, PassportEsResult> yesTodayResult = PassportEsQuery.getInstance().queryPlusSohu(start - ONE_DAY_MILLIS, MINUTE_INTERVAL);
+        return analysisTowDay(todayResult, yesTodayResult, alertRate);
+    }
+
     private List<PassportEsResult> analysisTowDay(Map<String, PassportEsResult> todayResult,
                                                   Map<String, PassportEsResult> yesTodayResult,
                                                   float alertRate) {
@@ -49,11 +65,15 @@ public class PassportEsAnalysis {
                 continue;
             }
             PassportEsResult yesToday = yesTodayResult.get(minKey);
-//            System.out.println("analysis:"+today.getInterfaceUri()+ "," + today.getCount() + "," + yesToday.getCount());
-            float rate = ((float) today.getCount()) / yesToday.getCount();
+            //处理今天有昨天没有的
+            float rate = 5;
+            if (yesToday != null) {
+                rate = ((float) today.getCount()) / yesToday.getCount();
+            }
             if (rate >= alertRate) {
                 today.setLastCount(yesToday.getCount());
                 today.setLastTotalCount(yesToday.getTotalCount());
+                today.setColor(rate >= 10 ? colorLevel[10] : colorLevel[(int) rate]);
                 results.add(today);
             }
         }

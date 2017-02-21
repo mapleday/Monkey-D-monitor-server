@@ -31,6 +31,12 @@ public class PassportEsQuery {
     final String PLUS_SOHUNO_INDEX = "logstash-detail-nginx-rest-plus-sohuno";
     final String PLUS_SOHUNO_TYPE = "detail-plus-sohuno";
 
+    final String PASSPORT_SOHU_INDEX = "logstash-passport-sohu-detail";
+    final String PASSPORT_SOHU_TYPE = "passport-sohu-detail";
+
+    final String PLUS_SOHU_INDEX = "logstash-plus-sohu-detail";
+    final String PLUS_SOHU_TYPE = "plus-sohu-detail";
+
     JsonMapper jsonMapper = JsonMapper.nonDefaultMapper();
 
     HttpClientUtil httpClientUtil = new HttpClientUtil(4, 10000, 10000);
@@ -70,7 +76,8 @@ public class PassportEsQuery {
         String uri = String.format(QUERY_FORMAT, ES_HOST, getIndex(INTERNAL_PASSPORT_INDEX, beginTime), INTERNAL_PASSPORT_TYPE);
         long endTime = beginTime / 1000 * 1000;
         long startTime = endTime - MIN_5_IN_MILLIS;
-        return PassportEsResultConverter.convertAggregationResult(esAggregationSearch(uri, beginTime, interval, genInternalPassportBody(startTime,endTime,interval)));
+        return PassportEsResultConverter.convertAggregationResult(
+                esAggregationSearch(uri, beginTime, interval, genInternalPassportBody(startTime,endTime,interval)));
     }
 
     /**
@@ -83,9 +90,31 @@ public class PassportEsQuery {
         String uri = String.format(QUERY_FORMAT, ES_HOST, getIndex(PLUS_SOHUNO_INDEX,beginTime), PLUS_SOHUNO_TYPE);
         long endTime = beginTime / 1000 * 1000;
         long startTime = endTime - MIN_5_IN_MILLIS;
-        return PassportEsResultConverter.convertAggregationResult(esAggregationSearch(uri, beginTime, interval, genPlusSohunoAppIdBody(startTime,endTime,interval)));
+        return PassportEsResultConverter.convertAggregationResult(
+                esAggregationSearch(uri, beginTime, interval, genPlusSohunoAppIdBody(startTime,endTime,interval)));
     }
 
+    /**
+     * 查询passport.sohu.com
+     * @param beginTime
+     * @param interval
+     * @return
+     */
+    public Map<String, PassportEsResult> queryPassportSohu(long beginTime, String interval) {
+        String uri = String.format(QUERY_FORMAT, ES_HOST, getIndex(PASSPORT_SOHU_INDEX,beginTime), PASSPORT_SOHU_TYPE);
+        long endTime = beginTime / 1000 * 1000;
+        long startTime = endTime - MIN_5_IN_MILLIS;
+        return PassportEsResultConverter.convertAggregationResult(
+                esAggregationSearch(uri, beginTime, interval, genPassportSohuBody(startTime,endTime,interval)));
+    }
+
+    public Map<String, PassportEsResult> queryPlusSohu(long beginTime, String interval) {
+        String uri = String.format(QUERY_FORMAT, ES_HOST, getIndex(PLUS_SOHU_INDEX,beginTime), PLUS_SOHU_TYPE);
+        long endTime = beginTime / 1000 * 1000;
+        long startTime = endTime - MIN_5_IN_MILLIS;
+        return PassportEsResultConverter.convertAggregationResult(
+                esAggregationSearch(uri, beginTime, interval, genPlusSohuBody(startTime,endTime,interval)));
+    }
 
     String genInternalPassportBody(long startTime, long endTime, String interval) {
         return new StringBuilder(
@@ -257,6 +286,162 @@ public class PassportEsQuery {
                 "        \"3\": {" +
                 "          \"terms\": {" +
                 "            \"field\": \"appkey.raw\"," +
+                "            \"size\": 30," +
+                "            \"order\": {" +
+                "              \"_count\": \"desc\"" +
+                "            }" +
+                "          }" +
+                "        }" +
+                "      }" +
+                "    }" +
+                "  }" +
+                "}";
+    }
+
+    String genPassportSohuBody(long startTime, long endTime, String interval) {
+        return "{" +
+                "  \"size\": 0," +
+                "  \"query\": {" +
+                "    \"filtered\": {" +
+                "      \"query\": {" +
+                "        \"query_string\": {" +
+                "          \"analyze_wildcard\": true," +
+                "          \"query\": \"*\"" +
+                "        }" +
+                "      }," +
+                "      \"filter\": {" +
+                "        \"bool\": {" +
+                "          \"must\": [" +
+                "            {" +
+                "              \"range\": {" +
+                "                \"@timestamp\": {" +
+                "                  \"gte\": "+startTime+"," +
+                "                  \"lte\": "+endTime+"," +
+                "                  \"format\": \"epoch_millis\"" +
+                "                }" +
+                "              }" +
+                "            }" +
+                "          ]," +
+                "          \"must_not\": [" +
+                "            {" +
+                "              \"query\": {" +
+                "                \"match\": {" +
+                "                  \"interface.raw\": {" +
+                "                    \"query\": \"-\"," +
+                "                    \"type\": \"phrase\"" +
+                "                  }" +
+                "                }" +
+                "              }" +
+                "            }," +
+                "            {" +
+                "              \"query\": {" +
+                "                \"match\": {" +
+                "                  \"interface.raw\": {" +
+                "                    \"query\": \"/\"," +
+                "                    \"type\": \"phrase\"" +
+                "                  }" +
+                "                }" +
+                "              }" +
+                "            }," +
+                "            {" +
+                "              \"query\": {" +
+                "                \"match\": {" +
+                "                  \"interface.raw\": {" +
+                "                    \"query\": \"/favicon.ico\"," +
+                "                    \"type\": \"phrase\"" +
+                "                  }" +
+                "                }" +
+                "              }" +
+                "            }" +
+                "          ]" +
+                "        }" +
+                "      }" +
+                "    }" +
+                "  }," +
+                "  \"aggs\": {" +
+                "    \"2\": {" +
+                "      \"date_histogram\": {" +
+                "        \"field\": \"@timestamp\"," +
+                "        \"interval\": \""+interval+"\"," +
+                "        \"time_zone\": \"Asia/Shanghai\"," +
+                "        \"min_doc_count\": 1," +
+                "        \"extended_bounds\": {" +
+                "          \"min\": "+startTime+"," +
+                "          \"max\": "+endTime+"" +
+                "        }" +
+                "      }," +
+                "      \"aggs\": {" +
+                "        \"3\": {" +
+                "          \"terms\": {" +
+                "            \"field\": \"interface.raw\"," +
+                "            \"size\": 30," +
+                "            \"order\": {" +
+                "              \"_count\": \"desc\"" +
+                "            }" +
+                "          }" +
+                "        }" +
+                "      }" +
+                "    }" +
+                "  }" +
+                "}";
+    }
+
+    String genPlusSohuBody(long startTime, long endTime, String interval) {
+        return "{" +
+                "  \"size\": 0," +
+                "  \"query\": {" +
+                "    \"filtered\": {" +
+                "      \"query\": {" +
+                "        \"query_string\": {" +
+                "          \"query\": \"NOT \\\"/saccounts/avatar/simpleStreamupload/\\\"\"," +
+                "          \"analyze_wildcard\": true" +
+                "        }" +
+                "      }," +
+                "      \"filter\": {" +
+                "        \"bool\": {" +
+                "          \"must\": [" +
+                "            {" +
+                "              \"range\": {" +
+                "                \"@timestamp\": {" +
+                "                  \"gte\": "+startTime+"," +
+                "                  \"lte\": "+endTime+"," +
+                "                  \"format\": \"epoch_millis\"" +
+                "                }" +
+                "              }" +
+                "            }" +
+                "          ]," +
+                "          \"must_not\": [" +
+                "            {" +
+                "              \"query\": {" +
+                "                \"match\": {" +
+                "                  \"interface.raw\": {" +
+                "                    \"query\": \"/\"," +
+                "                    \"type\": \"phrase\"" +
+                "                  }" +
+                "                }" +
+                "              }" +
+                "            }" +
+                "          ]" +
+                "        }" +
+                "      }" +
+                "    }" +
+                "  }," +
+                "  \"aggs\": {" +
+                "    \"2\": {" +
+                "      \"date_histogram\": {" +
+                "        \"field\": \"@timestamp\"," +
+                "        \"interval\": \""+interval+"\"," +
+                "        \"time_zone\": \"Asia/Shanghai\"," +
+                "        \"min_doc_count\": 1," +
+                "        \"extended_bounds\": {" +
+                "          \"min\": "+startTime+"," +
+                "          \"max\": "+endTime+"" +
+                "        }" +
+                "      }," +
+                "      \"aggs\": {" +
+                "        \"3\": {" +
+                "          \"terms\": {" +
+                "            \"field\": \"interface.raw\"," +
                 "            \"size\": 30," +
                 "            \"order\": {" +
                 "              \"_count\": \"desc\"" +

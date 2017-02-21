@@ -48,6 +48,7 @@ public class NotifyService {
         }
     }
 
+
     public List<NotifyPerson> getAllPerson(){
         return notifyPersonDao.getAllPerson();
     }

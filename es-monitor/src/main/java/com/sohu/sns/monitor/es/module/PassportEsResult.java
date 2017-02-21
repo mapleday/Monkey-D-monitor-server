@@ -12,6 +12,15 @@ public class PassportEsResult {
     private Integer lastTotalCount;
     private String timeKey;
     private String minKey;
+    private String color = "#FFFFFF";
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public String getInterfaceUri() {
         return interfaceUri;

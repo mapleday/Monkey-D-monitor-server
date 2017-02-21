@@ -1,8 +1,11 @@
 import com.sohu.sns.common.utils.json.JsonMapper;
+import com.sohu.sns.monitor.common.services.MailService;
+import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.es.esresult.PassportEsResultConverter;
 import com.sohu.sns.monitor.es.module.PassportEsResult;
 import com.sohu.sns.monitor.es.query.PassportEsAnalysis;
 import com.sohu.sns.monitor.es.query.PassportEsQuery;
+import com.sohu.sns.monitor.es.schedule.PassportEsSchedule;
 import com.sohu.snscommon.utils.http.HttpClientUtil;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -38,7 +41,7 @@ public class PassportEsTest {
 //            System.out.println(passportEsResult);
 //        }
 
-        List<PassportEsResult> results = PassportEsAnalysis.getInstance().analysisTowDayQpm(1.6f);
+        /*List<PassportEsResult> results = PassportEsAnalysis.getInstance().analysisTowDayQpm(1.6f);
         for (PassportEsResult result : results) {
             System.out.println(result);
         }
@@ -46,7 +49,28 @@ public class PassportEsTest {
         List<PassportEsResult> results1 = PassportEsAnalysis.getInstance().analysisTowDayAppKey(2.6f);
         for (PassportEsResult passportEsResult : results1) {
             System.out.println(passportEsResult);
+        }*/
+
+        List<PassportEsResult> results2 = PassportEsAnalysis.getInstance().analysisTowDayPassportSohu(1.5f);
+        for (PassportEsResult passportEsResult : results2) {
+            System.out.println(passportEsResult);
         }
+
+        List<PassportEsResult> results3 = PassportEsAnalysis.getInstance().analysisTowDayPlusSohu(1.5f);
+        for (PassportEsResult passportEsResult : results3) {
+            System.out.println(passportEsResult);
+        }
+
+        PassportEsSchedule passportEsSchedule = new PassportEsSchedule();
+
+        StringBuilder content = new StringBuilder(passportEsSchedule.HTML_HEAD);
+//        content.append(passportEsSchedule.genHtmlContent("internal.passport.sohu.com5分钟接口", results));
+//        content.append(passportEsSchedule.genHtmlContent("plus.sohuno.com5分钟appkey", results1));
+        content.append(passportEsSchedule.genHtmlContent("passport.sohu.com", results2));
+        content.append(passportEsSchedule.genHtmlContent("plus.sohu.com", results3));
+        content.append(passportEsSchedule.HTML_END);
+        System.out.println(content.toString());
+        NotifyUtils.sendMail("morganyang@sohu-inc.com", "passport 监控", content.toString());
     }
 
 

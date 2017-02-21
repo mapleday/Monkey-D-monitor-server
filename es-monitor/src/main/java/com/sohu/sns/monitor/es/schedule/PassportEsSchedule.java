@@ -27,38 +27,43 @@ public class PassportEsSchedule {
     public void monitor() {
         //查询今天和昨天的最近5分钟接口调用情况
         List<PassportEsResult> results = PassportEsAnalysis.getInstance().analysisTowDayQpm(2.5f);
-
+        boolean hasData = false;
         StringBuilder sb = new StringBuilder("时间,接口名称,数量,昨天,总计,昨天总计");
         if (!results.isEmpty()) {
+            hasData = true;
             sb.append("internal.passport.sohu.com5分钟接口\n");
             appendMonitorMsg(sb, results);
         }
         List<PassportEsResult> results2 = PassportEsAnalysis.getInstance().analysisTowDayAppKey(3.0f);
         if (!results2.isEmpty()) {
+            hasData = true;
             sb.append("plus.sohuno.com5分钟appkey\n");
             appendMonitorMsg(sb, results2);
         }
         List<PassportEsResult> result3 = PassportEsAnalysis.getInstance().analysisTowDayPassportSohu(1.8f);
         if (!result3.isEmpty()) {
+            hasData = true;
             sb.append("passport.sohu.com5分钟接口\n");
             appendMonitorMsg(sb, result3);
         }
         List<PassportEsResult> result4 = PassportEsAnalysis.getInstance().analysisTowDayPlusSohu(1.8f);
         if (!result4.isEmpty()) {
+            hasData = true;
             sb.append("plus.sohu.com5分钟接口\n");
             appendMonitorMsg(sb, result4);
         }
 
-//        System.out.println(sb.toString());
-        notifyService.sendNotifyToPersonGroup(sb.toString(),"passport");
+        if (hasData) {
+            notifyService.sendNotifyToPersonGroup(sb.toString(),"passport");
+            StringBuilder content = new StringBuilder(HTML_HEAD);
+            content.append(genHtmlContent("internal.passport.sohu.com5分钟接口", results));
+            content.append(genHtmlContent("plus.sohuno.com5分钟appkey", results2));
+            content.append(genHtmlContent("passport.sohu.com5分钟接口", result3));
+            content.append(genHtmlContent("plus.sohu.com5分钟接口", result4));
+            content.append(HTML_END);
+            mailService.sendMailToGroup("passport", content.toString());
+        }
 
-        StringBuilder content = new StringBuilder(HTML_HEAD);
-        content.append(genHtmlContent("internal.passport.sohu.com5分钟接口", results));
-        content.append(genHtmlContent("plus.sohuno.com5分钟appkey", results2));
-        content.append(genHtmlContent("passport.sohu.com5分钟接口", result3));
-        content.append(genHtmlContent("plus.sohu.com5分钟接口", result4));
-        content.append(HTML_END);
-        mailService.sendMailToGroup("passport", content.toString());
         lastNotifyTime = System.currentTimeMillis();
 
     }

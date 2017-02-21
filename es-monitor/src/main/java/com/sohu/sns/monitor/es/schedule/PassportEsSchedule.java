@@ -78,7 +78,7 @@ public class PassportEsSchedule {
         for (PassportEsResult result : results) {
             sb.append( String.format( "%s, %s, %s, %s, %s, %s\n",
                     result.getTimeKey(),result.getInterfaceUri(),result.getCount(),
-                    result.getLastCount(),result.getLastCount(),result.getLastTotalCount() ) );
+                    result.getTotalCount(),result.getLastCount(),result.getLastTotalCount() ) );
         }
     }
     public final String TABLE_TITLE = "<tr><td colspan=6>%s</td></tr>";

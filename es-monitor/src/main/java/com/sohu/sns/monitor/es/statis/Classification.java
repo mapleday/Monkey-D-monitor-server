@@ -53,8 +53,6 @@ public class Classification {
 
         for (Terms.Bucket bucket : buckets) {
             dataMap.put((String) bucket.getKey(),bucket.getDocCount());
-            System.out.println(bucket.getKey());
-            System.out.println(bucket.getDocCount());
         }
         return dataMap;
     }
@@ -65,7 +63,12 @@ public class Classification {
         String classification ="type";
 
         try {
-            classficationStatis(startTime,endTime,classification);
+            Map<String,Long> dataMap = classficationStatis(startTime,endTime,classification);
+             for(Map.Entry<String,Long> data:dataMap.entrySet()){
+                 System.out.println(data.getKey());
+                 System.out.println(data.getValue());
+             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }

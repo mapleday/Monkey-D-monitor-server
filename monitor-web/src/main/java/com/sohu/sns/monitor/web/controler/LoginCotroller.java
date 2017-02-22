@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
@@ -25,15 +26,14 @@ public class LoginCotroller {
     SnsWebUserService snsWebUserService;
 
     @RequestMapping(value = "/login")
-    public String doLogin(HttpServletRequest request,Model model)
+    public String doLogin(HttpServletRequest request, Model model)
     {
         System.out.println("----捕获！---");
         String userName=request.getParameter("userName");
         String password=request.getParameter("password");
         if (userName==null)
             return "login";
-        UsernamePasswordToken token=new UsernamePasswordToken(userName,password);
-        token.setRememberMe(true);
+        UsernamePasswordToken token=new UsernamePasswordToken(userName,password,false);
         Subject subject= SecurityUtils.getSubject();
         if (subject!=null&&subject.isAuthenticated()){
             boolean isAuthorized=Boolean.valueOf( subject.getSession().getAttribute("isAuthorized").toString());

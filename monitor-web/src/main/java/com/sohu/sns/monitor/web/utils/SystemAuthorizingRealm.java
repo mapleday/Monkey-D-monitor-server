@@ -41,7 +41,7 @@ public class SystemAuthorizingRealm extends AuthorizingRealm{
         }
         UsernamePasswordToken token=(UsernamePasswordToken)authenticationToken;
         String username=token.getUsername();
-        String password=String.copyValueOf(token.getPassword());
+        String password=String.valueOf(token.getPassword());
         System.out.println(password+"yyyttt");
         List<SnsWebUser> users= snsWebUserService.getSnsWebUser(token.getUsername());
 

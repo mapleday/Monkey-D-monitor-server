@@ -26,12 +26,12 @@ public class Classification {
 
         Settings settings = Settings.builder()
                 .put("cluster.name", "sns-api").build();
-        //加入es集群地址
+
         TransportClient client = TransportClient.builder().settings(settings).build()
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.11"), 9300))
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.12"), 9300))
                 .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.13"), 9300));
-        //根据field的参数进行查询,此处
+
         TermsBuilder interfaceCount = AggregationBuilders.terms("count")
                 .field(classification)
                 .order(Terms.Order.count(true));

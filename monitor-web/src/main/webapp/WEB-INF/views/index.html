@@ -40,6 +40,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!--<script src="resources/js/html5shiv.min.js"></script>-->
   <!--<script src="resources/js/respond.min.js"></script>-->
 
+  <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+  <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+  <META HTTP-EQUIV="Expires" CONTENT="0">
 
 </head>
 <!--
@@ -220,7 +223,7 @@ desired effect
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                  <a href="logout" class="btn btn-default btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
@@ -321,13 +324,13 @@ desired effect
       <!--</ol>-->
     <!--</section>-->
 
-    <script type="text/javascript">
+    <!--<script type="text/javascript">-->
 
-        $("#mainFrame").load(function () {
-            var mainheight = $(this).contents().find("body").height() + 100;
-            $(this).height(mainheight);
-        });
-    </script>
+        <!--$("#mainFrame").load(function () {-->
+            <!--var mainheight = $(this).contents().find("body").height() + 100;-->
+            <!--$(this).height(mainheight);-->
+        <!--});-->
+    <!--</script>-->
 
     <!-- Main content -->
     <section class="content" >

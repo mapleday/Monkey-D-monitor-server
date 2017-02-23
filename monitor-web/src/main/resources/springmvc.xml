@@ -31,7 +31,7 @@
     <!-- 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
 
   <!--静态资源访问-->
-    <mvc:resources mapping="/resources/**" location="/resources/node_modules/"></mvc:resources>
+    <mvc:resources mapping="resources/**" location="resources/node_modules/"></mvc:resources>
 </beans>
 
 

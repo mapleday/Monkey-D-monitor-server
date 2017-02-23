@@ -38,7 +38,6 @@
         <mysql.verison>5.1.22</mysql.verison>
         <monitor-common.version>1.0-SNAPSHOT</monitor-common.version>
         <es.version>2.3.4</es.version>
-        <shiro.version>1.2.3</shiro.version>
     </properties>
 
     <dependencyManagement>
@@ -103,29 +102,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
-            <!-- Shiro security -->
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-core</artifactId>
-                <version>${shiro.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-web</artifactId>
-                <version>${shiro.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-cas</artifactId>
-                <version>${shiro.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-spring</artifactId>
-                <version>${shiro.version}</version>
-            </dependency>
-            <!-- end of Shiro security -->
         </dependencies>
     </dependencyManagement>
 

@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * Created by yw on 2017/2/8.
+ *
+ * 对mqtt服务器资源配置
  */
 @Component
 public class MqttServerAddressService {

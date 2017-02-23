@@ -8,6 +8,8 @@ import java.util.List;
 /**
  * author:jy
  * time:16-10-14上午11:41
+ *
+ * update by yw on 2017.2.9
  * 资源配置类
  */
 @Repository

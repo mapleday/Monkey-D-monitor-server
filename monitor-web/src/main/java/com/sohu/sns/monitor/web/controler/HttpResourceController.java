@@ -16,7 +16,7 @@ import java.util.*;
  * Created by yw on 2017/1/13.
  */
 @Controller
-public class HttpResourceControler {
+public class HttpResourceController {
     @Autowired
     HttpResourceService httpResourceService;
 

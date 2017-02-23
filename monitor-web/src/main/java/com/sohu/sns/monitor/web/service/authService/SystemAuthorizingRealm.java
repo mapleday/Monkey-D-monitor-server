@@ -1,4 +1,4 @@
-package com.sohu.sns.monitor.web.utils;
+package com.sohu.sns.monitor.web.service.authService;
 
 import com.sohu.sns.common.model.User;
 import com.sohu.sns.monitor.common.module.SnsWebUser;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Set;
-
 
 /**
  * Created by yw on 2017/2/19.
@@ -44,11 +43,9 @@ public class SystemAuthorizingRealm extends AuthorizingRealm{
         String password=String.valueOf(token.getPassword());
         System.out.println(password+"yyyttt");
         List<SnsWebUser> users= snsWebUserService.getSnsWebUser(token.getUsername());
-
         if (!users.isEmpty()){
             if (!password.equals(users.get(0).getPassword()))
                 throw new IncorrectCredentialsException();
-//            return  new SimpleAuthenticationInfo(users.get(0),token.getPassword(),token.getUsername());
             return  new SimpleAuthenticationInfo(username,password.toCharArray(),getName());
         }
         throw new UnknownAccountException();
@@ -68,6 +65,5 @@ public class SystemAuthorizingRealm extends AuthorizingRealm{
         simpleAuthorizationInfo.setStringPermissions(roles);
         System.out.println(username+"yyy");
         return  simpleAuthorizationInfo;
-
     }
 }

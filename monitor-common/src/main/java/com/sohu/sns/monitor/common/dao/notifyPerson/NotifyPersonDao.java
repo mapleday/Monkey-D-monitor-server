@@ -8,6 +8,8 @@ import java.util.List;
 /**
  * author:jy
  * time:16-12-28下午3:20
+ *
+ * yw on 2017.2.9
  */
 @Repository
 public interface NotifyPersonDao {

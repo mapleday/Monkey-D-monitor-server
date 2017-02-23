@@ -8,9 +8,24 @@ import java.io.Serializable;
  * mqtt服务器地址
  */
 public class MqttServerAddress implements Serializable {
+    /**
+     *   序号
+     */
     private Integer id;
+
+    /**
+     *   服务器地址
+     */
     private String serverAddress;
+
+    /**
+     *   监控次数
+     */
     private Integer monitorNum;
+
+    /**
+     *   监控状态
+     */
     private Integer stat;
 
     public Integer getId() {

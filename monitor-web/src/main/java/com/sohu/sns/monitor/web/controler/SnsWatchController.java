@@ -4,19 +4,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
- * Created by Administrator on 2017/2/20.
+ * Created by yw on 2017/2/20.
  */
 @Controller
-public class SnsWatchUtil {
+public class SnsWatchController {
     @RequestMapping("/snsWatchUtil")
     public  String snsWatchUtil(){
         return "duty";
     }
-
-    //    @RequestMapping("/snsWatchUtil")
-//    public  ModelAndView snsWatchUtil(){
-//        return  new ModelAndView(new RedirectView("http://192.168.46.73:8080/"));
-//
-//    }
-
 }

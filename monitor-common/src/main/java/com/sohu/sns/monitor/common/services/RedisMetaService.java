@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/1/9.
+ * Created by yw on 2017/1/9.
  */
 @Component
 public class RedisMetaService {

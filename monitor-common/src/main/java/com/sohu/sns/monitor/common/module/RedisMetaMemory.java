@@ -9,12 +9,34 @@ import java.util.Date;
  * author:jy
  * time:16-12-29下午5:15
  * meta redis 使用的内存情况
+ *
+ * update by yw on 2017.2.9
  */
 public class RedisMetaMemory implements Serializable{
+
+    /**
+     *   序号
+     */
     private Integer id;
+
+    /**
+     *   最后一天内存使用量
+     */
     private Double lastDayUserMemory;
+
+    /**
+     *  已使用的内存
+     */
     private Double usedMemory;
+
+    /**
+     *  日志记录日期
+     */
     private String logDay;
+
+    /**
+     *  更新时间
+     */
     private Date updateTime;
 
     public Integer getId() {

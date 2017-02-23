@@ -9,6 +9,8 @@ import java.util.List;
 
 /**
  * Created by yzh on 2016/11/15.
+ *
+ * update by yw on 2017.2.9
  */
 @Component
 public class HttpResourceService {

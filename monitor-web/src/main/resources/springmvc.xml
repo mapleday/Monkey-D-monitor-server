@@ -19,9 +19,6 @@
         </mvc:message-converters>
     </mvc:annotation-driven>
 
-    <mvc:annotation-driven/>
-
-
    <mvc:default-servlet-handler/>
     <!-- ViewResolver -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">

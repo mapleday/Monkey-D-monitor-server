@@ -108,7 +108,7 @@
                     <descriptors>
                         <descriptor>src/env/${env}/assembly/package.xml</descriptor>
                     </descriptors>
-                    <finalName>sns-dubbo-monitor</finalName>
+                    <finalName>sns-monitro-web</finalName>
                     <archive>
                         <manifest>
                             <mainClass></mainClass>

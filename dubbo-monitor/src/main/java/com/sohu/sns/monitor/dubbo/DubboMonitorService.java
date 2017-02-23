@@ -142,7 +142,6 @@ public class DubboMonitorService implements MonitorService {
             dubboInvoke.setConcurrent(statistics.getParameter(CONCURRENT, 0));
             dubboInvoke.setMaxElapsed(statistics.getParameter(MAX_ELAPSED, 0));
             dubboInvoke.setMaxConcurrent(statistics.getParameter(MAX_CONCURRENT, 0));
-            DubboMonitorUtil.checkDubboInvoke(dubboInvoke);
             if ("com.sohu.sns.user.msg.dubbo.api.IUserMsgDubboService".equals(statistics.getServiceInterface())) {
                 if (random.nextInt(10000) != 1) {
                     return;

@@ -18,4 +18,9 @@ public class IndexController {
     public String index(HttpServletRequest request, HttpServletResponse response) {
         return "index";
     }
+
+    @RequestMapping(value = "/")
+    public String index(){
+        return "index";
+    }
 }

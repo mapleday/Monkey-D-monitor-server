@@ -19,8 +19,8 @@
             <if test="name != null"> name = #{name}, </if>
             <if test="email != null"> email = #{email}, </if>
             <if test="phone != null"> phone = #{phone}, </if>
-            <if test="status != null"> status = #{status} </if>
-            <if test="group!=null">group=#{group}</if>
+            <if test="status != null"> status = #{status}, </if>
+            <if test="group!=null">`group`=#{group}</if>
         </set>
         WHERE id = #{id}
     </update>
@@ -33,7 +33,7 @@
             <if test="email != null"> email, </if>
             <if test="phone != null"> phone, </if>
             <if test="status != null"> status,</if>
-            <if test="group!=null">group</if>
+            <if test="group!=null">`group`</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">

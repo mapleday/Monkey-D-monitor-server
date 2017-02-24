@@ -27,6 +27,7 @@
         <junit.version>3.8.1</junit.version>
         <guava.version>16.0.1</guava.version>
         <shiro.version>1.2.3</shiro.version>
+        <spring-mvc-cache-control.version>1.1.1-RELEASE</spring-mvc-cache-control.version>
     </properties>
     <dependencies>
         <dependency>
@@ -52,7 +53,7 @@
             <type>jar</type>
         </dependency>
 
-         <!--Shiro security-->
+        <!--Shiro security-->
         <dependency>
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-core</artifactId>
@@ -68,10 +69,10 @@
             <artifactId>shiro-cas</artifactId>
             <version>${shiro.version}</version>
             <!--<exclusions>-->
-                <!--<exclusion>-->
-                    <!--<groupId>javax.servlet</groupId>-->
-                    <!--<artifactId>servlet-api</artifactId>-->
-                <!--</exclusion>-->
+            <!--<exclusion>-->
+            <!--<groupId>javax.servlet</groupId>-->
+            <!--<artifactId>servlet-api</artifactId>-->
+            <!--</exclusion>-->
             <!--</exclusions>-->
         </dependency>
         <dependency>
@@ -85,7 +86,14 @@
             <artifactId>shiro-spring</artifactId>
             <version>${shiro.version}</version>
         </dependency>
-         <!--end of Shiro security -->
+        <!--end of Shiro security -->
+
+        <dependency>
+            <groupId>net.rossillo.mvc.cache</groupId>
+            <artifactId>spring-mvc-cache-control</artifactId>
+            <version>${spring-mvc-cache-control.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
     </dependencies>
 
@@ -154,8 +162,6 @@
             </plugin>
         </plugins>
     </build>
-
-
 
 
 </project>

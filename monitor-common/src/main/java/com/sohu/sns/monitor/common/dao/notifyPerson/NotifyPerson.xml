@@ -6,7 +6,7 @@
 
     <select id="getAllPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-              id, name, email, phone, `status`
+              id, name, email, phone, `status`,`group`
         FROM
               t_notify_person
     </select>
@@ -20,6 +20,7 @@
             <if test="email != null"> email = #{email}, </if>
             <if test="phone != null"> phone = #{phone}, </if>
             <if test="status != null"> status = #{status} </if>
+            <if test="group!=null">group=#{group}</if>
         </set>
         WHERE id = #{id}
     </update>
@@ -31,7 +32,8 @@
             <if test="name != null"> name, </if>
             <if test="email != null"> email, </if>
             <if test="phone != null"> phone, </if>
-            <if test="status != null"> status</if>
+            <if test="status != null"> status,</if>
+            <if test="group!=null">group</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -39,24 +41,13 @@
             <if test="name != null"> #{name}, </if>
             <if test="email != null"> #{email}, </if>
             <if test="phone != null">  #{phone}, </if>
-            <if test="status != null">  #{status} </if>
+            <if test="status != null">  #{status}, </if>
+            <if test="group!=null">#{group}</if>
         </trim>
     </insert>
-
-    <!--<delete id="deleteNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">-->
-        <!--DELETE FROM t_notify_person where id = #{id}-->
-    <!--</delete>-->
-
-    <!--<update id="updatePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">-->
-        <!--UPDATE t_notify_person SET id=#{id},name=#{name},email=#{email},phone=#{phone},status=#{status}-->
-        <!--WHERE id=#{id}-->
-    <!--</update>-->
 
     <delete id="deletePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
         DELETE FROM t_notify_person WHERE id=#{id}
     </delete>
 
-    <!--<insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">-->
-        <!--INSERT INTO t_notify_person(id,name,email,phone,status)VALUES (#{id},#{name},#{email},#{phone},#{status});-->
-    <!--</insert>-->
 </mapper>

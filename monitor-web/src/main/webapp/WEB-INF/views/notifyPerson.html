@@ -22,6 +22,7 @@
         <th>邮箱</th>
         <th>电话</th>
         <th>微信通知状态</th>
+        <th>开发组</th>
     </tr>
     </thead>
 </table>
@@ -105,7 +106,9 @@
                 },{
                     label: "微信通知状态:",
                     name:  "status"
-
+                },{
+                    label:  "开发组",
+                    name:   "group"
                 }
             ]
         } );
@@ -118,7 +121,8 @@
                 { data: "name" },
                 { data: "email"},
                 { data: "phone"},
-                { data: "status"}
+                { data: "status"},
+                { data: "group"}
             ],
             select: true,
             buttons: [

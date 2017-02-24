@@ -5,6 +5,8 @@ import java.io.Serializable;
 /**
  * author:jy
  * time:16-12-28下午3:11
+ *
+ * update by yw on 17.2.24
  * 通知人
  */
 public class NotifyPerson implements Serializable {
@@ -16,6 +18,15 @@ public class NotifyPerson implements Serializable {
     private String email;
     private String phone;
     private Integer status;
+    private String group;
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
 
     public Integer getId() {
         return id;
@@ -57,6 +68,7 @@ public class NotifyPerson implements Serializable {
         this.status = status;
     }
 
+
     @Override
     public String toString() {
         return "NotifyPerson{" +
@@ -65,6 +77,7 @@ public class NotifyPerson implements Serializable {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", status=" + status +
+                ", group='" + group + '\'' +
                 '}';
     }
 }

@@ -47,6 +47,6 @@ public class Message implements Comparable<Message>,Serializable{
 
     @Override
     public int compareTo(Message o) {
-        return (int) ((o.getCount()-this.getCount()+Math.random()/1000) * 10000);
+        return (int) ((o.getCount()-this.getCount()+Math.random()/10000) * 10000);
     }
 }

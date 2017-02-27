@@ -12,7 +12,7 @@
     <task:scheduled-tasks scheduler="schedulerEs">
         <task:scheduled ref="esSchedule" method="monitor" fixed-delay="300000" initial-delay="9000"/>
         <task:scheduled ref="esSchedule" method="monitorQps" cron="0 0 0,7-23 * * ?"/>
-
+        <task:scheduled ref="statisSchedule" method="statisMessageCount" fixed-delay="300000" initial-delay="9000"/>
     </task:scheduled-tasks>
 
     <import resource="classpath*:monitorCommonContext.xml"/>

@@ -2,6 +2,7 @@ package com.sohu.sns.monitor.common.services;
 
 import com.sohu.sns.monitor.common.module.NotifyPerson;
 import com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao;
+import com.sohu.sns.monitor.common.utils.EmailUtil;
 import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.snscommon.utils.LOGGER;
 import com.sohu.snscommon.utils.constant.ModuleEnum;
@@ -36,6 +37,33 @@ public class NotifyService {
             NotifyUtils.sendAlert(notifyPerson.getPhone(), message);
         }
     }
+
+
+
+    /**
+     * 发送邮件通知所有人
+     *
+     * @param message 　消息
+     */
+    public void sendEmailAllNotifyPerson(String message) {
+        List<NotifyPerson> allPerson = notifyPersonDao.getAllPerson();
+        if (allPerson == null || allPerson.isEmpty()) {
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "NotifyService.sendAllNotifyPerson", message, "no person");
+            return;
+        }
+
+        for (NotifyPerson notifyPerson : allPerson) {
+            try {
+                EmailUtil.sendSimpleEmail("测试环境: 每天消息统计情况",message,notifyPerson.getEmail());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+
 
 
     public List<NotifyPerson> getAllPerson(){

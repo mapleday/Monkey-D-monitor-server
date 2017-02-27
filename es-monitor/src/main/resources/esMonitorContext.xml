@@ -20,6 +20,7 @@
     <!-- 监控 passport es qps -->
     <task:scheduled-tasks scheduler="passportScheduler">
         <task:scheduled ref="passportEsSchedule" method="monitor" fixed-delay="300000" initial-delay="9000"/>
+        <task:scheduled ref="statisSchedule" method="statisMessageCount" fixed-delay="300000" initial-delay="9000"/>
     </task:scheduled-tasks>
 
 

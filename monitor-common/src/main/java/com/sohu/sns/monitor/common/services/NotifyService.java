@@ -44,6 +44,10 @@ public class NotifyService {
         return notifyPersonDao.getAllPerson();
     }
 
+    public List<NotifyPerson> getDutyPerson(){
+        return notifyPersonDao.getDutyPerson();
+    }
+
     public void creatPerson(NotifyPerson notifyPerson){
         notifyPersonDao.createPerson(notifyPerson);
     }

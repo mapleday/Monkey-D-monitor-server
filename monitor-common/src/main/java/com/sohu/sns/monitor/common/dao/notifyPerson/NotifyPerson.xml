@@ -4,9 +4,18 @@
 <mapper namespace="com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao">
     <cache flushInterval="300"/>
 
+    <select id="getDutyPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
+        SELECT
+        id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus
+        FROM
+        t_notify_person
+        WHERE duty_status!=0
+    </select>
+
+
     <select id="getAllPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-              id, name, email, phone, `status`,`group`
+              id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus
         FROM
               t_notify_person
     </select>
@@ -20,7 +29,8 @@
             <if test="email != null"> email = #{email}, </if>
             <if test="phone != null"> phone = #{phone}, </if>
             <if test="status != null"> status = #{status}, </if>
-            <if test="group!=null">`group`=#{group}</if>
+            <if test="group!=null">`group`=#{group},</if>
+            <if test="waitDutyStatus!=null">duty_status=#{waitDutyStatus}</if>
         </set>
         WHERE id = #{id}
     </update>
@@ -33,7 +43,8 @@
             <if test="email != null"> email, </if>
             <if test="phone != null"> phone, </if>
             <if test="status != null"> status,</if>
-            <if test="group!=null">`group`</if>
+            <if test="group!=null">`group`,</if>
+            <if test="waitDutyStatus!=null">duty_status</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -42,7 +53,8 @@
             <if test="email != null"> #{email}, </if>
             <if test="phone != null">  #{phone}, </if>
             <if test="status != null">  #{status}, </if>
-            <if test="group!=null">#{group}</if>
+            <if test="group!=null">#{group},</if>
+            <if test="waitDutyStatus!=null">#{waitDutyStatus}</if>
         </trim>
     </insert>
 

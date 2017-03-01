@@ -19,6 +19,15 @@ public class NotifyPerson implements Serializable {
     private String phone;
     private Integer status;
     private String group;
+    private Integer waitDutyStatus;
+
+    public Integer getWaitDutyStatus() {
+        return waitDutyStatus;
+    }
+
+    public void setWaitDutyStatus(Integer waitDutyStatus) {
+        this.waitDutyStatus = waitDutyStatus;
+    }
 
     public String getGroup() {
         return group;

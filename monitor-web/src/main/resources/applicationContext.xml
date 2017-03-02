@@ -10,12 +10,11 @@
     <import resource="classpath*:monitorCommonContext.xml"/>
     <!--<import resource="springmvc.xml"/>-->
 
-
-    <import resource="spring-shiro.xml"/>
-    <task:annotation-driven/>
     <context:annotation-config/>
-    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
-    <context:component-scan base-package="com.sohu.sns.monitor.web.service.PersonDutyService"/>
+    <import resource="spring-shiro.xml"/>
+    <!--<task:annotation-driven/>-->
+    <!--<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>-->
+    <context:component-scan base-package="com.sohu.sns.monitor"/>
 
 
 

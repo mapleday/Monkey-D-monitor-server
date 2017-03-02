@@ -15,7 +15,7 @@ public class HealthController {
     @ResponseBody
     @RequestMapping("/health")
     public String Health(){
-        SelectPersonDutyService.sendDutyInfo();
+//        SelectPersonDutyService.sendDutyInfo();
         return "health";
     }
 

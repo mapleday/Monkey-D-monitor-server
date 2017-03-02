@@ -5,13 +5,15 @@ import com.sohu.sns.monitor.common.services.NotifyService;
 import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.web.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import scala.util.parsing.combinator.testing.Str;
 
 import java.util.*;
 
 /**
- * Created by Gary on 2015/12/24.
+ * Created by yw on 2017.3.1
  */
 @Component
 public class SelectPersonDutyService {
@@ -22,6 +24,9 @@ public class SelectPersonDutyService {
 
     private  static NotifyUtils notifyUtils=new NotifyUtils();
     private  static NotifyService  notifyService;
+    private  static Map<String,NotifyPerson> notifyNameMap=new HashMap<String, NotifyPerson>();
+    public   static List<NotifyPerson> configureNotifyPerson=new ArrayList<NotifyPerson>();
+
 
 
     @Autowired
@@ -29,38 +34,52 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService=notifyService;
     }
 
-    @Scheduled(cron = "0 0 18 * * ?")
+    @Scheduled(cron = "0 50 18 * * ?")
     public  static void sendDutyInfo()  {
             /**发送值班提醒邮件和短信**/
-        notifyPeople=notifyService.getDutyPerson();
+
 //        if(null==flag)
 //            flag=new Random().nextInt(notifyPeople.size()-1);
         if(null==flag||flag==notifyPeople.size()){
+            notifyPeople=notifyService.getDutyPerson();
             flag=0;
+            notifyNameMap.clear();
             Collections.shuffle(notifyPeople);
+            for (NotifyPerson np:notifyPeople){
+                notifyNameMap.put(np.getName(),np);
+            }
         }
-        List<String> list=new ArrayList<String>();
-        for (NotifyPerson np:notifyPeople){
-            list.add(np.getName());
+//        System.out.println("值班顺序： "+list);
+//        存在bug ，修改值班状态存在延时！
+        if (!configureNotifyPerson.isEmpty()){
+                for (NotifyPerson np:configureNotifyPerson){
+                    if (!notifyNameMap.containsKey(np.getName())){
+                        notifyPeople.add(np);
+                        notifyNameMap.put(np.getName(),np);
+                    }
+                    else if (np.getWaitDutyStatus()==0) {
+                        notifyPeople.remove(notifyNameMap.get(np.getName()));
+                        notifyNameMap.remove(np.getName());
+                    }
+                }
+            configureNotifyPerson.clear();
         }
-        System.out.println("值班顺序： "+list);
+
+        if(flag>=notifyPeople.size()){
+            Collections.shuffle(notifyPeople);
+            flag=0;
+        }
+
         NotifyPerson dutyPerson=notifyPeople.get(flag++);
-        String msg="[Test]你好，当前值班通知是：今天是%s值班"+ DateUtils.getCurrentDate()+",值班顺序是  :"+list;
-//        if("袁巍".equals(dutyPerson.getName()))
-//             notifyUtils.sendWeixin(dutyPerson.getPhone(),String.format(msg,dutyPerson.getName()));
-//        else
-//            notifyUtils.sendWeixin("13051807977",String.format(msg,dutyPerson.getName()));
+        List<String>  nameList=new ArrayList<String>();
+        for (NotifyPerson np:notifyPeople)
+            nameList.add(np.getName());
+        String msg="[Test]你好，当前值班通知是：今天是%s值班"+ DateUtils.getCurrentTime()+",值班顺序是  :"+nameList.toString();
         for (NotifyPerson np:notifyPeople){
             notifyUtils.sendWeixin(np.getPhone(),String.format(msg,dutyPerson.getName()));
         }
-
-
-
-
-
-
-
-
-//            System.out.println("值班人：" + personInfo.getName() + "time : " + DateUtils.getCurrentTime());
+        msg=String.format(msg,dutyPerson.getName());
+        notifyUtils.sendWeixin("13051807977",msg);
+        System.out.println(msg);
     }
 }

@@ -2,6 +2,7 @@ package com.sohu.sns.monitor.web.controler;
 
 import com.sohu.sns.monitor.common.module.NotifyPerson;
 import com.sohu.sns.monitor.common.services.NotifyService;
+import com.sohu.sns.monitor.web.service.PersonDutyService.SelectPersonDutyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,6 +35,7 @@ public class NotifyController {
         map.put("options","");
         map.put("files","");
         return map;
+
     }
 
     @ResponseBody
@@ -44,6 +46,7 @@ public class NotifyController {
         ArrayList<NotifyPerson> list=new ArrayList<NotifyPerson>();
         list.add(np);
         map.put("data",list);
+        SelectPersonDutyService.configureNotifyPerson.add(np);
         return map;
     }
 
@@ -51,6 +54,8 @@ public class NotifyController {
     @RequestMapping(value = "/deletePerson",method = RequestMethod.POST)
     public NotifyPerson  deletePerson(NotifyPerson np){
         notifyService.deletePerson(np);
+        np.setWaitDutyStatus(0);
+        SelectPersonDutyService.configureNotifyPerson.add(np);
         return new NotifyPerson();
     }
 
@@ -62,6 +67,7 @@ public class NotifyController {
         ArrayList<NotifyPerson> list=new ArrayList<NotifyPerson>();
         list.add(notifyPerson);
         map.put("data",list);
+        SelectPersonDutyService.configureNotifyPerson.add(notifyPerson);
         return map;
     }
 

@@ -32,7 +32,7 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService=notifyService;
     }
 
-    @Scheduled(cron = "0 0 19 * * ?")
+//    @Scheduled(cron = "0 0 19 * * ?")
     public  static void sendDutyInfo()  {
             /**发送值班提醒邮件和短信**/
 

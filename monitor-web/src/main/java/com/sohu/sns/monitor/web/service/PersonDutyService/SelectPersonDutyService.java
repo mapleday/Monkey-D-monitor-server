@@ -5,10 +5,8 @@ import com.sohu.sns.monitor.common.services.NotifyService;
 import com.sohu.sns.monitor.common.utils.NotifyUtils;
 import com.sohu.sns.monitor.web.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import scala.util.parsing.combinator.testing.Str;
 
 import java.util.*;
 
@@ -34,7 +32,7 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService=notifyService;
     }
 
-    @Scheduled(cron = "0 0 19 * * ?")
+//    @Scheduled(cron = "0 0 19 * * ?")
     public  static void sendDutyInfo()  {
             /**发送值班提醒邮件和短信**/
 

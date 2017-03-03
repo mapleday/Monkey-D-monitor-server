@@ -36,7 +36,7 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService = notifyService;
     }
 
-    @Scheduled(cron = "0 0/5 15 * * ?")
+//    @Scheduled(cron = "0 0 19 * * ?")
     public static void sendDutyInfo() {
         /**发送值班提醒邮件和短信**/
         if (lock.equals("smw.sohusce.com")) {
@@ -80,7 +80,7 @@ public class SelectPersonDutyService {
             notifyUtils.sendWeixin(np.getPhone(),String.format(msg,dutyPerson.getName())+"---每隔5分钟发一次");
             }
             msg = String.format(msg, dutyPerson.getName());
-            notifyUtils.sendWeixin("13051807977", msg+"---每隔5分钟发一次");
+            notifyUtils.sendWeixin("13051807977", msg);
             System.out.println(msg);
         }
     }

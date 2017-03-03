@@ -6,18 +6,22 @@
 
     <select id="getDutyPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-        id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus
+        id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group
         FROM
         t_notify_person
-        WHERE duty_status!=0
+        WHERE duty_status!=0 AND duty_in_group!=0
     </select>
 
 
     <select id="getAllPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-              id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus
+              id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group
         FROM
               t_notify_person
+    </select>
+
+    <select id="getReceiveMsgPhones" resultType="String">
+        SELECT phone FROM t_notify_person WHERE duty_status=1
     </select>
 
 
@@ -30,10 +34,25 @@
             <if test="phone != null"> phone = #{phone}, </if>
             <if test="status != null"> status = #{status}, </if>
             <if test="group!=null">`group`=#{group},</if>
-            <if test="waitDutyStatus!=null">duty_status=#{waitDutyStatus}</if>
+            <if test="waitDutyStatus!=null">duty_status=#{waitDutyStatus},</if>
+            <if test="dutyIngroup!=null">duty_in_group=#{dutyingroup}</if>
         </set>
         WHERE id = #{id}
     </update>
+
+    <update id="initDutyInGroup">
+        UPDATE t_notify_person
+            SET duty_in_group=1
+        WHERE duty_status=1
+    </update>
+
+    <update id="removeInDutyGroup" parameterType="int">
+        UPDATE t_notify_person
+            SET duty_in_group=0
+        WHERE id=#{id}
+    </update>
+
+
 
     <insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_notify_person
@@ -44,7 +63,8 @@
             <if test="phone != null"> phone, </if>
             <if test="status != null"> status,</if>
             <if test="group!=null">`group`,</if>
-            <if test="waitDutyStatus!=null">duty_status</if>
+            <if test="waitDutyStatus!=null">duty_status,</if>
+            <if test="dutyIngroup!=null">duty_in_group</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -54,7 +74,8 @@
             <if test="phone != null">  #{phone}, </if>
             <if test="status != null">  #{status}, </if>
             <if test="group!=null">#{group},</if>
-            <if test="waitDutyStatus!=null">#{waitDutyStatus}</if>
+            <if test="waitDutyStatus!=null">#{waitDutyStatus},</if>
+            <if test="dutyIngroup!=null">#{dutyingroup}</if>
         </trim>
     </insert>
 

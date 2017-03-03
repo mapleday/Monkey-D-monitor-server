@@ -61,5 +61,15 @@ public class NotifyService {
     }
 
 
+    public void initDutyInGroup() {
+        notifyPersonDao.initDutyInGroup();
+    }
 
+    public List<String> getReceiveMsgPhones() {
+        return notifyPersonDao.getReceiveMsgPhones();
+    }
+
+    public void removeInDutyGroup(int id){
+        notifyPersonDao.removeInDutyGroup(id);
+    }
 }

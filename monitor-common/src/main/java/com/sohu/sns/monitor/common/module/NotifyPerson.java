@@ -20,6 +20,15 @@ public class NotifyPerson implements Serializable {
     private Integer status;
     private String group;
     private Integer waitDutyStatus;
+    private Integer dutyIngroup;
+
+    public Integer getDutyIngroup() {
+        return dutyIngroup;
+    }
+
+    public void setDutyIngroup(Integer dutyIngroup) {
+        this.dutyIngroup = dutyIngroup;
+    }
 
     public Integer getWaitDutyStatus() {
         return waitDutyStatus;
@@ -87,6 +96,8 @@ public class NotifyPerson implements Serializable {
                 ", phone='" + phone + '\'' +
                 ", status=" + status +
                 ", group='" + group + '\'' +
+                ", waitDutyStatus=" + waitDutyStatus +
+                ", dutyIngroup=" + dutyIngroup +
                 '}';
     }
 }

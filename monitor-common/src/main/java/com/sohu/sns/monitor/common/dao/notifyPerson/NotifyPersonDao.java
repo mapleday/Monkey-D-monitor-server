@@ -21,4 +21,10 @@ public interface NotifyPersonDao {
     public void updatePerson(NotifyPerson notifyPerson);
     public void deletePerson(NotifyPerson notifyPerson);
     public void createPerson(NotifyPerson notifyPerson);
+
+    public void initDutyInGroup();
+
+    public List<String> getReceiveMsgPhones();
+
+    public void removeInDutyGroup(int id);
 }

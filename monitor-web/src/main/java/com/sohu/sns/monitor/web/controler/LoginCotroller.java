@@ -25,19 +25,19 @@ public class LoginCotroller {
 
     @Autowired
     SnsWebUserService snsWebUserService;
-    private Integer flag=null;
+//    private Integer flag=null;
 
     @RequestMapping(value = "/login")
     public String doLogin(HttpServletRequest request, Model model)
     {
-        if (null==flag){
-        StringBuffer url=request.getRequestURL();
-        String URL=url.delete(url.length()-request.getRequestURI().length(),url.length()).toString();
-        String result[]=URL.split("/");
-        SelectPersonDutyService.lock=result[2].split(":")[0];
-        System.out.println(result[2].split(":")[0]);
-        flag=1;
-        }
+//        if (null==flag){
+//        StringBuffer url=request.getRequestURL();
+//        String URL=url.delete(url.length()-request.getRequestURI().length(),url.length()).toString();
+//        String result[]=URL.split("/");
+//        SelectPersonDutyService.lock=result[2].split(":")[0];
+//        System.out.println(result[2].split(":")[0]);
+//        flag=1;
+//        }
 
         System.out.println("----捕获！---");
         String userName=request.getParameter("userName");

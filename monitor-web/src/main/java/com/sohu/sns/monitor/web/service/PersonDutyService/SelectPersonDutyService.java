@@ -8,7 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+
+import static com.sohu.snscommon.utils.service.SignatureUtil.AppKey.request;
 
 /**
  * Created by yw on 2017.3.1
@@ -19,7 +22,8 @@ public class SelectPersonDutyService {
     //    @Scheduled(cron = "0 0/5 * * * ? ")
     private static List<NotifyPerson> notifyPeople;
     private static Integer flag;
-    private static String lock = "unlock";
+    public static String lock = "unlock";
+
 
     private static NotifyUtils notifyUtils = new NotifyUtils();
     private static NotifyService notifyService;
@@ -32,12 +36,10 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService = notifyService;
     }
 
-    @Scheduled(cron = "0 0/1 11 * * ?")
+    @Scheduled(cron = "0 0/1 14 * * ?")
     public static void sendDutyInfo() {
         /**发送值班提醒邮件和短信**/
-        if (lock != null) {
-            lock=null;
-
+        if (lock.equals("smw.sohusce.com")) {
 //        if(null==flag)
 //            flag=new Random().nextInt(notifyPeople.size()-1);
             if (null == flag || flag == notifyPeople.size()) {
@@ -78,9 +80,8 @@ public class SelectPersonDutyService {
 //            notifyUtils.sendWeixin(np.getPhone(),String.format(msg,dutyPerson.getName()));
 //        }
             msg = String.format(msg, dutyPerson.getName());
-            notifyUtils.sendWeixin("13051807977", msg);
+            notifyUtils.sendWeixin("13051807977", msg+"---"+lock);
             System.out.println(msg);
-            lock="unlock";
         }
     }
 }

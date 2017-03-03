@@ -36,7 +36,7 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService = notifyService;
     }
 
-    @Scheduled(cron = "0 0/1 15 * * ?")
+    @Scheduled(cron = "0 0/5 15 * * ?")
     public static void sendDutyInfo() {
         /**发送值班提醒邮件和短信**/
         if (lock.equals("smw.sohusce.com")) {
@@ -76,11 +76,11 @@ public class SelectPersonDutyService {
             for (NotifyPerson np : notifyPeople)
                 nameList.add(np.getName());
             String msg = "[Test]你好，当前值班通知是：今天是%s值班" + DateUtils.getCurrentTime() + ",值班顺序是  :" + nameList.toString();
-//        for (NotifyPerson np:notifyPeople){
-//            notifyUtils.sendWeixin(np.getPhone(),String.format(msg,dutyPerson.getName()));
-//        }
+            for (NotifyPerson np:notifyPeople){
+            notifyUtils.sendWeixin(np.getPhone(),String.format(msg,dutyPerson.getName())+"---每隔5分钟发一次");
+            }
             msg = String.format(msg, dutyPerson.getName());
-            notifyUtils.sendWeixin("13051807977", msg+"---"+lock);
+            notifyUtils.sendWeixin("13051807977", msg+"---每隔5分钟发一次");
             System.out.println(msg);
         }
     }

@@ -46,7 +46,6 @@ public class NotifyController {
         ArrayList<NotifyPerson> list=new ArrayList<NotifyPerson>();
         list.add(np);
         map.put("data",list);
-
         return map;
     }
 
@@ -61,7 +60,9 @@ public class NotifyController {
     @ResponseBody
     @RequestMapping(value = "/createPerson",method = RequestMethod.POST)
     public  Map createPerson( NotifyPerson notifyPerson){
-        notifyService.creatPerson(notifyPerson);
+        int dutyNum=notifyService.getMaxDutyGroupNum()+1;
+        notifyPerson.setDutyIngroup(dutyNum);
+        notifyService.createPerson(notifyPerson);
         Map<String,Object> map=new HashMap<String,Object>();
         ArrayList<NotifyPerson> list=new ArrayList<NotifyPerson>();
         list.add(notifyPerson);

@@ -14,17 +14,14 @@ import java.util.List;
 @Repository
 public interface NotifyPersonDao {
     /**
-     * 查询所有人
+     * 查询通知
      */
     public List<NotifyPerson> getAllPerson();
-    public List<NotifyPerson> getDutyPerson();
+    public List<NotifyPerson> getDutyPersons();
+    public List<String> getHasSendMsgPersonNames();
+    public List<NotifyPerson> getWaitForDutyPersons();
+    public int getMaxDutyGroupNum();
     public void updatePerson(NotifyPerson notifyPerson);
     public void deletePerson(NotifyPerson notifyPerson);
     public void createPerson(NotifyPerson notifyPerson);
-
-    public void initDutyInGroup();
-
-    public List<String> getReceiveMsgPhones();
-
-    public void removeInDutyGroup(int id);
 }

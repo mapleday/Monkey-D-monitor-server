@@ -44,11 +44,11 @@ public class NotifyService {
         return notifyPersonDao.getAllPerson();
     }
 
-    public List<NotifyPerson> getDutyPerson(){
-        return notifyPersonDao.getDutyPerson();
+    public List<NotifyPerson> getDutyPersons(){
+        return notifyPersonDao.getDutyPersons();
     }
 
-    public void creatPerson(NotifyPerson notifyPerson){
+    public void createPerson(NotifyPerson notifyPerson){
         notifyPersonDao.createPerson(notifyPerson);
     }
 
@@ -60,16 +60,19 @@ public class NotifyService {
         notifyPersonDao.deletePerson(notifyPerson);
     }
 
-
-    public void initDutyInGroup() {
-        notifyPersonDao.initDutyInGroup();
+    public List<NotifyPerson> getWaitForDutyPersons() {
+        return notifyPersonDao.getWaitForDutyPersons();
     }
 
-    public List<String> getReceiveMsgPhones() {
-        return notifyPersonDao.getReceiveMsgPhones();
+    public int getMaxDutyGroupNum(){
+        return notifyPersonDao.getMaxDutyGroupNum();
     }
 
-    public void removeInDutyGroup(int id){
-        notifyPersonDao.removeInDutyGroup(id);
+    public void setDutyGroupNum(NotifyPerson notifyPerson){
+        notifyPersonDao.updatePerson(notifyPerson);
+    }
+
+    public List<String> getHasSendMsgPersonNames(){
+        return  notifyPersonDao.getHasSendMsgPersonNames();
     }
 }

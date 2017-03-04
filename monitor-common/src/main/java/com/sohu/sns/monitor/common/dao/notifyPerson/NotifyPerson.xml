@@ -4,24 +4,39 @@
 <mapper namespace="com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao">
     <cache flushInterval="300"/>
 
-    <select id="getDutyPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
+    <select id="getDutyPersons" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-        id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group
+        id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group as dutyIngroup
         FROM
         t_notify_person
-        WHERE duty_status!=0 AND duty_in_group!=0
+        WHERE duty_status!=0
     </select>
 
 
     <select id="getAllPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-              id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group
+              id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group as dutyIngroup
         FROM
               t_notify_person
     </select>
 
-    <select id="getReceiveMsgPhones" resultType="String">
-        SELECT phone FROM t_notify_person WHERE duty_status=1
+    <select id="getWaitForDutyPersons" resultType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        SELECT id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group as dutyIngroup
+         FROM t_notify_person
+        WHERE duty_status=1 AND duty_in_group >0
+        ORDER BY duty_in_group ASC
+    </select>
+
+    <select id="getMaxDutyGroupNum" resultType="int">
+        SELECT max(duty_in_group)
+        FROM t_notify_person
+    </select>
+
+    <select id="getHasSendMsgPersonNames" resultType="String">
+        SELECT name
+         FROM t_notify_person
+        WHERE duty_status=1 AND duty_in_group &lt; 0
+        ORDER BY duty_in_group DESC
     </select>
 
 
@@ -35,24 +50,10 @@
             <if test="status != null"> status = #{status}, </if>
             <if test="group!=null">`group`=#{group},</if>
             <if test="waitDutyStatus!=null">duty_status=#{waitDutyStatus},</if>
-            <if test="dutyIngroup!=null">duty_in_group=#{dutyingroup}</if>
+            <if test="dutyIngroup!=null">duty_in_group=#{dutyIngroup}</if>
         </set>
         WHERE id = #{id}
     </update>
-
-    <update id="initDutyInGroup">
-        UPDATE t_notify_person
-            SET duty_in_group=1
-        WHERE duty_status=1
-    </update>
-
-    <update id="removeInDutyGroup" parameterType="int">
-        UPDATE t_notify_person
-            SET duty_in_group=0
-        WHERE id=#{id}
-    </update>
-
-
 
     <insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO t_notify_person
@@ -75,7 +76,7 @@
             <if test="status != null">  #{status}, </if>
             <if test="group!=null">#{group},</if>
             <if test="waitDutyStatus!=null">#{waitDutyStatus},</if>
-            <if test="dutyIngroup!=null">#{dutyingroup}</if>
+            <if test="dutyIngroup!=null">#{dutyIngroup}</if>
         </trim>
     </insert>
 

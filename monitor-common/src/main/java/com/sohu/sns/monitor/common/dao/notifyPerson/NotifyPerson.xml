@@ -43,11 +43,11 @@
     <update id="updatePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
         UPDATE t_notify_person
         <set>
-            <if test="id != null"> id = #{id}, </if>
-            <if test="name != null"> name = #{name}, </if>
-            <if test="email != null"> email = #{email}, </if>
-            <if test="phone != null"> phone = #{phone}, </if>
-            <if test="status != null"> status = #{status}, </if>
+            <if test="id != null">id = #{id},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="status != null">status = #{status},</if>
             <if test="group!=null">`group`=#{group},</if>
             <if test="waitDutyStatus!=null">duty_status=#{waitDutyStatus},</if>
             <if test="dutyIngroup!=null">duty_in_group=#{dutyIngroup}</if>
@@ -55,14 +55,15 @@
         WHERE id = #{id}
     </update>
 
-    <insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson" useGeneratedKeys="true" keyProperty="id">
+    <insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson" useGeneratedKeys="true"
+            keyProperty="id">
         INSERT INTO t_notify_person
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id!=null">id,</if>
-            <if test="name != null"> name, </if>
-            <if test="email != null"> email, </if>
-            <if test="phone != null"> phone, </if>
-            <if test="status != null"> status,</if>
+            <if test="name != null">name,</if>
+            <if test="email != null">email,</if>
+            <if test="phone != null">phone,</if>
+            <if test="status != null">status,</if>
             <if test="group!=null">`group`,</if>
             <if test="waitDutyStatus!=null">duty_status,</if>
             <if test="dutyIngroup!=null">duty_in_group</if>
@@ -70,10 +71,10 @@
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id!=null">#{id},</if>
-            <if test="name != null"> #{name}, </if>
-            <if test="email != null"> #{email}, </if>
-            <if test="phone != null">  #{phone}, </if>
-            <if test="status != null">  #{status}, </if>
+            <if test="name != null">#{name},</if>
+            <if test="email != null">#{email},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="status != null">#{status},</if>
             <if test="group!=null">#{group},</if>
             <if test="waitDutyStatus!=null">#{waitDutyStatus},</if>
             <if test="dutyIngroup!=null">#{dutyIngroup}</if>

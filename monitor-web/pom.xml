@@ -24,7 +24,6 @@
         <mysql.version>5.1.30</mysql.version>
         <druid.version>1.0.14</druid.version>
         <jackson.version>2.3.3</jackson.version>
-        <junit.version>3.8.1</junit.version>
         <guava.version>16.0.1</guava.version>
         <shiro.version>1.2.3</shiro.version>
         <spring-mvc-cache-control.version>1.1.1-RELEASE</spring-mvc-cache-control.version>
@@ -95,16 +94,19 @@
             <scope>compile</scope>
             <exclusions>
                 <exclusion>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-context</artifactId>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>4.0.5.RELEASE</version>
+            <artifactId>spring-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
 
     </dependencies>

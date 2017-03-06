@@ -20,7 +20,7 @@ public class SelectPersonDutyService {
     private  NotifyService notifyService;
     private  String currentTime;
 
-    @Scheduled(cron = "0 0/1 18 * * ?")
+    @Scheduled(cron = "0 0 19 * * ?")
     public void sendDutyInfo() {
         /**发送值班微信提醒**/
         //总计需要值班人
@@ -54,8 +54,8 @@ public class SelectPersonDutyService {
         int dutyGroupNum = -dutyPerson.getDutyIngroup();
         dutyPerson.setDutyIngroup(dutyGroupNum);
         notifyService.updateDutyGroupNum(dutyPerson);
-        System.out.println(msg);
-//        sendWeixinNotify(dutyPersons,msg);
+        sendWeixinNotify(dutyPersons,msg);
+        NotifyUtils.sendWeixin("13051807977",msg);
     }
 
     public  void  initDutyNum(List<NotifyPerson> dutyPersons,List<NotifyPerson> waitForDutyPersons){
@@ -71,8 +71,8 @@ public class SelectPersonDutyService {
                 nextRoundDutyNames.add(np.getName());
             }
             String msg = "你好，当前一轮值班已完成" + currentTime + ",下一轮值班顺序是  :" + nextRoundDutyNames.toString();
-//            sendWeixinNotify(dutyPersons,msg);
-            System.out.println(msg);
+            sendWeixinNotify(dutyPersons,msg);
+            NotifyUtils.sendWeixin("13051807977",msg);
         } else
             sendDutyInfo();
     }

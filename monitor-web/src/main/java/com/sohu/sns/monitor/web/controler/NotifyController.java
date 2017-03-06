@@ -2,10 +2,8 @@ package com.sohu.sns.monitor.web.controler;
 
 import com.sohu.sns.monitor.common.module.NotifyPerson;
 import com.sohu.sns.monitor.common.services.NotifyService;
-import com.sohu.sns.monitor.web.service.PersonDutyService.SelectPersonDutyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;

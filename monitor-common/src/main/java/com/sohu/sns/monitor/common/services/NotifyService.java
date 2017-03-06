@@ -68,7 +68,7 @@ public class NotifyService {
         return notifyPersonDao.getMaxDutyGroupNum();
     }
 
-    public void setDutyGroupNum(NotifyPerson notifyPerson){
+    public void updateDutyGroupNum(NotifyPerson notifyPerson){
         notifyPersonDao.updatePerson(notifyPerson);
     }
 

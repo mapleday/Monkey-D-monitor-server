@@ -39,6 +39,11 @@ public class NotifyController {
     @ResponseBody
     @RequestMapping(value = "/updatePerson",method = RequestMethod.POST)
     public Map updatePerson(NotifyPerson np){
+        int originDutyStatus=notifyService.getDutyStatus(np.getId());
+        if (np.getWaitDutyStatus()==1&&originDutyStatus==0){
+            int dutyNum=notifyService.getMaxDutyGroupNum()+1;
+            np.setDutyIngroup(dutyNum);
+        }
         notifyService.updatePerson(np);
         Map<String,Object> map=new HashMap<String,Object>();
         ArrayList<NotifyPerson> list=new ArrayList<NotifyPerson>();
@@ -51,7 +56,6 @@ public class NotifyController {
     @RequestMapping(value = "/deletePerson",method = RequestMethod.POST)
     public NotifyPerson  deletePerson(NotifyPerson np){
         notifyService.deletePerson(np);
-        np.setWaitDutyStatus(0);
         return new NotifyPerson();
     }
 

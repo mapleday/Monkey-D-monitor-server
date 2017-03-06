@@ -12,6 +12,13 @@
         WHERE duty_status!=0
     </select>
 
+    <select id="getDutyStatus" parameterType="int" resultType="int" >
+        SELECT duty_status
+        FROM
+        t_notify_person
+        WHERE id=#{id}
+    </select>
+
 
     <select id="getAllPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT

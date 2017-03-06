@@ -22,7 +22,7 @@ public class TestDutyPerson {
     @Test
     public void testDuty() {
         for (int i = 0; i < 64; i++) {
-            SelectPersonDutyService.sendDutyInfo();
+            selectPersonDutyService.sendDutyInfo();
         }
     }
 }

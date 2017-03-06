@@ -21,7 +21,7 @@ public class NotifyUtils {
     private static final HttpClientUtil httpClientUtil = HttpClientUtil.create(NotifyUtils.class.getName(), "sendWeixin", 3000);
     private static final String WEI_XIN_URL = "http://sns-mail-weixin.sce.sohuno.com/sendSms";
 
-    public NotifyUtils() {
+    private NotifyUtils() {
 
     }
 

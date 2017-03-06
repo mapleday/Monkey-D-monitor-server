@@ -21,6 +21,7 @@ public interface NotifyPersonDao {
     public List<String> getHasSendMsgPersonNames();
     public List<NotifyPerson> getWaitForDutyPersons();
     public int getMaxDutyGroupNum();
+    public int getDutyStatus(int id);
     public void updatePerson(NotifyPerson notifyPerson);
     public void deletePerson(NotifyPerson notifyPerson);
     public void createPerson(NotifyPerson notifyPerson);

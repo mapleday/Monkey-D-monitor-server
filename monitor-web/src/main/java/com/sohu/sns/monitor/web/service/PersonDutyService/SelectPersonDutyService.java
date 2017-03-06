@@ -22,7 +22,7 @@ public class SelectPersonDutyService {
         SelectPersonDutyService.notifyService = notifyService;
     }
 
-    @Scheduled(cron = "0 0/1 22 * * ?")
+    @Scheduled(cron = "0 0/1 9 * * ?")
     public static void sendDutyInfo() {
         /**发送值班微信提醒**/
         int dutyNum = 1;
@@ -46,6 +46,8 @@ public class SelectPersonDutyService {
             dutyPerson.setDutyIngroup(dutyGroupNum);
             notifyService.setDutyGroupNum(dutyPerson);
             System.out.println(msg);
+//            sendWeixinNotify(dutyPersons,msg);
+            NotifyUtils.sendWeixin("13051807977",msg);
 
         }//进行初始化消息队列
         if (waitForDutyPersons.size() <= 1) {//包含通过改数据库后size 为0的状态
@@ -61,8 +63,17 @@ public class SelectPersonDutyService {
                 }
                 String msg = "[Test]你好，当前一轮值班已完成" + DateUtils.getCurrentTime() + ",下一轮值班顺序是  :" + nextRoundDutyNames.toString();
                 System.out.println(msg);
+//                发送微信通知
+//                sendWeixinNotify(dutyPersons,msg);
+//                只发给自己
+                NotifyUtils.sendWeixin("13051807977",msg);
             } else
                 sendDutyInfo();
+        }
+    }
+    public static void sendWeixinNotify(List<NotifyPerson> dutyPersons,String msg){
+        for (NotifyPerson dutyPerson:dutyPersons){
+            NotifyUtils.sendWeixin(dutyPerson.getPhone(),msg);
         }
     }
     }

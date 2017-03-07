@@ -36,10 +36,10 @@
     </bean>
     <mvc:interceptors>
         <bean class="net.rossillo.spring.web.mvc.CacheControlHandlerInterceptor" />
-        <mvc:interceptor>
-            <mvc:mapping path="/index"/>
-            <bean class="com.sohu.sns.monitor.web.interceptor.AuthInterceptor"/>
-        </mvc:interceptor>
+        <!--<mvc:interceptor>-->
+            <!--<mvc:mapping path="/*"/>-->
+            <!--<bean class="com.sohu.sns.monitor.web.interceptor.AuthInterceptor"/>-->
+        <!--</mvc:interceptor>-->
     </mvc:interceptors>
 
     <!--静态资源访问-->

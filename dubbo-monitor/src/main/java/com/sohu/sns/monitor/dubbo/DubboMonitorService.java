@@ -25,7 +25,6 @@ import com.alibaba.dubbo.monitor.MonitorService;
 import com.google.common.collect.Maps;
 import com.sohu.sns.monitor.dubbo.domain.DubboInvoke;
 import com.sohu.sns.monitor.dubbo.support.Dao;
-import com.sohu.sns.monitor.dubbo.util.DubboMonitorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -142,7 +141,6 @@ public class DubboMonitorService implements MonitorService {
             dubboInvoke.setConcurrent(statistics.getParameter(CONCURRENT, 0));
             dubboInvoke.setMaxElapsed(statistics.getParameter(MAX_ELAPSED, 0));
             dubboInvoke.setMaxConcurrent(statistics.getParameter(MAX_CONCURRENT, 0));
-            DubboMonitorUtil.checkDubboInvoke(dubboInvoke);
             if ("com.sohu.sns.user.msg.dubbo.api.IUserMsgDubboService".equals(statistics.getServiceInterface())) {
                 if (random.nextInt(10000) != 1) {
                     return;

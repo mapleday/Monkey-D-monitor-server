@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sohu.sns.monitor.common.dao.mqttServerAddress.MqttServerAddressDao">
+    <cache flushInterval="300"/>
+
+    <select id="getMqtt" resultType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        SELECT
+        id as id,
+        server_address AS serverAddress,
+        monitor_num AS  monitorNum,
+        stat as stat
+        FROM
+        t_monitor_mqtt
+    </select>
+
+    <update id="updateMqtt" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        UPDATE t_monitor_mqtt
+        <set>
+            <if test="serverAddress!=null">server_address=#{serverAddress},</if>
+            <if test="monitorNum!=null">monitor_num=#{monitorNum},</if>
+            <if test="stat!=null">stat=#{stat}</if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <delete id="deleteMqtt" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress">
+        DELETE FROM  t_monitor_mqtt WHERE  id=#{id}
+    </delete>
+
+    <insert id="createMqtt" parameterType="com.sohu.sns.monitor.common.module.MqttServerAddress" useGeneratedKeys="true" keyProperty="id">
+        INSERT  INTO t_monitor_mqtt
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="id!=null">id,</if>-->
+            <if test="serverAddress!=null">server_address,</if>
+            <if test="monitorNum!=null">monitor_num,</if>
+            <if test="stat!=null">stat</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="id!=null">#{id},</if>-->
+            <if test="serverAddress!=null">#{serverAddress},</if>
+            <if test="monitorNum!=null">#{monitorNum},</if>
+            <if test="stat!=null">#{stat}</if>
+        </trim>
+    </insert>
+</mapper>

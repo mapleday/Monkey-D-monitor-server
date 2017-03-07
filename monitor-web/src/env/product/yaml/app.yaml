@@ -1,0 +1,12 @@
+appid: 969692980
+start: $JETTY_START
+setenv: {'JVM_ARGS':'-Xms1500m -Xmx1500m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/logs/ -Djava.awt.headless=true -Dfile.encoding=UTF-8 -Dmonitor_agent_app_id="$APPID"_"$INSTANCEID" -Denv=PRODUCT'}
+tryRestart: 
+    enable: true
+    fail: 3
+webHealth: false
+webHealthConf: 
+    path: /health
+    timeout: 2000ms
+    success: [200,201,403,301,302]
+tcpHealth: false

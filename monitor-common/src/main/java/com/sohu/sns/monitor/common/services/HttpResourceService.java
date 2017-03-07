@@ -2,7 +2,6 @@ package com.sohu.sns.monitor.common.services;
 
 import com.sohu.sns.monitor.common.dao.httpResource.HttpResourceDAO;
 import com.sohu.sns.monitor.common.module.HttpResource;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +9,8 @@ import java.util.List;
 
 /**
  * Created by yzh on 2016/11/15.
+ *
+ * update by yw on 2017.2.9
  */
 @Component
 public class HttpResourceService {
@@ -22,31 +23,24 @@ public class HttpResourceService {
      * @return
      */
     public List<HttpResource> getResources() {
-//        List<HttpResource> newlist = httpResourceDAO.getResources();
-//        for (int i = 0; i < newlist.size(); i++) {
-//            System.out.println(newlist.get(i).toString());
-//        }
         return httpResourceDAO.getResources();
     }
 
-
-    /**
-     * 修改资源
-     */
-    public int updatehttpResource(HttpResource httpResource){
-        return httpResourceDAO.updateResources(httpResource);
+    public List<HttpResource> getAllResources() {
+        return httpResourceDAO.getAllResources();
     }
 
-    /**
-     * 增加资源
-     */
-
-    public int addhttpResource(HttpResource httpResource){
-        return httpResourceDAO.addResources(httpResource);
+    public void updateResource(HttpResource httpResource ){
+        httpResourceDAO.updateResource(httpResource);
     }
 
-    public int deletehttpResource(HttpResource httpResource){
-        return httpResourceDAO.deleteResources(httpResource);
+    public void  deleteResource(HttpResource httpResource){
+        httpResourceDAO.deleteResource(httpResource);
     }
+
+    public  void createResource(HttpResource httpResource){
+        httpResourceDAO.createResource(httpResource);
+    }
+
 
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * Created by Administrator on 2017/1/9.
+ * Created by yw on 2017/1/9.
  */
 @Component
 public class RedisMetaService {
@@ -16,31 +16,31 @@ public class RedisMetaService {
     RedisMetaDao redisMetaDao;
 
     /**
-     * 添加记录
-     * @param redisMetaMemory
+     * 获取 meta_redis_used_memory表格记录
+     * @return
      */
-    public void addRedisMetaMemory(RedisMetaMemory redisMetaMemory){
-        redisMetaDao.saveDayRecord(redisMetaMemory);
+    public List<RedisMetaMemory> getRedisMeta(){
+        return redisMetaDao.getRedisMeta();
+    }
+
+    /*
+      增加 meta_redis_used_memory表格记录
+     */
+    public void createRedisMeta(RedisMetaMemory redisMetaMemory){
+        redisMetaDao.createRedisMeta(redisMetaMemory);
+    }
+
+    /*
+      删除 meta_redis_used_memory表格记录
+     */
+    public void deleteRedisMeta(RedisMetaMemory redisMetaMemory){
+        redisMetaDao.deleteRedisMeta(redisMetaMemory);
     }
 
     /**
-     * 修改记录
-     * @param redisMetaMemory
+     * 更新 meta_redis_used_memory表格记录
      */
-    public void updateRedisMetaMemory(RedisMetaMemory redisMetaMemory){
-        redisMetaDao.updateDayRecord(redisMetaMemory);
-    }
-
-    /**
-     * 删除记录
-     * @param redisMetaMemory
-     */
-    public void deleteRedisMetaMemory(RedisMetaMemory redisMetaMemory){
-        redisMetaDao.deleteDayRecord(redisMetaMemory);
-    }
-
-
-    public List<RedisMetaMemory> getRedisMetaMemory(){
-        return redisMetaDao.getRedisMetaMemory();
+    public void updateRedisMeta(RedisMetaMemory redisMetaMemory){
+        redisMetaDao.updateRedisMeta(redisMetaMemory);
     }
 }

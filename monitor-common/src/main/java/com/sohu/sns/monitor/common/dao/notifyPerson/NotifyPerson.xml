@@ -4,13 +4,46 @@
 <mapper namespace="com.sohu.sns.monitor.common.dao.notifyPerson.NotifyPersonDao">
     <cache flushInterval="300"/>
 
+    <select id="getDutyPersons" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
+        SELECT
+        id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group as dutyIngroup
+        FROM
+        t_notify_person
+        WHERE duty_status!=0
+    </select>
+
+    <select id="getDutyStatus" parameterType="int" resultType="int" >
+        SELECT duty_status
+        FROM
+        t_notify_person
+        WHERE id=#{id}
+    </select>
+
+
     <select id="getAllPerson" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
-              id, name, email, phone, `status`
+              id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group as dutyIngroup
         FROM
-              t_notify_person t
-        WHERE
-          t.status=1
+              t_notify_person
+    </select>
+
+    <select id="getWaitForDutyPersons" resultType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        SELECT id, name, email, phone, `status`,`group`,duty_status as waitDutyStatus,duty_in_group as dutyIngroup
+         FROM t_notify_person
+        WHERE duty_status=1 AND duty_in_group >0
+        ORDER BY duty_in_group ASC
+    </select>
+
+    <select id="getMaxDutyGroupNum" resultType="int">
+        SELECT max(duty_in_group)
+        FROM t_notify_person
+    </select>
+
+    <select id="getHasSendMsgPersonNames" resultType="String">
+        SELECT name
+         FROM t_notify_person
+        WHERE duty_status=1 AND duty_in_group &lt; 0
+        ORDER BY duty_in_group DESC
     </select>
     <select id="getGroupPerson" parameterType="java.lang.String" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
         SELECT
@@ -22,39 +55,49 @@
     </select>
 
 
-    <update id="updateNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+    <update id="updatePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
         UPDATE t_notify_person
         <set>
-            <if test="id != null"> id = #{id}, </if>
-            <if test="name != null"> name = #{name}, </if>
-            <if test="email != null"> email = #{email}, </if>
-            <if test="phone != null"> phone = #{phone}, </if>
-            <if test="status != null"> status = #{status} </if>
+            <if test="id != null">id = #{id},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="group!=null">`group`=#{group},</if>
+            <if test="waitDutyStatus!=null">duty_status=#{waitDutyStatus},</if>
+            <if test="dutyIngroup!=null">duty_in_group=#{dutyIngroup}</if>
         </set>
         WHERE id = #{id}
     </update>
 
-
-    <insert id="addNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+    <insert id="createPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson" useGeneratedKeys="true"
+            keyProperty="id">
         INSERT INTO t_notify_person
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="name != null"> name, </if>
-            <if test="email != null"> email, </if>
-            <if test="phone != null"> phone, </if>
-            <if test="status != null"> status</if>
+            <if test="id!=null">id,</if>
+            <if test="name != null">name,</if>
+            <if test="email != null">email,</if>
+            <if test="phone != null">phone,</if>
+            <if test="status != null">status,</if>
+            <if test="group!=null">`group`,</if>
+            <if test="waitDutyStatus!=null">duty_status,</if>
+            <if test="dutyIngroup!=null">duty_in_group</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="name != null"> #{name}, </if>
-            <if test="email != null"> #{email}, </if>
-            <if test="phone != null">  #{phone}, </if>
-            <if test="status != null">  #{status} </if>
+            <if test="id!=null">#{id},</if>
+            <if test="name != null">#{name},</if>
+            <if test="email != null">#{email},</if>
+            <if test="phone != null">#{phone},</if>
+            <if test="status != null">#{status},</if>
+            <if test="group!=null">#{group},</if>
+            <if test="waitDutyStatus!=null">#{waitDutyStatus},</if>
+            <if test="dutyIngroup!=null">#{dutyIngroup}</if>
         </trim>
     </insert>
 
-    <delete id="deleteNotifyPerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
-        DELETE FROM t_notify_person where id = #{id}
+    <delete id="deletePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">
+        DELETE FROM t_notify_person WHERE id=#{id}
     </delete>
-
 
 </mapper>

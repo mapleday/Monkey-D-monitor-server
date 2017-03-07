@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,36 +24,64 @@ public class RedisMetaControler {
     @Autowired
     RedisMetaService redisMetaService;
 
-    @RequestMapping("/redisMetaMemory")
+    @RequestMapping("/redisMeta")
     public String index(Model model) {
-        return "redisMetaMemory";
+        return "redisMeta";
     }
 
-    @RequestMapping("/updateRedisMetaMemory")
+//    @RequestMapping("/updateRedisMetaMemory")
+//    @ResponseBody
+//    public void updateRedisMetaMemory(RedisMetaMemory redisMetaMemory) {
+//        redisMetaService.updateRedisMetaMemory(redisMetaMemory);
+//    }
+
+//    @RequestMapping("/addRedisMetaMemory")
+//    @ResponseBody
+//    public void addRedisMetaMemory(RedisMetaMemory redisMetaMemory) {
+//        redisMetaService.addRedisMetaMemory(redisMetaMemory);
+//    }
+
+//    @RequestMapping("/deleteRedisMetaMemory")
+//    @ResponseBody
+//    public void deleteRedisMetaMemory(RedisMetaMemory redisMetaMemory) {
+//        redisMetaService.deleteRedisMetaMemory(redisMetaMemory);
+//    }
+
+    @RequestMapping(value = "/getRedisMeta")
     @ResponseBody
-    public void updateRedisMetaMemory(RedisMetaMemory redisMetaMemory) {
-        redisMetaService.updateRedisMetaMemory(redisMetaMemory);
+    public Map  getRedisMeta(){
+        HashMap<String,Object> map=new HashMap<String,Object>();
+        map.put("data",redisMetaService.getRedisMeta());
+        return map;
     }
 
-    @RequestMapping("/addRedisMetaMemory")
     @ResponseBody
-    public void addRedisMetaMemory(RedisMetaMemory redisMetaMemory) {
-        redisMetaService.addRedisMetaMemory(redisMetaMemory);
+    @RequestMapping(value = "/updateRedisMeta",method = RequestMethod.POST)
+    public Map updateRedisMeta(RedisMetaMemory redisMetaMemory){
+        System.out.print(redisMetaMemory.getUpdateTime()+"YY");
+        redisMetaService.updateRedisMeta(redisMetaMemory);
+        Map<String,Object> map=new HashMap<String,Object>();
+        List<RedisMetaMemory> list=new ArrayList<RedisMetaMemory>();
+        list.add(redisMetaMemory);
+        map.put("data",list);
+        return map;
     }
 
-    @RequestMapping("/deleteRedisMetaMemory")
     @ResponseBody
-    public void deleteRedisMetaMemory(RedisMetaMemory redisMetaMemory) {
-        redisMetaService.deleteRedisMetaMemory(redisMetaMemory);
+    @RequestMapping(value = "/deleteRedisMeta",method = RequestMethod.POST)
+    public RedisMetaMemory  deleteRedisMeta(RedisMetaMemory redisMetaMemory){
+        redisMetaService.deleteRedisMeta(redisMetaMemory);
+        return new RedisMetaMemory();
     }
 
-
-    @RequestMapping(value = "/getRedisMetaMemoryList")
     @ResponseBody
-    public Object getRedisMetaMemoryList(RedisMetaMemory redisMetaMemory) {
-        Map<String,Object> redisMetaMemoryListMap = new HashMap<String,Object>();
-        List<RedisMetaMemory> redisMetaMemoryList =redisMetaService.getRedisMetaMemory();
-        redisMetaMemoryListMap.put("data",redisMetaMemoryList);
-        return redisMetaMemoryListMap;
+    @RequestMapping(value = "/createRedisMeta",method = RequestMethod.POST)
+    public  Map createRedisMeta( RedisMetaMemory redisMetaMemory){
+        redisMetaService.createRedisMeta(redisMetaMemory);
+        Map<String,Object> map=new HashMap<String,Object>();
+        List<RedisMetaMemory> list=new ArrayList<RedisMetaMemory>();
+        list.add(redisMetaMemory);
+        map.put("data",list);
+        return map;
     }
 }

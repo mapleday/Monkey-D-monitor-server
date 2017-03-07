@@ -11,13 +11,6 @@
             log_day = #{logDay}
     </select>
 
-    <select id="getRedisMetaMemory">
-        SELECT
-        *
-        FROM
-        meta_redis_used_memory_day
-    </select>
-
     <select id="getLastDayMemory">
         SELECT
             used_memory
@@ -27,32 +20,47 @@
             log_day = #{logDay}
     </select>
 
-    <insert id="saveDayRecord" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
-      INSERT INTO
-          meta_redis_used_memory_day (
-          last_day_used_memory,
-          used_memory,
-          log_day,
-          update_time)
-      VALUES(
-          #{lastDayUserMemory},
-          #{usedMemory},
-          #{logDay},
-          #{updateTime})
-    </insert>
+    <select id="getRedisMeta" resultType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+        SELECT id as id,
+           last_day_used_memory as lastDayUserMemory,
+           used_memory as usedMemory,
+           log_day as logDay,
+           update_time as updateTime
+        FROM meta_redis_used_memory_day
+    </select>
 
-    <update id="updateDayRecord" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
-        UPDATE
-          meta_redis_used_memory_day
-        SET
-            used_memory = #{usedMemory},
-            update_time = now()
-        WHERE
-          log_day = #{logDay}
+    <update id="updateRedisMeta" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+         UPDATE meta_redis_used_memory_day
+           <set>
+               <if test="lastDayUserMemory!=null">last_day_used_memory=#{lastDayUserMemory},</if>
+               <if test="usedMemory!=null">used_memory=#{usedMemory},</if>
+               <if test="logDay!=null">log_day=#{logDay}</if>
+               <if test="updateTime!=null">update_time=#{updatTime}</if>
+           </set>
+        WHERE id=#{id}
     </update>
 
-    <delete id="deleteDayRecord" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
-        DELETE FROM meta_redis_used_memory_day where log_day = #{logDay}
+    <delete id="deleteRedisMeta" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+        DELETE FROM meta_redis_used_memory_day WHERE id=#{id}
     </delete>
+
+    <insert id="createRedisMeta" parameterType="com.sohu.sns.monitor.common.module.RedisMetaMemory">
+        INSERT INTO meta_redis_used_memory_day
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">id,</if>
+            <if test="lastDayUserMemory!=null">last_day_used_memory,</if>
+            <if test="usedMemory!=null">used_memory,</if>
+            <if test="logDay!=null">log_day,</if>
+            <if test="updateTime!=null">update_time</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id!=null">#{id},</if>
+            <if test="lastDayUserMemory!=null">#{lastDayUserMemory},</if>
+            <if test="usedMemory!=null">#{usedMemory},</if>
+            <if test="logDay!=null">#{logDay},</if>
+            <if test="updateTime!=null">#{updateTime}</if>
+        </trim>
+    </insert>
 
 </mapper>

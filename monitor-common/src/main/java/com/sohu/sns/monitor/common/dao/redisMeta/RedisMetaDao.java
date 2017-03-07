@@ -9,6 +9,8 @@ import java.util.List;
  * author:jy
  * time:16-12-29下午5:10
  * redisMeta
+ *
+ * update by yw on 2017.2.9
  */
 @Repository
 public interface RedisMetaDao {
@@ -29,25 +31,23 @@ public interface RedisMetaDao {
     public Double getLastDayMemory(String logDay);
 
     /**
-     * 保存内存使用记录
-     *
-     * @param redisMetaMemory
+     * 获取 内存使用表中所有数据
+     * @return
      */
-    public void saveDayRecord(RedisMetaMemory redisMetaMemory);
+    public List<RedisMetaMemory> getRedisMeta();
 
     /**
-     * 更新内存使用记录
-     *
-     * @param redisMetaMemory
+     * 增加 一条内存使用记录
      */
-    public void updateDayRecord(RedisMetaMemory redisMetaMemory);
+    public void createRedisMeta(RedisMetaMemory redisMetaMemory);
 
     /**
-     * 删除内存使用记录
-     *
-     * @param redisMetaMemory
+     * 删除 一条内存使用记录
      */
-    public void deleteDayRecord(RedisMetaMemory redisMetaMemory);
+    public void deleteRedisMeta(RedisMetaMemory redisMetaMemory);
 
-    public List<RedisMetaMemory> getRedisMetaMemory();
+    /**
+     * 更新 一条内存使用记录
+     */
+    public void updateRedisMeta(RedisMetaMemory redisMetaMemory);
 }

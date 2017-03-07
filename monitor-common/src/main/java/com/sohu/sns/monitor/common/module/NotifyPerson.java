@@ -5,23 +5,52 @@ import java.io.Serializable;
 /**
  * author:jy
  * time:16-12-28下午3:11
+ *
+ * update by yw on 17.2.24
  * 通知人
  */
 public class NotifyPerson implements Serializable {
     /**
      * 自增主键
      */
-    private int id;
+    private Integer id;
     private String name;
     private String email;
     private String phone;
-    private int status;
+    private Integer status;
+    private String group;
+    private Integer waitDutyStatus;
+    private Integer dutyIngroup;
 
-    public int getId() {
+    public Integer getDutyIngroup() {
+        return dutyIngroup;
+    }
+
+    public void setDutyIngroup(Integer dutyIngroup) {
+        this.dutyIngroup = dutyIngroup;
+    }
+
+    public Integer getWaitDutyStatus() {
+        return waitDutyStatus;
+    }
+
+    public void setWaitDutyStatus(Integer waitDutyStatus) {
+        this.waitDutyStatus = waitDutyStatus;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -49,13 +78,14 @@ public class NotifyPerson implements Serializable {
         this.phone = phone;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
+
 
     @Override
     public String toString() {
@@ -65,6 +95,9 @@ public class NotifyPerson implements Serializable {
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
                 ", status=" + status +
+                ", group='" + group + '\'' +
+                ", waitDutyStatus=" + waitDutyStatus +
+                ", dutyIngroup=" + dutyIngroup +
                 '}';
     }
 }

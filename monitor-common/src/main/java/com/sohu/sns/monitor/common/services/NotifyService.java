@@ -38,6 +38,9 @@ public class NotifyService {
         }
     }
 
+    /**
+     * update by yw on 2017.2.9
+     */
     public void sendNotifyToPersonGroup(String message, String groupName) {
         List<NotifyPerson> groupPerson = notifyPersonDao.getGroupPerson(groupName);
         if (groupPerson == null || groupPerson.isEmpty()) {
@@ -81,30 +84,39 @@ public class NotifyService {
         return notifyPersonDao.getAllPerson();
     }
 
-    /**
-     * 添加记录
-     * @return
-     */
-    public int addNotifyPerson(NotifyPerson notifyPerson){
-        return notifyPersonDao.addNotifyPerson(notifyPerson);
+    public List<NotifyPerson> getDutyPersons(){
+        return notifyPersonDao.getDutyPersons();
     }
 
-    /**
-     * 修改记录
-     * @param notifyPerson
-     * @return
-     */
-    public int updateNotifyPerson(NotifyPerson notifyPerson){
-        return notifyPersonDao.updateNotifyPerson(notifyPerson);
+    public void createPerson(NotifyPerson notifyPerson){
+        notifyPersonDao.createPerson(notifyPerson);
     }
 
-    /**
-     * 删除记录
-     * @param notifyPerson
-     * @return
-     */
-    public int deleteNotifyPerson(NotifyPerson notifyPerson){
-        return notifyPersonDao.deleteNotifyPerson(notifyPerson);
+    public void updatePerson(NotifyPerson notifyPerson){
+        notifyPersonDao.updatePerson(notifyPerson);
     }
 
+    public void deletePerson(NotifyPerson notifyPerson){
+        notifyPersonDao.deletePerson(notifyPerson);
+    }
+
+    public List<NotifyPerson> getWaitForDutyPersons() {
+        return notifyPersonDao.getWaitForDutyPersons();
+    }
+
+    public int getMaxDutyGroupNum(){
+        return notifyPersonDao.getMaxDutyGroupNum();
+    }
+
+    public int getDutyStatus(int id){
+        return notifyPersonDao.getDutyStatus(id);
+    }
+
+    public void updateDutyGroupNum(NotifyPerson notifyPerson){
+        notifyPersonDao.updatePerson(notifyPerson);
+    }
+
+    public List<String> getHasSendMsgPersonNames(){
+        return  notifyPersonDao.getHasSendMsgPersonNames();
+    }
 }

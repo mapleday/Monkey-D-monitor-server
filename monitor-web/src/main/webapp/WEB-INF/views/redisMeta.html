@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>redisMeta</title>
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/editor.dataTables.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/select.dataTables.min.css">
+
+</head>
+<body>
+
+<div style="text-align: center">
+    <h3 >redisMeta</h3>
+</div>
+<table id="example" class="display dataTable" cellpadding="0" width="100%" style="table-layout:fixed;word-break:break-all;overflow: scroll" >
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>最后一天内存使用量</th>
+        <th>已使用内存</th>
+        <th>日志记录日期</th>
+        <th>更新时间</th>
+    </tr>
+    </thead>
+</table>
+
+<!--editor js-->
+
+<script  src="resources/js/jquery/jquery-1.12.4.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
+
+
+<script type="text/javascript">
+    // use a global for the submit and return data rendering in the examples
+    var editor;
+    $(document).ready(function() {
+        editor = new $.fn.dataTable.Editor( {
+            ajax: {
+                create:{
+                    type:'POST',
+                    url: 'createRedisMeta',
+                    data:function (data) {
+
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                },
+                edit:{
+                    type:'POST',
+                    url: 'updateRedisMeta',
+                    data:function(data){
+//                        console.log(data);
+                        var result={};
+                        for (var i in data.data){
+                            result=data.data[i];
+//                            console.log("yy")
+                            console.log(result);
+                            result.action=data.action;
+                        }
+                        result.id=parseInt(result.id);
+                        result.lastDayUserMemory=parseFloat(result.lastDayUserMemory);
+                        result.usedMemory=parseFloat(result.usedMemory);
+                        console.log(result);
+                        return result;
+                    }
+                },
+                remove:{
+                    type:'POST',
+                    url: 'deleteRedisMeta',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                }
+            },
+            table: "#example",
+            idSrc: "id",
+            fields: [
+                {
+                    label: "序号:",
+                    name: "id",
+                    type:  "readonly"
+                },
+                {
+                    label: "最后一天内存使用量:",
+                    name: "lastDayUserMemory"
+                },  {
+                    label: "已使用内存:",
+                    name: "usedMemory"
+                },{
+                    label: "日志记录日期:",
+                    name:  "logDay"
+                }
+                ,{
+                    label: "更新时间:",
+                    name:  "updateTime"
+
+                }
+            ]
+        } );
+
+        $('#example').DataTable( {
+            dom: "Bfrtip",
+            ajax: "getRedisMeta",
+            columns: [
+                { data: "id" } ,
+                { data: "lastDayUserMemory" },
+                { data: "usedMemory"},
+                { data: "logDay"},
+                { data: "updateTime"}
+            ],
+            select: true,
+            buttons: [
+//                { extend: "create", editor: editor},
+//                { extend: "edit",   editor: editor },
+//                { extend: "remove", editor: editor }
+            ]
+        } );
+    } );
+</script>
+</body>
+</html>

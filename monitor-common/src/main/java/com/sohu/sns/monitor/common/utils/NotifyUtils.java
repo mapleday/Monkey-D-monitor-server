@@ -15,6 +15,7 @@ import java.util.Map;
  * time:16-10-13下午5:20
  * 通知工具类
  */
+
 public class NotifyUtils {
     private static final HttpClientUtil httpClientUtil = HttpClientUtil.create(NotifyUtils.class.getName(), "sendWeixin", 3000);
     private static final String WEI_XIN_URL = "http://sns-mail-weixin.sce.sohuno.com/sendSms";

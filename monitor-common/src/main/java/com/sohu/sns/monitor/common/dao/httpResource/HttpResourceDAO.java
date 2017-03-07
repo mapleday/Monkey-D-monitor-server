@@ -8,12 +8,16 @@ import java.util.List;
 /**
  * author:jy
  * time:16-10-14上午11:41
+ *
+ * update by yw on 2017.2.9
  * 资源配置类
  */
 @Repository
 public interface HttpResourceDAO {
     public List<HttpResource> getResources();
-    public int updateResources(HttpResource httpResource);
-    public int addResources(HttpResource httpResource);
-    public int deleteResources(HttpResource httpResource);
+    public List<HttpResource> getAllResources();
+    public void updateResource(HttpResource httpResource);
+    public void deleteResource(HttpResource httpResource);
+    public void createResource(HttpResource httpResource);
+
 }

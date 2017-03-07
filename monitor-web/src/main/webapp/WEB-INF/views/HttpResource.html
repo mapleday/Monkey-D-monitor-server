@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HttpResourceTable</title>
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/editor.dataTables.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/select.dataTables.min.css">
+
+
+
+</head>
+<body>
+<div style="text-align: center">
+    <h3 >HttpResource</h3>
+</div>
+
+
+<table id="example" class="display dataTable" cellpadding="0" width="100%" style="table-layout:fixed;word-break:break-all; overflow:scroll" >
+<!--<table id="example" class="table table-bordered table-striped table-hover">-->
+    <thead>
+    <tr>
+        <th>序号</th>
+        <th>资源名称</th>
+        <th>资源地址</th>
+        <th >监控超时时间</th>
+        <th>监控间隔时间</th>
+        <th>监控次数</th>
+        <th>报警阀值次数</th>
+        <th>监控状态</th>
+    </tr>
+    </thead>
+</table>
+
+
+<!--editor js-->
+
+<script  src="resources/js/jquery/jquery-1.12.4.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
+
+
+<script type="text/javascript">
+    // use a global for the submit and return data rendering in the examples
+    var editor;
+
+    $(document).ready(function() {
+        editor = new $.fn.dataTable.Editor( {
+            ajax: {
+                create:{
+                    type:'POST',
+                    url: 'createResource',
+                    data:function (data) {
+
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+
+                    }
+
+
+                },
+                edit:{
+                    type:'POST',
+                    url: 'updateResource',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            result=data.data[i];
+//                                  result.id=i;
+                            result.action=data.action;
+
+                        }
+                        console.log(result);
+                        return result;
+                    }
+
+                },
+                remove:{
+                    type:'POST',
+                    url: 'deleteResource',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                }
+            },
+            table: "#example",
+            idSrc: "id",
+            fields: [
+                {
+                    label: "序号:",
+                    name: "id",
+                    type:  "readonly"
+                },
+                {
+                    label: "资源名称:",
+                    name: "resourceName"
+                },  {
+                    label: "资源地址:",
+                    name: "resourceAddress"
+                },{
+                    label: "监控超时时间:",
+                    name:  "monitorTimeOut"
+                }, {
+                    label: "监控间隔时间:",
+                    name: "monitorInterval"
+                }, {
+                    label: "监控次数:",
+                    name: "monitorTimes"
+                }, {
+                    label: "报警阀值次数:",
+                    name: "alarmThresholdTimes"
+                }, {
+                    label: "监控状态:",
+                    name: "stat"
+                }
+            ]
+        } );
+
+        $('#example').DataTable( {
+            dom: "Bfrtip",
+            ajax: "getAllResource",
+            autoWidth: false,
+            columns: [
+                { data: "id" } ,
+                { data: "resourceName" },
+                { data: "resourceAddress"},
+                { data: "monitorTimeOut" },
+                { data: "monitorInterval" },
+                { data: "monitorTimes" },
+                { data: "alarmThresholdTimes" },
+                {data:  "stat"}
+            ],
+            select: true,
+            buttons: [
+                { extend: "create", editor: editor},
+                { extend: "edit",   editor: editor },
+                { extend: "remove", editor: editor }
+            ]
+        } );
+    } );
+</script>
+</body>
+</html>

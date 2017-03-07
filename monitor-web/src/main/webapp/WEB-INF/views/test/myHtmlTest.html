@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test</title>
+</head>
+<body>
+mytest!
+
+<!--<script type="text/javascript">-->
+<!--//    alert(tmp);-->
+<!--//    var tmp="111";-->
+<!--//    alert(tmp);-->
+    <!--test();-->
+
+<!--</script>-->
+
+<script type="text/javascript">
+//    test();
+    var num='100.1';
+    var numInt=parseInt(num);
+    var numFloat=parseFloat(num);
+    function test(){
+//        alert(num+'!');
+//        alert(numInt);
+//        alert(numFloat);
+        var st=new Array("zhang","yuan","my");
+//        for(var i=0;i<st.length;i++){
+//            alert(st[i]);
+//        }
+        for(var i in st){
+            document.writeln(st[i]+'  ');
+            if (st[i]!='yuan')
+                document.writeln('false'+'<br />');
+            else {
+                document.writeln('true'+'<br />');
+            }
+//            document.write(st[i]+"<br />");
+        }
+
+
+
+    }
+</script>
+
+<script type="text/javascript">
+    window.onload=test;
+    alert('hah!');
+
+</script>
+
+</body>
+</html>

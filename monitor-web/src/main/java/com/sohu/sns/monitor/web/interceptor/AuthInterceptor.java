@@ -29,7 +29,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
     private static final JsonMapper jsonMapper = JsonMapper.nonEmptyMapper();
-    private UrlPathHelper helper = new UrlPathHelper();
+//    private UrlPathHelper helper = new UrlPathHelper();
 //    private PathMatcher pathMatcher = new AntPathMatcher();
     private List<String> whiteLists;
 
@@ -48,7 +48,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp,
                              Object obj) throws Exception {
         // 登录拦截
-        String uri = helper.getLookupPathForRequest(req);
+//        String uri = helper.getLookupPathForRequest(req);
 //        for (String res : whiteLists) {
 //            if (pathMatcher.match(res, uri)) {
 //                return true;

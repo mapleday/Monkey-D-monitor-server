@@ -39,6 +39,7 @@
         <monitor-common.version>1.0-SNAPSHOT</monitor-common.version>
         <es.version>2.3.4</es.version>
         <junit.version>4.11</junit.version>
+        <sso.version>1.0</sso.version>
     </properties>
 
     <dependencyManagement>
@@ -115,6 +116,12 @@
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sohu.sns.sso</groupId>
+                <artifactId>sns-sso-client</artifactId>
+                <version>${sso.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

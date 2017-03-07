@@ -67,12 +67,6 @@
             <groupId>org.apache.shiro</groupId>
             <artifactId>shiro-cas</artifactId>
             <version>${shiro.version}</version>
-            <!--<exclusions>-->
-            <!--<exclusion>-->
-            <!--<groupId>javax.servlet</groupId>-->
-            <!--<artifactId>servlet-api</artifactId>-->
-            <!--</exclusion>-->
-            <!--</exclusions>-->
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -100,6 +94,7 @@
             </exclusions>
         </dependency>
 
+        <!--test-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
@@ -107,6 +102,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+        </dependency>
+
+        <!--搜狐权限校验-->
+        <dependency>
+            <groupId>com.sohu.sns.sso</groupId>
+            <artifactId>sns-sso-client</artifactId>
         </dependency>
 
     </dependencies>

@@ -41,7 +41,8 @@ public class NotifyController {
     public Map updatePerson(NotifyPerson np){
         int originDutyStatus=notifyService.getDutyStatus(np.getId());
         if (np.getWaitDutyStatus()==1&&originDutyStatus==0){
-            int dutyNum=notifyService.getMaxDutyGroupNum()+1;
+            int dutyNum=notifyService.getMaxDutyGroupNum();
+            dutyNum=dutyNum<=0?1:dutyNum+1;
             np.setDutyIngroup(dutyNum);
         }
         notifyService.updatePerson(np);
@@ -62,7 +63,8 @@ public class NotifyController {
     @ResponseBody
     @RequestMapping(value = "/createPerson",method = RequestMethod.POST)
     public  Map createPerson( NotifyPerson notifyPerson){
-        int dutyNum=notifyService.getMaxDutyGroupNum()+1;
+        int dutyNum=notifyService.getMaxDutyGroupNum();
+        dutyNum=dutyNum<=0?1:dutyNum+1;
         notifyPerson.setDutyIngroup(dutyNum);
         notifyService.createPerson(notifyPerson);
         Map<String,Object> map=new HashMap<String,Object>();

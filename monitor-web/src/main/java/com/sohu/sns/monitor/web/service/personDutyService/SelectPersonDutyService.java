@@ -20,7 +20,7 @@ public class SelectPersonDutyService {
     private  NotifyService notifyService;
     private  String currentTime;
 
-    @Scheduled(cron = "0 0 19 * * ?")
+    @Scheduled(cron = "0 0 18 * * ?")
     public void sendDutyInfo() {
         /**发送值班微信提醒**/
         //总计需要值班人
@@ -34,7 +34,7 @@ public class SelectPersonDutyService {
         }
         //正常发送值班消息
         if (!waitForDutyPersons.isEmpty()) {
-            nomalSendDutyMsg(dutyPersons,waitForDutyPersons);
+            normalSendDutyMsg(dutyPersons,waitForDutyPersons);
         }
         //处理待值班人小于等于1时，重新初始化值班顺序
         if (waitForDutyPersons.size() <= 1) {
@@ -42,7 +42,7 @@ public class SelectPersonDutyService {
         }
     }
 
-    public  void  nomalSendDutyMsg(List<NotifyPerson> dutyPersons,List<NotifyPerson> waitForDutyPersons){
+    public  void  normalSendDutyMsg(List<NotifyPerson> dutyPersons,List<NotifyPerson> waitForDutyPersons){
         NotifyPerson dutyPerson = waitForDutyPersons.get(0);
         List<String> sendMsgPersonNames = new ArrayList<String>();
         sendMsgPersonNames.addAll(notifyService.getHasSendMsgPersonNames());

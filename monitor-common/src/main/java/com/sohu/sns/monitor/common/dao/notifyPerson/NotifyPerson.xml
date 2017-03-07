@@ -45,6 +45,14 @@
         WHERE duty_status=1 AND duty_in_group &lt; 0
         ORDER BY duty_in_group DESC
     </select>
+    <select id="getGroupPerson" parameterType="java.lang.String" resultType="com.sohu.sns.monitor.common.module.NotifyPerson" useCache="true">
+        SELECT
+        id, name, email, phone, `status`
+        FROM
+        t_notify_person t
+        WHERE
+        t.group=#{group_name}
+    </select>
 
 
     <update id="updatePerson" parameterType="com.sohu.sns.monitor.common.module.NotifyPerson">

@@ -40,6 +40,18 @@ public class NotifyService {
     /**
      * update by yw on 2017.2.9
      */
+    public void sendNotifyToPersonGroup(String message, String groupName) {
+        List<NotifyPerson> groupPerson = notifyPersonDao.getGroupPerson(groupName);
+        if (groupPerson == null || groupPerson.isEmpty()) {
+            LOGGER.buziLog(ModuleEnum.MONITOR_SERVICE, "NotifyService.sendAllNotifyPerson", message, "no person");
+            return;
+        }
+        for (NotifyPerson notifyPerson : groupPerson) {
+            NotifyUtils.sendAlert(notifyPerson.getPhone(), message);
+        }
+    }
+
+
     public List<NotifyPerson> getAllPerson(){
         return notifyPersonDao.getAllPerson();
     }

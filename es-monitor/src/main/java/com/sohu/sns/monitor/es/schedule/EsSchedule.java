@@ -164,8 +164,8 @@ public class EsSchedule {
         }
 
         System.out.println(sb.toString());
-        notifyService.sendAllNotifyPerson(sb.toString());
-    }
+            notifyService.sendAllNotifyPerson(sb.toString());
+        }
 
     private Map<String, EsResult> queryEs(Date startTime, Date endTime) {
 

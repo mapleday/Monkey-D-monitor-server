@@ -20,7 +20,6 @@ public interface NotifyPersonDao {
     public List<NotifyPerson> getDutyPersons();
     public List<String> getHasSendMsgPersonNames();
     public List<NotifyPerson> getWaitForDutyPersons();
-    public List<NotifyPerson> getWaitForDutyPersons();
     public int getMaxDutyGroupNum();
     public int getDutyStatus(int id);
     public void updatePerson(NotifyPerson notifyPerson);

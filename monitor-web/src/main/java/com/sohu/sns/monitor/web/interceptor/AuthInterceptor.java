@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -29,8 +30,8 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(AuthInterceptor.class);
     private static final JsonMapper jsonMapper = JsonMapper.nonEmptyMapper();
-//    private UrlPathHelper helper = new UrlPathHelper();
-//    private PathMatcher pathMatcher = new AntPathMatcher();
+    private UrlPathHelper helper = new UrlPathHelper();
+    private PathMatcher pathMatcher = new AntPathMatcher();
     private List<String> whiteLists;
 
     @Override
@@ -48,12 +49,12 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp,
                              Object obj) throws Exception {
         // 登录拦截
-//        String uri = helper.getLookupPathForRequest(req);
-//        for (String res : whiteLists) {
-//            if (pathMatcher.match(res, uri)) {
-//                return true;
-//            }
-//        }
+        String uri = helper.getLookupPathForRequest(req);
+        for (String res : whiteLists) {
+            if (pathMatcher.match(res, uri)) {
+                return true;
+            }
+        }
         // 登录拦截
         Principal p = req.getUserPrincipal();
         if (p == null) {

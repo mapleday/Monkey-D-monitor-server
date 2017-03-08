@@ -23,9 +23,8 @@ import java.util.Set;
  */
 @Controller
 public class LoginCotroller {
-    @RequestMapping(value = "/cleancookie")
-    public String doLogout(HttpServletRequest req, HttpServletResponse resp,Model model) throws IOException {
-//        resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/logout");
-        return "redirect:index";
+    @RequestMapping(value = "/logout")
+    public void doLogout(HttpServletRequest req, HttpServletResponse resp,Model model) throws IOException {
+        resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/logout");
     }
 }

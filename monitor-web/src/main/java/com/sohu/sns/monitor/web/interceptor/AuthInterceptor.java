@@ -1,13 +1,10 @@
 package com.sohu.sns.monitor.web.interceptor;
 
-
 import com.sohu.sns.common.utils.json.JsonMapper;
 import com.sohu.sns.sso.client.SSO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -62,21 +59,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             return false;
         }
         HttpSession session = req.getSession();
-//        Boolean loginState=(Boolean) session.getAttribute("loginState");
-
         if (session != null) {
-//            Operator operator = (Operator) session.getAttribute("operator");
-//            if (operator == null) {
-//                operator = operatorServiceImpl.get(p.getName());
-//                if (operator == null) {
-
-
-//                }
-//                log.info(jsonMapper.toJson(operator));
-//                session.setAttribute("operator", operator);
-//            }
-
-
         }
         return true;
     }

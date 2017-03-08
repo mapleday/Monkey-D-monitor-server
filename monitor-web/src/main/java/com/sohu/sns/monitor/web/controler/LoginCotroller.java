@@ -101,9 +101,10 @@ public class LoginCotroller {
 //    }
 
     @RequestMapping(value = "/logout")
-    public void doLogout(HttpServletRequest req, HttpServletResponse resp,Model model) throws IOException {
+    public String doLogout(HttpServletRequest req, HttpServletResponse resp,Model model) throws IOException {
 
         resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/logout");
+        return "redirect:/";
 
     }
 }

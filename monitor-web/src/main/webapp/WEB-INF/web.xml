@@ -42,6 +42,25 @@
     </filter-mapping>
 
 
+    <servlet>
+        <servlet-name>SetCookie</servlet-name>
+        <servlet-class>com.sohu.sns.sso.client.SetCookieServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SetCookie</servlet-name>
+        <url-pattern>/setcookie</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>CleanCookie</servlet-name>
+        <servlet-class>com.sohu.sns.sso.client.CleanCookieServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CleanCookie</servlet-name>
+        <url-pattern>/cleancookie</url-pattern>
+    </servlet-mapping>
+
+
     <!--集成Shiro安全框架-->
     <!--<filter>
         <filter-name>shiroFilter</filter-name>

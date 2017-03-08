@@ -57,26 +57,20 @@ public class AuthInterceptor implements HandlerInterceptor {
 //        }
         // 登录拦截
         Principal p = req.getUserPrincipal();
-
         if (p == null) {
             resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
             return false;
         }
         HttpSession session = req.getSession();
-        Boolean loginState=(Boolean) session.getAttribute("loginState");
-        if (loginState==null){
-            session.setAttribute("loginState",true);
-            loginState=true;
-        }
+//        Boolean loginState=(Boolean) session.getAttribute("loginState");
 
-        if (session != null&&loginState!=true) {
+        if (session != null) {
 //            Operator operator = (Operator) session.getAttribute("operator");
 //            if (operator == null) {
 //                operator = operatorServiceImpl.get(p.getName());
 //                if (operator == null) {
-                    session.setAttribute("loginState",null);
-                    resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
-                    return false;
+
+
 //                }
 //                log.info(jsonMapper.toJson(operator));
 //                session.setAttribute("operator", operator);

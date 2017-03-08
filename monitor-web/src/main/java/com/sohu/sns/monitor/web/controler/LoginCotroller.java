@@ -2,6 +2,7 @@ package com.sohu.sns.monitor.web.controler;
 
 import com.sohu.sns.monitor.common.services.SnsWebUserService;
 import com.sohu.sns.sso.client.AuthFilter;
+import com.sohu.sns.sso.client.SSO;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Set;
 
 /**
@@ -97,9 +100,10 @@ public class LoginCotroller {
 //        return "login";
 //    }
 
-//    @RequestMapping(value = "/logout")
-//    public String doLogout(HttpServletRequest req, HttpServletResponse resp,Model model){
-//
-//        return "redirect:/";
-//    }
+    @RequestMapping(value = "/logout")
+    public void doLogout(HttpServletRequest req, HttpServletResponse resp,Model model) throws IOException {
+        HttpSession Session = req.getSession();
+        Session = null;
+        resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
+    }
 }

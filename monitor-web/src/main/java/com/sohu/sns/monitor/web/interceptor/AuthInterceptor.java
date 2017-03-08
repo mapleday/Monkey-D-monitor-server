@@ -49,12 +49,12 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp,
                              Object obj) throws Exception {
         // 登录拦截
-        String uri = helper.getLookupPathForRequest(req);
-        for (String res : whiteLists) {
-            if (pathMatcher.match(res, uri)) {
-                return true;
-            }
-        }
+//        String uri = helper.getLookupPathForRequest(req);
+//        for (String res : whiteLists) {
+//            if (pathMatcher.match(res, uri)) {
+//                return true;
+//            }
+//        }
         // 登录拦截
         Principal p = req.getUserPrincipal();
 

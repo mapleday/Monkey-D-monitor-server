@@ -107,6 +107,6 @@ public class LoginCotroller {
         if (loginState!=null){
             Session.setAttribute("loginState",false);
         }
-        resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
+        resp.sendRedirect( "/");
     }
 }

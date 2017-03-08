@@ -69,7 +69,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             loginState=true;
         }
 
-        if (session != null&&loginState==false) {
+        if (session != null&&loginState!=true) {
 //            Operator operator = (Operator) session.getAttribute("operator");
 //            if (operator == null) {
 //                operator = operatorServiceImpl.get(p.getName());

@@ -74,6 +74,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 //            if (operator == null) {
 //                operator = operatorServiceImpl.get(p.getName());
 //                if (operator == null) {
+                    session.setAttribute("loginState",null);
                     resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
                     return false;
 //                }

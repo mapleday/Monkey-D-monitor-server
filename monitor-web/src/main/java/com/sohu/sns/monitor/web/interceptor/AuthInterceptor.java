@@ -57,6 +57,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
         // 登录拦截
         Principal p = req.getUserPrincipal();
+
         if (p == null) {
             resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
             return false;

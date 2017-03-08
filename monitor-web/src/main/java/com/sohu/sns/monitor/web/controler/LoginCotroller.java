@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 
 /**
@@ -22,9 +23,9 @@ public class LoginCotroller {
 
 
 
-//    @Autowired
-//    SnsWebUserService snsWebUserService;
-//    private Integer flag=null;
+    @Autowired
+    SnsWebUserService snsWebUserService;
+    private Integer flag=null;
 
 //    @RequestMapping(value = "/login")
 //    public String doLogin(HttpServletRequest request, Model model)
@@ -97,12 +98,8 @@ public class LoginCotroller {
 //    }
 
 //    @RequestMapping(value = "/logout")
-//    public String doLogout(HttpServletRequest request,Model model){
-//        model.addAttribute("oAuth",new Object());
-////        Subject subject=SecurityUtils.getSubject();
-//        System.out.println("清楚认证信息！");
-//        subject.logout();
-//        System.out.println("已注销！"+subject.isAuthenticated());
-//        return "redirect:login";
+//    public String doLogout(HttpServletRequest req, HttpServletResponse resp,Model model){
+//
+//        return "redirect:/";
 //    }
 }

@@ -69,21 +69,21 @@ public class AuthInterceptor implements HandlerInterceptor {
             loginState=true;
         }
 
-        if (session != null&&loginState==true) {
+        if (session != null&&loginState==false) {
 //            Operator operator = (Operator) session.getAttribute("operator");
 //            if (operator == null) {
 //                operator = operatorServiceImpl.get(p.getName());
 //                if (operator == null) {
-//                    resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
-//                    return false;
+                    resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
+                    return false;
 //                }
 //                log.info(jsonMapper.toJson(operator));
 //                session.setAttribute("operator", operator);
 //            }
 
-            return true;
+
         }
-        return false;
+        return true;
     }
 
     public List<String> getWhiteLists() {

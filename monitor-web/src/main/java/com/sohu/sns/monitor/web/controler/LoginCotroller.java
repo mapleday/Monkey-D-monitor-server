@@ -25,6 +25,9 @@ import java.util.Set;
 public class LoginCotroller {
     @RequestMapping(value = "/logout")
     public void doLogout(HttpServletRequest req, HttpServletResponse resp,Model model) throws IOException {
-        resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/logout");
+//        resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/logout");
+        String url=SSO.getProtocol() + "://" + SSO.getSsoServer() + "/logout";
+        System.out.println(url);
+        resp.sendRedirect("http://sns-portal.sce.sohuno.com/logout");
     }
 }

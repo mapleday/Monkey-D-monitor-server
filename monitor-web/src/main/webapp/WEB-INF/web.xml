@@ -41,11 +41,6 @@
         <url-pattern>/</url-pattern>
     </filter-mapping>
 
-
-
-
-
-
     <servlet>
         <servlet-name>SetCookie</servlet-name>
         <servlet-class>com.sohu.sns.sso.client.SetCookieServlet</servlet-class>
@@ -63,9 +58,6 @@
         <servlet-name>CleanCookie</servlet-name>
         <url-pattern>/cleancookie</url-pattern>
     </servlet-mapping>
-
-
-
 
     <!--post 乱码-->
     <filter>

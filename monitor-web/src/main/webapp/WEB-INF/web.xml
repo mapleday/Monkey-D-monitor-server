@@ -38,7 +38,11 @@
     </filter>
     <filter-mapping>
         <filter-name>myFilter</filter-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>/HttpResource/*</url-pattern>
     </filter-mapping>
 
     <servlet>

@@ -38,11 +38,31 @@
     </filter>
     <filter-mapping>
         <filter-name>myFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>/index/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>myFilter</filter-name>
         <url-pattern>/HttpResource/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>/mqtt/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>/notifyPerson/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>/redisMeta/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>myFilter</filter-name>
+        <url-pattern>/logout/*</url-pattern>
     </filter-mapping>
 
     <servlet>

@@ -47,7 +47,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp,
                              Object obj) throws Exception {
-        this.setWhiteLists(Lists.newArrayList("/resources/**","/error"));
+        this.setWhiteLists(Lists.newArrayList("/resources/**","/error","/health"));
         // 登录不拦截白名单
         String uri = helper.getLookupPathForRequest(req);
         for (String res : whiteLists) {

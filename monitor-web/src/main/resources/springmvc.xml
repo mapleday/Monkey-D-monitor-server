@@ -35,7 +35,10 @@
         <property name="suffix" value=".html"/>
     </bean>
     <mvc:interceptors>
-        <bean class="net.rossillo.spring.web.mvc.CacheControlHandlerInterceptor" />
+        <mvc:interceptor>
+            <mvc:mapping path="/*"/>
+            <bean class="net.rossillo.spring.web.mvc.CacheControlHandlerInterceptor" />
+        </mvc:interceptor>
         <mvc:interceptor>
             <mvc:mapping path="/*"/>
             <mvc:exclude-mapping path="/resources/**"/>

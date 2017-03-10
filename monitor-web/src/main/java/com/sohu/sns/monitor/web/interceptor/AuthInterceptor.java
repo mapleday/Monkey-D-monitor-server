@@ -1,7 +1,6 @@
 package com.sohu.sns.monitor.web.interceptor;
 
 import com.sohu.sns.common.utils.json.JsonMapper;
-import com.sohu.sns.sso.client.SSO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -39,6 +38,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest req, HttpServletResponse resp,
                            Object obj, ModelAndView mav) throws Exception {
+        resp.setHeader("Cache-Control", "no-cache");
     }
 
     @Override
@@ -51,7 +51,6 @@ public class AuthInterceptor implements HandlerInterceptor {
             resp.sendRedirect("/");
             return false;
         }
-
         if (session != null&&p!=null) {
             session.setAttribute("Principal",p);
         }

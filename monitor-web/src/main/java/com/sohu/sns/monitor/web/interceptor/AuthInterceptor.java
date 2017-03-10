@@ -45,13 +45,15 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp,
                              Object obj) throws Exception {
         // 登录拦截
+        HttpSession session = req.getSession();
         Principal p = req.getUserPrincipal();
-        if (p == null) {
-            resp.sendRedirect(SSO.getProtocol() + "://" + SSO.getSsoServer() + "/auth");
+        if (p == null&&session.getAttribute("Principal")==null) {
+            resp.sendRedirect("/");
             return false;
         }
-        HttpSession session = req.getSession();
-        if (session != null) {
+
+        if (session != null&&p!=null) {
+            session.setAttribute("Principal",p);
         }
         return true;
     }

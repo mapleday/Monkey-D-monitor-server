@@ -17,9 +17,6 @@ import javax.servlet.http.HttpSession;
 import java.security.Principal;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
-
 /**
  * @author zhouhe
  * @since 上午12:13:08
@@ -47,14 +44,6 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp,
                              Object obj) throws Exception {
-        this.setWhiteLists(Lists.newArrayList("/resources/**","/error","/health"));
-        // 登录不拦截白名单
-        String uri = helper.getLookupPathForRequest(req);
-        for (String res : whiteLists) {
-            if (pathMatcher.match(res, uri)) {
-                return true;
-            }
-        }
         // 登录拦截
         Principal p = req.getUserPrincipal();
         if (p == null) {

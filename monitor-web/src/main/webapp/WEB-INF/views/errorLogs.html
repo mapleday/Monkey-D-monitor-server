@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:overflow="http://java.sun.com/xml/ns/persistence/orm"
+      xmlns:white-space="http://www.w3.org/1999/xhtml" xmlns:word-break="http://www.w3.org/1999/xhtml"
+      xmlns:text-overflow="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>ErrorLogs</title>
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/editor.dataTables.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/select.dataTables.min.css">
+
+
+
+</head>
+<body>
+<div style="text-align: center">
+    <h3 >ErrorLogs</h3>
+</div>
+
+
+<!--<table id="example" class="display dataTable" style="table-layout: fixed;word-break:keep-all;overflow: scroll" >-->
+    <table id="example" class="table table-bordered table-striped table-hover">
+    <thead>
+    <tr>
+        <td>exceptionName</td>
+        <td>module</td>
+        <td>appId</td>
+        <td>param</td>
+        <td>returnValue</td>
+        <td>method</td>
+        <td>exceptionDesc</td>
+        <td>stackTrace</td>
+        <td>version</td>
+        <td>timestamp</td>
+    </tr>
+    </thead>
+</table>
+
+
+<!--editor js-->
+
+<script  src="resources/js/jquery/jquery-1.12.4.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
+
+
+<script type="text/javascript">
+    // use a global for the submit and return data rendering in the examples
+    var editor;
+
+    $(document).ready(function() {
+
+        $('#example').DataTable( {
+            dom: "Bfrtip",
+            ajax: "getErrorLogs",
+            autoWidth: false,
+            columns: [
+                { data: "exceptionName" } ,
+                { data: "module" },
+                { data: "appId"},
+                { data: "param" },
+                { data: "returnValue" },
+                { data: "method" },
+                { data: "exceptionDesc" },
+                { data: "stackTrace"},
+                { data: "version"},
+                { data: "timestamp"}
+            ],
+            buttons:[],
+            select: true,
+        } );
+    } );
+</script>
+</body>
+</html>

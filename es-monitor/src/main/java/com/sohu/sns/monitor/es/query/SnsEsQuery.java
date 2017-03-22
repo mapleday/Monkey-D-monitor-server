@@ -23,22 +23,15 @@ import java.util.List;
  */
 @Component
 public class SnsEsQuery {
-//    @Autowired
-//    TransportClient client;
-    public List<ErrorLog> queryErrorLogs(QueryBuilder queryBuilder, String indexName, String type) throws UnknownHostException {
-        Settings settings = Settings.builder()
-                .put("client.transport.sniff",true)
-                .put("cluster.name", "sns-api").build();
-        TransportClient client=TransportClient.builder().settings(settings).build()
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.11"), 9300))
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.12"), 9300))
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.13"), 9300));
+//
+    private  static  TransportClient client;
+
+
+    public List<ErrorLog> queryErrorLogs(SearchResponse searchResponse) throws UnknownHostException {
+
 
         List<ErrorLog> errorLogsList=new ArrayList<ErrorLog>();
-        SearchResponse searchResponse=client.prepareSearch(indexName).setTypes("logs")
-                .setQuery(queryBuilder)
-                .execute()
-                .actionGet();
+
         SearchHits hits=searchResponse.getHits();
         System.out.println("查询到记录"+hits.getTotalHits());
         SearchHit[] searchHits=hits.getHits();
@@ -66,11 +59,26 @@ public class SnsEsQuery {
         String indexName="logstash_snsweb-2017.03.16";
         String type="logs";
         QueryBuilder queryBuilder= QueryBuilders.boolQuery().must(QueryBuilders.termQuery("module","sns_cc_dm"));
-        List<ErrorLog> errorLogs=snsEsQuery.queryErrorLogs(queryBuilder,indexName,type);
-        if (errorLogs==null){
-            System.out.println("xx");
-            return;
-        }
+        SearchResponse searchResponse=client.prepareSearch(indexName).setTypes("logs")
+                .setQuery(queryBuilder)
+                .execute()
+                .actionGet();
+
+        List<ErrorLog> errorLogs = snsEsQuery.queryErrorLogs(searchResponse);
         System.out.println("------"+errorLogs);
+    }
+
+    public   TransportClient getClient() throws UnknownHostException {
+        if (null==client){
+        Settings settings = Settings.builder()
+                .put("client.transport.sniff", true)
+                .put("cluster.name", "sns-api").build();
+        client = TransportClient.builder().settings(settings).build()
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.11"), 9300))
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.12"), 9300))
+                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("10.10.9.13"), 9300));
+        }
+        return client;
+
     }
 }

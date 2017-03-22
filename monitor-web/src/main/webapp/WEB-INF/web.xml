@@ -2,9 +2,9 @@
 <web-app>
     <display-name>SNS-MONITOR-WEB</display-name>
 
-    <listener>
-        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-    </listener>
+    <!--<listener>-->
+        <!--<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>-->
+    <!--</listener>-->
 
     <!--spring 文件配置-->
     <listener>

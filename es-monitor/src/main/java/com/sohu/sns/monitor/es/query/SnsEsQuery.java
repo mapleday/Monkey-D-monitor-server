@@ -2,6 +2,8 @@ package com.sohu.sns.monitor.es.query;
 
 import com.sohu.sns.monitor.es.config.EsBeanConfig;
 import com.sohu.sns.monitor.es.module.ErrorLog;
+import io.searchbox.core.search.facet.Facet;
+import io.searchbox.core.search.facet.TermsFacet;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
@@ -10,13 +12,20 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by yw on 2017/3/16.
@@ -56,16 +65,29 @@ public class SnsEsQuery {
 
     public static void main(String[] args) throws UnknownHostException {
         SnsEsQuery snsEsQuery=new SnsEsQuery();
-        String indexName="logstash_snsweb-2017.03.16";
+        String indexName="logstash_snsweb-2017.03.20";
         String type="logs";
-        QueryBuilder queryBuilder= QueryBuilders.boolQuery().must(QueryBuilders.termQuery("module","sns_cc_dm"));
+//        QueryBuilder queryBuilder= QueryBuilders.boolQuery().must(QueryBuilders.termQuery("module","sns_cc_dm"));
+
+        client=snsEsQuery.getClient();
+
+        TermsBuilder appIdTermsBuilder= AggregationBuilders.terms("appIdAgg").field("appId").size(0);
         SearchResponse searchResponse=client.prepareSearch(indexName).setTypes("logs")
-                .setQuery(queryBuilder)
+                .addAggregation(appIdTermsBuilder)
                 .execute()
                 .actionGet();
+        Map<String,Aggregation> appMap=searchResponse.getAggregations().asMap();
+        StringTerms appIds=(StringTerms)appMap.get("appIdAgg");
+        Iterator<Terms.Bucket> appIdsBucketIt=appIds.getBuckets().iterator();
+        int count=0;
+        while (appIdsBucketIt.hasNext()){
+            Terms.Bucket appIdBucket=appIdsBucketIt.next();
+            System.out.println(appIdBucket.getKeyAsString()+"----"+appIdBucket.getDocCount());
+            count++;
 
-        List<ErrorLog> errorLogs = snsEsQuery.queryErrorLogs(searchResponse);
-        System.out.println("------"+errorLogs);
+        }
+
+        System.out.println(count);
     }
 
     public   TransportClient getClient() throws UnknownHostException {
@@ -81,4 +103,5 @@ public class SnsEsQuery {
         return client;
 
     }
+
 }

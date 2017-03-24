@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:overflow="http://java.sun.com/xml/ns/persistence/orm"
+      xmlns:white-space="http://www.w3.org/1999/xhtml" xmlns:word-break="http://www.w3.org/1999/xhtml"
+      xmlns:text-overflow="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>ErrorLogs</title>
+    <link rel="stylesheet" href="resources/css/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/editor.dataTables.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="resources/css/Editor-1.6.1/css/select.dataTables.min.css">
+
+
+
+</head>
+<body>
+<div style="text-align: center">
+    <h3 >ErrorLogStat</h3>
+</div>
+
+
+<!--<table id="example" class="display dataTable" style="table-layout: fixed;word-break:keep-all;overflow: scroll" >-->
+    <table id="example" class="table table-bordered table-striped table-hover">
+    <thead>
+    <tr>
+        <td>appId</td>
+        <td>今日错误次数</td>
+        <td>错误通知阀值</td>
+    </tr>
+    </thead>
+</table>
+
+
+<!--editor js-->
+
+<script  src="resources/js/jquery/jquery-1.12.4.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/jquery.dataTables.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.buttons.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.select.min.js"></script>
+<script  src="resources/js/Editor-1.6.1/js/dataTables.editor.min.js"></script>
+
+
+
+<script type="text/javascript">
+    // use a global for the submit and return data rendering in the examples
+    var editor;
+
+    $(document).ready(function() {
+        editor = new $.fn.dataTable.Editor( {
+            ajax: {
+                create:{
+                    type:'POST',
+                    url: 'createPerson',
+                    data:function (data) {
+
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+//                              result.id=i;
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                },
+                edit:{
+                    type:'POST',
+                    url: 'updatePerson',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                },
+                remove:{
+                    type:'POST',
+                    url: 'deletePerson',
+                    data:function(data){
+                        var result={};
+                        for (var i in data.data){
+                            var result=data.data[i];
+                            result.action=data.action;
+                        }
+                        console.log(result);
+                        return result;
+                    }
+                }},
+                table: "#example",
+                idSrc: "appId",
+                fields: [
+                    {
+                        label: "appId:",
+                        name: "appId",
+                        type: "readonly"
+                    },
+                    {
+                        label: "错误次数:",
+                        name: "errorCount",
+                        type: "readonly"
+                    },
+                    {
+                        label: "微信通知阀值:",
+                        name: "threshold"
+                    }
+                ]
+            });
+
+
+        $('#example').DataTable( {
+            dom: "Bfrtip",
+            ajax: "getErrorLogStats",
+            autoWidth: false,
+            columns: [
+                { data: "appId" } ,
+                { data: "errorCount"},
+                { data: "threshold" }
+            ],
+            select: true,
+            buttons:
+                [{ extend: "create", editor: editor},
+                { extend: "edit",   editor: editor },
+                { extend: "remove", editor: editor }]
+
+        } );
+    } );
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sohu.sns.monitor.common.dao.errorLogStat.ErrorLogStatDao">
+    <cache flushInterval="300"/>
+    
+    <select id="getAllErrorLogStats" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
+        SELECT * FROM sns_web_errorlogstat
+    </select>
+    
+    <update id="updateErrorLogStat" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat">
+        UPDATE sns_web_errorlogstat
+        <set>
+            <if test="threshold!=null">threshold=#{threshold}</if>
+        </set>
+        Where appId=#{appId}
+    </update>
+
+</mapper>

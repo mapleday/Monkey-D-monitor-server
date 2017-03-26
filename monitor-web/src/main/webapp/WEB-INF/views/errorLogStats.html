@@ -25,6 +25,9 @@
     <thead>
     <tr>
         <td>appId</td>
+        <td>instanceId</td>
+        <td>appName</td>
+        <td>appDeveloper</td>
         <td>今日错误次数</td>
         <td>错误通知阀值</td>
     </tr>
@@ -99,6 +102,21 @@
                         type: "readonly"
                     },
                     {
+                        label: "instanceId:",
+                        name: "instanceId",
+                        type: "readonly"
+                    }
+                    ,
+                    {
+                        label: "appName:",
+                        name: "appName",
+                        type: "readonly"
+                    },
+                    {
+                        label: "appDeveloper:",
+                        name: "appDeveloper",
+                        type: "readonly"
+                    },{
                         label: "错误次数:",
                         name: "errorCount",
                         type: "readonly"
@@ -117,6 +135,9 @@
             autoWidth: false,
             columns: [
                 { data: "appId" } ,
+                { data: "instanceId" } ,
+                { data: "appName" } ,
+                { data: "appDeveloper" } ,
                 { data: "errorCount"},
                 { data: "threshold" }
             ],

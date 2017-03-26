@@ -1,6 +1,8 @@
 package com.sohu.sns.monitor.web.controler;
 
+import com.sohu.sns.monitor.common.module.AppInfo;
 import com.sohu.sns.monitor.common.module.ErrorLogStat;
+import com.sohu.sns.monitor.common.services.AppInfoService;
 import com.sohu.sns.monitor.common.services.ErrorLogStatService;
 import com.sohu.sns.monitor.es.query.SnsEsQuery;
 
@@ -31,60 +33,89 @@ public class ErrorLogStatController {
     @Autowired
     private ErrorLogStatService errorLogStatService;
 
+    @Autowired
+    private AppInfoService appInfoService;
+
+    private String startISOTime = "", currentISOTime = "", today = "";
+
     @RequestMapping("/errorLogStats")
-    public String ErrorLogStat(){
+    public String ErrorLogStat() {
         return "errorLogStats";
     }
 
     @RequestMapping("/getErrorLogStats")
     @ResponseBody
-    public Map<String,Object> getErrorLogStat() throws UnknownHostException {
-        Map map=new HashMap<String,Object>();
-        List<ErrorLogStat> errStatList=new ArrayList<ErrorLogStat>();
-        SnsEsQuery snsEsQuery=new SnsEsQuery();
+    public Map<String, Object> getErrorLogStat() throws UnknownHostException {
+        Map map = new HashMap<String, Object>();
+        List<ErrorLogStat> errStatList = new ArrayList<ErrorLogStat>();
+        SnsEsQuery snsEsQuery = new SnsEsQuery();
+        //查询今天凌晨到现在的结果
+        Client client = snsEsQuery.getClient();
+        //获取本地ISO格式时间
+        setISOTime();
+        String indexName = "logstash_snsweb-" + today;
+        String type = "logs";
 
-
-        //查询最近2小时结果
-        Client client=snsEsQuery.getClient();
-
-        Date now=new Date();
-        String IOSTimepattern="yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-        String dayPattern="yyyy.MM.dd";
-        String today=DateFormatUtils.format(now,dayPattern);
-        String indexName="logstash_snsweb-"+today;
-        String type="logs";
-        String currentISOTime=DateFormatUtils.format(now.getTime()-60*60*1000*8,IOSTimepattern);
-        String startISOTime=DateFormatUtils.format(new Date(now.getTime()-60*60*1000*8-60*60*1000*2),IOSTimepattern);
-        TermsBuilder appIdTermsBuilder=AggregationBuilders.terms("appIdAgg").field("appId")
-                        .size(0);
-        QueryBuilder filterQuery=QueryBuilders
-                        .rangeQuery("@timestamp")
-                        .gte(startISOTime)
-                        .lte(currentISOTime);
-        SearchResponse searchResponse=client.prepareSearch(indexName).setTypes(type)
+        TermsBuilder appIdTermsBuilder = AggregationBuilders.terms("appIdAgg").field("appId")
+                .size(0);
+        QueryBuilder filterQuery = QueryBuilders
+                .rangeQuery("@timestamp")
+                .gte(startISOTime)
+                .lte(currentISOTime);
+        SearchResponse searchResponse = client.prepareSearch(indexName).setTypes(type)
                 .setQuery(filterQuery)
                 .addAggregation(appIdTermsBuilder)
                 .execute()
                 .actionGet();
-        Map<String,Aggregation> appMap=searchResponse.getAggregations().asMap();
-        StringTerms appIds=(StringTerms)appMap.get("appIdAgg");
-        Iterator<Terms.Bucket> appIdsBucketIt=appIds.getBuckets().iterator();
-        while (appIdsBucketIt.hasNext()){
-            ErrorLogStat errorLogStat=new ErrorLogStat();
-            Terms.Bucket appIdBucket=appIdsBucketIt.next();
-            errorLogStat.setErrorCount((int)appIdBucket.getDocCount());
-            errorLogStat.setAppId(appIdBucket.getKeyAsString());
-            errStatList.add(errorLogStat);
-            System.out.println(appIdBucket.getKeyAsString()+"----"+appIdBucket.getDocCount());
-        }
-        map.put("data",errStatList);
-        System.out.println(errStatList.get(0));
+        Map<String, Aggregation> appMap = searchResponse.getAggregations().asMap();
+        StringTerms appIds = (StringTerms) appMap.get("appIdAgg");
+        Iterator<Terms.Bucket> appIdsBucketIt = appIds.getBuckets().iterator();
+        setErrorLogStat(errStatList, appIdsBucketIt);
+        map.put("data", errStatList);
         return map;
     }
 
     @RequestMapping("/updateErrorLogStat")
     @ResponseBody
-    public void updateErrorLogStat(ErrorLogStat errorLogStat){
+    public void updateErrorLogStat(ErrorLogStat errorLogStat) {
         errorLogStatService.updatErrorLogStat(errorLogStat);
     }
+
+    public void setErrorLogStat(List<ErrorLogStat> errStatList, Iterator<Terms.Bucket> appIdsBucketIt) {
+        while (appIdsBucketIt.hasNext()) {
+            ErrorLogStat errorLogStat = new ErrorLogStat();
+            Terms.Bucket appIdBucket = appIdsBucketIt.next();
+            String appInfo = appIdBucket.getKeyAsString();
+            String appIdInstanceInfo[] = appInfo.replace("\"", "").split("_");
+            if (appIdInstanceInfo.length > 1) {
+                errorLogStat.setInstanceId(appIdInstanceInfo[1]);
+            }
+            errorLogStat.setAppId(appIdInstanceInfo[0]);
+            errorLogStat.setErrorCount((int) appIdBucket.getDocCount());
+            List<AppInfo> appInfoList = appInfoService.getAppInfo(appIdInstanceInfo[0]);
+            if (!appInfoList.isEmpty()) {
+                errorLogStat.setAppName(appInfoList.get(0).getAppName());
+                errorLogStat.setAppDeveloper(appInfoList.get(0).getAppDeveloper());
+            }
+            errStatList.add(errorLogStat);
+        }
+    }
+
+    public void setISOTime() {
+        Calendar todayStartTime = Calendar.getInstance();
+        Date now = todayStartTime.getTime();
+        todayStartTime.set(Calendar.HOUR_OF_DAY, 0);
+        todayStartTime.set(Calendar.MINUTE, 0);
+        todayStartTime.set(Calendar.SECOND, 0);
+        todayStartTime.set(Calendar.MILLISECOND, 0);
+        Date start = todayStartTime.getTime();
+        String IOSTimepattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+        String dayPattern = "yyyy.MM.dd";
+        currentISOTime = DateFormatUtils.format(now.getTime() - 60 * 60 * 1000 * 8, IOSTimepattern);
+        startISOTime = DateFormatUtils.format(start.getTime() - 60 * 60 * 1000 * 8, IOSTimepattern);
+        today = DateFormatUtils.format(now, dayPattern);
+
+    }
+
+
 }

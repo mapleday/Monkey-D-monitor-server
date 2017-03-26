@@ -9,6 +9,9 @@ public class ErrorLogStat implements Serializable {
     private String appId;
     private Integer errorCount;
     private Integer threshold ;
+    private String instanceId;
+    private String appName;
+    private String appDeveloper;
 
     public String getAppId() {
         return appId;
@@ -32,5 +35,41 @@ public class ErrorLogStat implements Serializable {
 
     public void setThreshold(Integer threshold) {
         this.threshold = threshold;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public String getAppName() {
+        return appName;
+    }
+
+    public void setAppName(String appName) {
+        this.appName = appName;
+    }
+
+    public String getAppDeveloper() {
+        return appDeveloper;
+    }
+
+    public void setAppDeveloper(String appDeveloper) {
+        this.appDeveloper = appDeveloper;
+    }
+
+    @Override
+    public String toString() {
+        return "ErrorLogStat{" +
+                "appId='" + appId + '\'' +
+                ", errorCount=" + errorCount +
+                ", threshold=" + threshold +
+                ", instanceId='" + instanceId + '\'' +
+                ", appName='" + appName + '\'' +
+                ", appDeveloper='" + appDeveloper + '\'' +
+                '}';
     }
 }

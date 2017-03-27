@@ -10,8 +10,13 @@ import java.util.List;
  */
 @Repository
 public interface ErrorLogStatDao {
-    public List<ErrorLogStat> getAllErrorLogStats();
+    public List<ErrorLogStat> getErrorLogStats();
+    public List<ErrorLogStat> getErrorLogStatById(ErrorLogStat errorLogStat);
+    public List<ErrorLogStat> existNullAppId(ErrorLogStat errorLogStat);
     public void updateErrorLogStat(ErrorLogStat errorLogStat);
+    public void insertErrorLogStat(ErrorLogStat errorLogStat);
+
+
 
 
 }

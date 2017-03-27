@@ -11,5 +11,4 @@ import java.util.List;
 @Repository
 public interface AppInfoDao {
     public List<AppInfo> getAppInfo(String appId);
-
 }

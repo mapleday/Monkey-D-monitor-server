@@ -2,17 +2,52 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.sohu.sns.monitor.common.dao.errorLogStat.ErrorLogStatDao">
     <cache flushInterval="300"/>
-    
-    <select id="getAllErrorLogStats" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
+    <insert id="insertErrorLogStat" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat">
+        INSERT INTO sns_web_errorlogstat
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="appId!=null">appId,</if>
+            <if test="errorCount!=null">errorCount,</if>
+            <if test="threshold!=null">threshold,</if>
+            <if test="instanceId!=null">instanceId,</if>
+            <if test="appName!=null">appName,</if>
+            <if test="appDeveloper!=null">appDeveloper</if>
+        </trim>
+        VALUES
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="appId!=null">#{appId},</if>
+            <if test="errorCount!=null">#{errorCount},</if>
+            <if test="threshold!=null">#{threshold},</if>
+            <if test="instanceId!=null">#{instanceId},</if>
+            <if test="appName!=null">#{appName},</if>
+            <if test="appDeveloper!=null">#{appDeveloper}</if>
+        </trim>
+    </insert>
+
+    <select id="getErrorLogStats" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
         SELECT * FROM sns_web_errorlogstat
     </select>
+    <select id="getErrorLogStatById" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
+        SELECT * FROM sns_web_errorlogstat
+        WHERE appId=#{appId} and instanceId = #{instanceId}
+    </select>
     
+
+    <select id="existNullAppId" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
+        SELECT * FROM sns_web_errorlogstat
+        WHERE appId=#{appId} and instanceId is null
+    </select>
+
     <update id="updateErrorLogStat" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat">
         UPDATE sns_web_errorlogstat
         <set>
+            <if test="appId!=null">appId=#{appId},</if>
+            <if test="instanceId!=null">instanceId=#{instanceId},</if>
+            <if test="appName!=null">appName=#{appName},</if>
+            <if test="appDeveloper!=null">appDeveloper=#{appDeveloper},</if>
+            <if test="errorCount!=null">errorCount=#{errorCount},</if>
             <if test="threshold!=null">threshold=#{threshold}</if>
         </set>
-        Where appId=#{appId}
+        Where appId=#{appId} and instanceId=#{instanceId}
     </update>
 
 </mapper>

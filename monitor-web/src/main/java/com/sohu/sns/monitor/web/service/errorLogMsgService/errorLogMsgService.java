@@ -18,7 +18,7 @@ public class errorLogMsgService {
         return errMsgInfo;
     }
 
-    public void  sendMsg(){
-        
-    }
+
+
+
 }

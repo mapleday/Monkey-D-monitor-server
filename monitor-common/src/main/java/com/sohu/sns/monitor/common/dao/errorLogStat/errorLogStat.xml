@@ -26,17 +26,12 @@
     <select id="getErrorLogStats" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
         SELECT * FROM sns_web_errorlogstat
     </select>
+
     <select id="getErrorLogStatById" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
         SELECT * FROM sns_web_errorlogstat
         WHERE appId=#{appId} and instanceId = #{instanceId}
     </select>
     
-
-    <select id="existNullAppId" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat" resultType="com.sohu.sns.monitor.common.module.ErrorLogStat">
-        SELECT * FROM sns_web_errorlogstat
-        WHERE appId=#{appId} and instanceId is null
-    </select>
-
     <update id="updateErrorLogStat" parameterType="com.sohu.sns.monitor.common.module.ErrorLogStat">
         UPDATE sns_web_errorlogstat
         <set>

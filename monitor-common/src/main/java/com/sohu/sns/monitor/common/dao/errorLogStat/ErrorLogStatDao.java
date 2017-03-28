@@ -12,7 +12,6 @@ import java.util.List;
 public interface ErrorLogStatDao {
     public List<ErrorLogStat> getErrorLogStats();
     public List<ErrorLogStat> getErrorLogStatById(ErrorLogStat errorLogStat);
-    public List<ErrorLogStat> existNullAppId(ErrorLogStat errorLogStat);
     public void updateErrorLogStat(ErrorLogStat errorLogStat);
     public void insertErrorLogStat(ErrorLogStat errorLogStat);
 

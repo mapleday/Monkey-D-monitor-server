@@ -62,14 +62,14 @@ public class ErrorLogStatService {
             //写入数据库
             List<ErrorLogStat> result=null;
             String instanceId=errorLogStat.getInstanceId();
-            //处理appId为0的情况
+            //处理appId为空的情况
             if (instanceId==null)
             {
-                result=errorLogStatDao.existNullAppId(errorLogStat);
+                errorLogStat.setAppId("null");
+                errorLogStat.setAppName("null");
+                errorLogStat.setInstanceId("null");
             }
-            else {
-                result=errorLogStatDao.getErrorLogStatById(errorLogStat);
-            }
+            result=errorLogStatDao.getErrorLogStatById(errorLogStat);
             //执行数据库操作
             if (!result.isEmpty())
             {

@@ -4,14 +4,13 @@ import com.sohu.sns.monitor.common.dao.errorLogStat.ErrorLogStatDao;
 import com.sohu.sns.monitor.common.module.AppInfo;
 import com.sohu.sns.monitor.common.module.ErrorLogStat;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by yw on 2017/3/23.
@@ -21,7 +20,7 @@ public class ErrorLogStatService {
     @Autowired
     private ErrorLogStatDao errorLogStatDao;
 
-    public void updatErrorLogStat(ErrorLogStat errorLogStat){
+    public void updateErrorLogStat(ErrorLogStat errorLogStat){
         errorLogStatDao.updateErrorLogStat(errorLogStat);
     }
 
@@ -58,6 +57,16 @@ public class ErrorLogStatService {
                 errorLogStat.setAppName(appInfoList.get(0).getAppName());
                 errorLogStat.setAppDeveloper(appInfoList.get(0).getAppDeveloper());
             }
+//            获取exception桶
+            Map<String, Aggregation> exceptionMap=appIdBucket.getAggregations().asMap();
+            StringTerms exceptions=(StringTerms) exceptionMap.get("exception_stat");
+            List<Terms.Bucket> buckets=exceptions.getBuckets();
+            StringBuilder str=new StringBuilder();
+            for (Terms.Bucket bucket:buckets){
+                str.append(bucket.getKey()+"(").append(bucket.getDocCount()+")\n");
+            }
+            System.out.print(str);
+            errorLogStat.setExceptionName(str.toString());
             errStatList.add(errorLogStat);
             //写入数据库
             List<ErrorLogStat> result=null;

@@ -10,7 +10,8 @@
             <if test="threshold!=null">threshold,</if>
             <if test="instanceId!=null">instanceId,</if>
             <if test="appName!=null">appName,</if>
-            <if test="appDeveloper!=null">appDeveloper</if>
+            <if test="appDeveloper!=null">appDeveloper,</if>
+            <if test="exceptionName!=null">exceptionName</if>
         </trim>
         VALUES
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -19,7 +20,8 @@
             <if test="threshold!=null">#{threshold},</if>
             <if test="instanceId!=null">#{instanceId},</if>
             <if test="appName!=null">#{appName},</if>
-            <if test="appDeveloper!=null">#{appDeveloper}</if>
+            <if test="appDeveloper!=null">#{appDeveloper},</if>
+            <if test="exceptionName!=null">#{exceptionName}</if>
         </trim>
     </insert>
 
@@ -40,7 +42,8 @@
             <if test="appName!=null">appName=#{appName},</if>
             <if test="appDeveloper!=null">appDeveloper=#{appDeveloper},</if>
             <if test="errorCount!=null">errorCount=#{errorCount},</if>
-            <if test="threshold!=null">threshold=#{threshold}</if>
+            <if test="threshold!=null">threshold=#{threshold},</if>
+            <if test="exceptionName!=null">exceptionName=#{exceptionName}</if>
         </set>
         Where appId=#{appId} and instanceId=#{instanceId}
     </update>

@@ -29,6 +29,7 @@
         <td>appName</td>
         <td>appDeveloper</td>
         <td>今日错误次数</td>
+        <td>错误名称</td>
         <td>错误通知阀值</td>
     </tr>
     </thead>
@@ -69,7 +70,7 @@
                 },
                 edit:{
                     type:'POST',
-                    url: 'updatePerson',
+                    url: 'updateErrorLogStat',
                     data:function(data){
                         var result={};
                         for (var i in data.data){
@@ -105,8 +106,7 @@
                         label: "instanceId:",
                         name: "instanceId",
                         type: "readonly"
-                    }
-                    ,
+                    },
                     {
                         label: "appName:",
                         name: "appName",
@@ -119,6 +119,11 @@
                     },{
                         label: "错误次数:",
                         name: "errorCount",
+                        type: "readonly"
+                    },
+                    {
+                        label: "错误名称:",
+                        name: "exceptionName",
                         type: "readonly"
                     },
                     {
@@ -139,13 +144,13 @@
                 { data: "appName" } ,
                 { data: "appDeveloper" } ,
                 { data: "errorCount"},
+                { data: "exceptionName"},
                 { data: "threshold" }
             ],
             select: true,
             buttons:
-                [{ extend: "create", editor: editor},
-                { extend: "edit",   editor: editor },
-                { extend: "remove", editor: editor }]
+                [
+                { extend: "edit",   editor: editor }]
 
         } );
     } );

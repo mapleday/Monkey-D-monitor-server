@@ -1,12 +1,9 @@
 package com.sohu.sns.monitor.web.controler;
 
-import com.sohu.sns.monitor.common.module.AppInfo;
 import com.sohu.sns.monitor.common.module.ErrorLogStat;
 import com.sohu.sns.monitor.common.services.AppInfoService;
 import com.sohu.sns.monitor.common.services.ErrorLogStatService;
 import com.sohu.sns.monitor.es.query.SnsEsQuery;
-
-import org.apache.commons.lang.time.DateFormatUtils;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -60,7 +57,7 @@ public class ErrorLogStatController {
         String type = "logs";
         TermsBuilder appIdTermsBuilder = AggregationBuilders
                 .terms("appIdAgg").field("appId")
-                .size(0);
+                .size(0).subAggregation(AggregationBuilders.terms("exception_stat").field("exceptionName.raw").size(0));
         QueryBuilder filterQuery = QueryBuilders
                 .rangeQuery("@timestamp").gte(startISOTime)
                 .lte(currentISOTime);
@@ -77,8 +74,13 @@ public class ErrorLogStatController {
 
     @RequestMapping("/updateErrorLogStat")
     @ResponseBody
-    public void updateErrorLogStat(ErrorLogStat errorLogStat) {
-        errorLogStatService.updatErrorLogStat(errorLogStat);
+    public Map updateErrorLogStat(ErrorLogStat errorLogStat) {
+        errorLogStatService.updateErrorLogStat(errorLogStat);
+        Map<String,Object> map=new HashMap<String,Object>();
+        List<ErrorLogStat> list=new ArrayList<ErrorLogStat>();
+        list.add(errorLogStat);
+        map.put("data",list);
+        return map;
     }
 
 }

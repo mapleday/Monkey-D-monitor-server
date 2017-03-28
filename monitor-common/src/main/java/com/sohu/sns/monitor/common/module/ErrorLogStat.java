@@ -12,6 +12,7 @@ public class ErrorLogStat implements Serializable {
     private String instanceId;
     private String appName;
     private String appDeveloper;
+    private String exceptionName;
 
     public String getAppId() {
         return appId;
@@ -61,6 +62,14 @@ public class ErrorLogStat implements Serializable {
         this.appDeveloper = appDeveloper;
     }
 
+    public String getExceptionName() {
+        return exceptionName;
+    }
+
+    public void setExceptionName(String exceptionName) {
+        this.exceptionName = exceptionName;
+    }
+
     @Override
     public String toString() {
         return "ErrorLogStat{" +
@@ -70,6 +79,7 @@ public class ErrorLogStat implements Serializable {
                 ", instanceId='" + instanceId + '\'' +
                 ", appName='" + appName + '\'' +
                 ", appDeveloper='" + appDeveloper + '\'' +
+                ", exceptionName='" + exceptionName + '\'' +
                 '}';
     }
 }
